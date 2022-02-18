@@ -5,7 +5,7 @@ import main.Status;
 public class Task {
     private String name;
     private String description;
-    private int id;
+    private long id;
     private Status status;
 
     public Task(String taskName, String description) {
@@ -14,7 +14,7 @@ public class Task {
         status = Status.NEW;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 

@@ -152,8 +152,8 @@ public class ConsoleTest {
         print("EpicName: " + epic.getName() + " - id:" + epic.getId() + " - status: " + epic.getStatus());
         print(epic.getName() + " sub tasks:");
 
-        for (SubTask subTask : epic.getSubTasks()) {
-            printSubTask(subTask);
+        for (Task task : epic.getSubTasks()) {
+            printSubTask((SubTask) task);
         }
     }
 
