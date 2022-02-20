@@ -7,6 +7,7 @@ import main.tasks.SubTask;
 import main.tasks.Task;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * !! WARNING !!
@@ -24,18 +25,18 @@ public class ConsoleTest {
 
     public ConsoleTest(Manager manager) {
         this.manager = manager;
-        task1 = new Task("Task1", "First action");
-        task2 = new Task("Task2", "Second Action");
-        subTask1 = new SubTask("SubTask1", "First SubTask - First Epic");
-        subTask2 = new SubTask("SubTask2", "Second SubTask - First Epic");
-        subTask3 = new SubTask("SubTask3", "First subTask - second Epic");
+        task1 = new Task("Task1", "First action", manager);
+        task2 = new Task("Task2", "Second Action", manager);
+        subTask1 = new SubTask("SubTask1", "First SubTask - First Epic", manager);
+        subTask2 = new SubTask("SubTask2", "Second SubTask - First Epic", manager);
+        subTask3 = new SubTask("SubTask3", "First subTask - second Epic", manager);
 
-        ArrayList<SubTask> firstEpicSubTasks = new ArrayList<>();
+        List<SubTask> firstEpicSubTasks = new ArrayList<>();
         firstEpicSubTasks.add(subTask1);
         firstEpicSubTasks.add(subTask2);
 
-        epic1 = new Epic("Epic1", "Several First Epic SubTasks", firstEpicSubTasks);
-        epic2 = new Epic("Epic2", "The only Second Epic SubTask!");
+        epic1 = new Epic("Epic1", "Several First Epic SubTasks", firstEpicSubTasks, manager);
+        epic2 = new Epic("Epic2", "The only Second Epic SubTask!", manager);
 
         epic2.addSubTask(subTask3);
     }
@@ -90,16 +91,16 @@ public class ConsoleTest {
      */
     private void updateTasks() {
         printUpdateWarning();
-        Task updatedTask1 = new Task("updatedTask1", "Update firstAction");
-        Task updatedTask2 = new Task("updatedTask2", "Update secondAction");
+        Task updatedTask1 = new Task("updatedTask1", "Update firstAction", manager);
+        Task updatedTask2 = new Task("updatedTask2", "Update secondAction", manager);
         updatedTask1.setId(1);
         updatedTask2.setId(2);
         updatedTask1.setStatus(Status.IN_PROGRESS);
         updatedTask2.setStatus(Status.DONE);
 
-        SubTask updatedSubTask1 = new SubTask("updatedSubTask1", "updatedSubTask1 - Epic1");
-        SubTask updatedSubTask2 = new SubTask("updatedSubTask2", "updatedSubTask2 - Epic1");
-        SubTask updatedSubTask3 = new SubTask("updatedSubTask3", "updatedSubTask3 - Epic2");
+        SubTask updatedSubTask1 = new SubTask("updatedSubTask1", "updatedSubTask1 - Epic1", manager);
+        SubTask updatedSubTask2 = new SubTask("updatedSubTask2", "updatedSubTask2 - Epic1", manager);
+        SubTask updatedSubTask3 = new SubTask("updatedSubTask3", "updatedSubTask3 - Epic2", manager);
         updatedSubTask1.setId(3);
         updatedSubTask2.setId(4);
         updatedSubTask3.setId(5);
@@ -107,14 +108,14 @@ public class ConsoleTest {
         updatedSubTask2.setStatus(Status.DONE);
         updatedSubTask3.setStatus(Status.DONE);
 
-        ArrayList<SubTask> firstEpicUpdatedSubTasks = new ArrayList<>();
-        firstEpicUpdatedSubTasks.add(updatedSubTask1);
-        firstEpicUpdatedSubTasks.add(updatedSubTask2);
+        List<SubTask> epic1UpdatedSubTasks = new ArrayList<>();
+        epic1UpdatedSubTasks.add(updatedSubTask1);
+        epic1UpdatedSubTasks.add(updatedSubTask2);
 
         Epic updatedEpic1 = new Epic("updatedEpic1", "Several updated First Epic SubTasks",
-                firstEpicUpdatedSubTasks);
+                epic1UpdatedSubTasks, manager);
 
-        Epic updatedEpic2 = new Epic("updatedEpic2", "The only updated Second Epic SubTask!");
+        Epic updatedEpic2 = new Epic("updatedEpic2", "The only updated Second Epic SubTask!", manager);
         updatedEpic2.addSubTask(updatedSubTask3);
 
         updatedEpic1.setId(6);
@@ -152,8 +153,8 @@ public class ConsoleTest {
         print("EpicName: " + epic.getName() + " - id:" + epic.getId() + " - status: " + epic.getStatus());
         print(epic.getName() + " sub tasks:");
 
-        for (Task task : epic.getSubTasks()) {
-            printSubTask((SubTask) task);
+        for (SubTask subTask : epic.getSubTasks()) {
+            printSubTask(subTask);
         }
     }
 

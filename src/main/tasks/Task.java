@@ -1,16 +1,21 @@
 package main.tasks;
 
+import main.Manager;
 import main.Status;
 
+/**
+ * Basic "task" type
+ */
 public class Task {
     private String name;
     private String description;
     private long id;
     private Status status;
 
-    public Task(String taskName, String description) {
-        this.name = taskName;
+    public Task(String name, String description, Manager manager) {
+        this.name = name;
         this.description = description;
+        id = manager.assignId();
         status = Status.NEW;
     }
 
@@ -18,16 +23,16 @@ public class Task {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
     }
 
     public Status getStatus() {
         return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public String getName() {

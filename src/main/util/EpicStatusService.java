@@ -2,25 +2,25 @@ package main.util;
 
 import main.Status;
 import main.tasks.Epic;
-import main.tasks.Task;
+import main.tasks.SubTask;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class EpicStatusService {
 
     public Status calculateStatus(Epic epic) {
         boolean done = true;
         boolean brandNew = true;
-        ArrayList<Task> subTasks = epic.getSubTasks();
+        List<SubTask> subTasks = epic.getSubTasks();
 
         if (!subTasks.isEmpty()) {
 
-            for (Task task : subTasks) {
-                if (brandNew && task.getStatus() != Status.NEW) {
+            for (SubTask subTask : subTasks) {
+                if (brandNew && subTask.getStatus() != Status.NEW) {
                     brandNew = false;
                 }
 
-                if (done && task.getStatus() != Status.DONE) {
+                if (done && subTask.getStatus() != Status.DONE) {
                     done = false;
                 }
             }

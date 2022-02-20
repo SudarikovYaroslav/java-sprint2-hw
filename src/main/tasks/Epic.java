@@ -1,20 +1,23 @@
 package main.tasks;
 
+import main.Manager;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class Epic extends Task {
-    private final ArrayList<Task> subTasks = new ArrayList<>();
+    private final List<SubTask> subTasks = new ArrayList<>();
 
-    public Epic(String taskName, String description, ArrayList<SubTask> subTasks) {
-        super(taskName, description);
+    public Epic(String name, String description, List<SubTask> subTasks, Manager manager) {
+        super(name, description, manager);
         addSubTasks(subTasks);
     }
 
-    public Epic(String taskName, String description) {
-        super(taskName, description);
+    public Epic(String name, String description, Manager manager) {
+        super(name, description, manager);
     }
 
-    public ArrayList<Task> getSubTasks() {
+    public List<SubTask> getSubTasks() {
         return subTasks;
     }
 
@@ -27,12 +30,12 @@ public class Epic extends Task {
         subTasks.removeIf(subTask -> subTask.getId() == id);
     }
 
-    public void addSubTasks(ArrayList<SubTask> subTasks) {
+    public void addSubTasks(List<SubTask> subTasks) {
         linkWithSubTasks(subTasks);
         this.subTasks.addAll(subTasks);
     }
 
-    private void linkWithSubTasks(ArrayList<SubTask> subTasks) {
+    private void linkWithSubTasks(List<SubTask> subTasks) {
         for (SubTask subTask : subTasks) {
             subTask.setEpic(this);
         }
