@@ -12,10 +12,10 @@ public class Task {
     private long id;
     private Status status;
 
-    public Task(String name, String description, Manager manager) {
+    public Task(String name, String description, long id) {
         this.name = name;
         this.description = description;
-        id = manager.assignId();
+        this.id = id;
         status = Status.NEW;
     }
 

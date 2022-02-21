@@ -5,8 +5,8 @@ import main.Manager;
 public class SubTask extends Task {
     private Epic epic;
 
-    public SubTask(String name, String description, Manager manager) {
-        super(name, description, manager);
+    public SubTask(String name, String description, long id) {
+        super(name, description, id);
     }
 
     public Epic getEpic() {

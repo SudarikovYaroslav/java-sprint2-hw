@@ -122,7 +122,7 @@ public class Manager {
         return epic.getSubTasks();
     }
 
-    public long assignId() {
+    public long generatedId() {
         return id++;
     }
 }

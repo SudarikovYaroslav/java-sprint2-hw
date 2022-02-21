@@ -29,12 +29,8 @@ public class EpicStatusService {
             done = false;
         }
 
-        if (done) {
-            return Status.DONE;
-        } else if (brandNew) {
-            return Status.NEW;
-        } else {
-            return Status.IN_PROGRESS;
-        }
+        if (done) return Status.DONE;
+        if (brandNew) return Status.NEW;
+        return Status.IN_PROGRESS;
     }
 }
