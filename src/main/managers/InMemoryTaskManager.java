@@ -1,6 +1,5 @@
 package main.managers;
 
-import main.managers.TaskManager;
 import main.tasks.Epic;
 import main.tasks.SubTask;
 import main.tasks.Task;
@@ -158,6 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
     /**
      * As a result returns last 10 requests different types of tasks by id
      */
+    @Override
     public List<Task> history() {
         return historyList;
     }

@@ -1,4 +1,4 @@
-package main.test;
+package main.tests;
 
 import main.managers.InMemoryTaskManager;
 import main.Status;
