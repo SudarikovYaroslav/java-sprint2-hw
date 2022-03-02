@@ -7,6 +7,7 @@ import main.tasks.Task;
 import java.util.List;
 
 public interface TaskManager {
+
     List<Task> getTasksList();
 
     List<Epic> getEpicsList();

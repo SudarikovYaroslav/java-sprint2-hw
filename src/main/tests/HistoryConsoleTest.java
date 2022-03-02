@@ -12,13 +12,13 @@ import java.util.Random;
 
 /**
  * WARNING!
- * This class should be used only for console tests of history() method
+ * This class should be used only for console tests of HistoryManager
  * There is only one public method run() for start testing
  */
 public class HistoryConsoleTest {
+    private static int counter = 0;
     private final TaskManager manager;
     private final List<Task> tasks;
-    private static int counter = 0;
 
     public HistoryConsoleTest() {
         manager = Managers.getDefault();
@@ -53,20 +53,20 @@ public class HistoryConsoleTest {
         Random random = new Random();
         int taskType = random.nextInt(3);
 
-        switch (taskType){
-            case 0 :
+        switch (taskType) {
+            case 0:
                 Task task = new Task("Task", "простая задача", manager.generatedId());
                 manager.createTask(task);
                 return task;
-            case 1 :
+            case 1:
                 Epic epic = new Epic("Epic", "сложная задача", manager.generatedId());
                 manager.createEpic(epic);
                 return epic;
-            case 2 :
+            case 2:
                 SubTask subTask = new SubTask("SubTask", "подзадача", manager.generatedId());
                 manager.createSubTask(subTask);
                 return subTask;
-            default :
+            default:
                 Task defaultTask = new Task("DefaultTask", "простая задача", manager.generatedId());
                 manager.createTask(defaultTask);
                 return defaultTask;
@@ -74,8 +74,9 @@ public class HistoryConsoleTest {
     }
 
     /**
-     * Because of each type of task in TaskManger have it's own method to get task type by id
-     * Method defines which concrete type of "Task" is variable task*/
+     * Because of each type of task in TaskManger should has it's own method to get task type by id
+     * Method defines which concrete type of "Task" is variable task
+     */
     private void callTaskById(Task task) {
         long id = task.getId();
         try {
@@ -136,7 +137,7 @@ public class HistoryConsoleTest {
         System.out.println(message);
     }
 
-    private void print(){
+    private void print() {
         print("\n");
     }
 }

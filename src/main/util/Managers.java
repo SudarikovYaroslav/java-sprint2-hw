@@ -1,5 +1,7 @@
 package main.util;
 
+import main.managers.HistoryManager;
+import main.managers.InMemoryHistoryManager;
 import main.managers.InMemoryTaskManager;
 import main.managers.TaskManager;
 
@@ -10,5 +12,9 @@ public class Managers {
      */
     public static TaskManager getDefault() {
         return new InMemoryTaskManager();
+    }
+
+    public static HistoryManager getDefaultHistory() {
+        return new InMemoryHistoryManager();
     }
 }

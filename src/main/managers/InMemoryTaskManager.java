@@ -4,6 +4,7 @@ import main.tasks.Epic;
 import main.tasks.SubTask;
 import main.tasks.Task;
 import main.util.EpicStatusService;
+import main.util.Managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,14 +15,14 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Long, Epic> epics;
     private final HashMap<Long, SubTask> subTasks;
     private final EpicStatusService epicStatusService;
-    private final List<Task> historyList;
+    private final HistoryManager historyManager;
     private long id;
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subTasks = new HashMap<>();
-        historyList = new ArrayList<>();
+        historyManager = Managers.getDefaultHistory();
         id = 1;
         epicStatusService = new EpicStatusService();
     }
@@ -59,21 +60,21 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task getTaskById(long id) {
         Task task = tasks.get(id);
-        if (task != null) addToTheHistoryList(task);
+        if (task != null) historyManager.add(task);
         return task;
     }
 
     @Override
     public Epic getEpicById(long id) {
         Epic epic = epics.get(id);
-        if (epic != null) addToTheHistoryList(epic);
+        if (epic != null) historyManager.add(epic);
         return epic;
     }
 
     @Override
     public SubTask getSubTaskById(long id) {
         SubTask subTask = subTasks.get(id);
-        if (subTask != null) addToTheHistoryList(subTask);
+        if (subTask != null) historyManager.add(subTask);
         return subTask;
     }
 
@@ -154,18 +155,8 @@ public class InMemoryTaskManager implements TaskManager {
         return id++;
     }
 
-    /**
-     * As a result returns last 10 requests different types of tasks by id
-     */
     @Override
     public List<Task> history() {
-        return historyList;
-    }
-
-    private void addToTheHistoryList(Task task) {
-        byte maxHistorySize = 10;
-        boolean full = historyList.size() >= maxHistorySize;
-        if (full) historyList.remove(0);
-        historyList.add(task);
+        return historyManager.getHistory();
     }
 }
