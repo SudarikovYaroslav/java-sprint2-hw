@@ -1,7 +1,5 @@
 package main.tasks;
 
-import main.Manager;
-
 public class SubTask extends Task {
     private Epic epic;
 

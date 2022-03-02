@@ -1,11 +1,12 @@
 package main;
 
+import main.managers.InMemoryTaskManager;
 import main.test.ConsoleTest;
 
 public class Main {
     public static void main(String[] args) {
-        Manager manager = new Manager();
-        ConsoleTest consoleTest = new ConsoleTest(manager);
+        InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager();
+        ConsoleTest consoleTest = new ConsoleTest(inMemoryTaskManager);
         consoleTest.runConsoleTest();
     }
 }

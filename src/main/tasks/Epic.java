@@ -1,7 +1,5 @@
 package main.tasks;
 
-import main.Manager;
-
 import java.util.ArrayList;
 import java.util.List;
 

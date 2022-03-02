@@ -1,6 +1,5 @@
 package main.tasks;
 
-import main.Manager;
 import main.Status;
 
 /**

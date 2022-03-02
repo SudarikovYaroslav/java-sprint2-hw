@@ -1,6 +1,6 @@
 package main.test;
 
-import main.Manager;
+import main.managers.InMemoryTaskManager;
 import main.Status;
 import main.tasks.Epic;
 import main.tasks.SubTask;
@@ -14,7 +14,7 @@ import java.util.List;
  * Class ConsoleTest used only for console tests! It has only one public method runConsoleTest() to run testing;
  */
 public class ConsoleTest {
-    private final Manager manager;
+    private final InMemoryTaskManager inMemoryTaskManager;
     private final Task task1;
     private final Task task2;
     private final SubTask subTask1;
@@ -23,20 +23,20 @@ public class ConsoleTest {
     private final Epic epic1;
     private final Epic epic2;
 
-    public ConsoleTest(Manager manager) {
-        this.manager = manager;
-        task1 = new Task("Task1", "First action", manager.generatedId());
-        task2 = new Task("Task2", "Second Action", manager.generatedId());
-        subTask1 = new SubTask("SubTask1", "First SubTask - First Epic", manager.generatedId());
-        subTask2 = new SubTask("SubTask2", "Second SubTask - First Epic", manager.generatedId());
-        subTask3 = new SubTask("SubTask3", "First subTask - second Epic", manager.generatedId());
+    public ConsoleTest(InMemoryTaskManager inMemoryTaskManager) {
+        this.inMemoryTaskManager = inMemoryTaskManager;
+        task1 = new Task("Task1", "First action", inMemoryTaskManager.generatedId());
+        task2 = new Task("Task2", "Second Action", inMemoryTaskManager.generatedId());
+        subTask1 = new SubTask("SubTask1", "First SubTask - First Epic", inMemoryTaskManager.generatedId());
+        subTask2 = new SubTask("SubTask2", "Second SubTask - First Epic", inMemoryTaskManager.generatedId());
+        subTask3 = new SubTask("SubTask3", "First subTask - second Epic", inMemoryTaskManager.generatedId());
 
         List<SubTask> firstEpicSubTasks = new ArrayList<>();
         firstEpicSubTasks.add(subTask1);
         firstEpicSubTasks.add(subTask2);
 
-        epic1 = new Epic("Epic1", "Several First Epic SubTasks", firstEpicSubTasks, manager.generatedId());
-        epic2 = new Epic("Epic2", "The only Second Epic SubTask!", manager.generatedId());
+        epic1 = new Epic("Epic1", "Several First Epic SubTasks", firstEpicSubTasks, inMemoryTaskManager.generatedId());
+        epic2 = new Epic("Epic2", "The only Second Epic SubTask!", inMemoryTaskManager.generatedId());
 
         epic2.addSubTask(subTask3);
     }
@@ -62,21 +62,21 @@ public class ConsoleTest {
 
     private void createTestTasks() {
         printStartTestMessage();
-        manager.createTask(task1);
-        manager.createTask(task2);
-        manager.createSubTask(subTask1);
-        manager.createSubTask(subTask2);
-        manager.createSubTask(subTask3);
-        manager.createEpic(epic1);
-        manager.createEpic(epic2);
+        inMemoryTaskManager.createTask(task1);
+        inMemoryTaskManager.createTask(task2);
+        inMemoryTaskManager.createSubTask(subTask1);
+        inMemoryTaskManager.createSubTask(subTask2);
+        inMemoryTaskManager.createSubTask(subTask3);
+        inMemoryTaskManager.createEpic(epic1);
+        inMemoryTaskManager.createEpic(epic2);
     }
 
     private void printTasksCondition() {
-        for (Task task : manager.getTasksList()) {
+        for (Task task : inMemoryTaskManager.getTasksList()) {
             printTask(task);
         }
 
-        for (Epic epic : manager.getEpicsList()) {
+        for (Epic epic : inMemoryTaskManager.getEpicsList()) {
             printEpic(epic);
         }
     }
@@ -87,20 +87,20 @@ public class ConsoleTest {
      * в виде параметра в метод update(), уникальный для каждого типа "задачи", в классе Manager, и статусы задач не
      * меняются непосредственно в backend блоке программы, а приходят из frontend блока в изменённых "задачах", метод
      * updateTasks() ИММИТИРУЕТ обновление имеющихся "задач" всех типов с сохранинием уникального id,
-     * изменение статуса задач и их передачу в объект Manager;
+     * изменение статуса задач и их передачу в объект InMemoryTaskManager;
      */
     private void updateTasks() {
         printUpdateWarning();
-        Task updatedTask1 = new Task("updatedTask1", "Update firstAction", manager.generatedId());
-        Task updatedTask2 = new Task("updatedTask2", "Update secondAction", manager.generatedId());
+        Task updatedTask1 = new Task("updatedTask1", "Update firstAction", inMemoryTaskManager.generatedId());
+        Task updatedTask2 = new Task("updatedTask2", "Update secondAction", inMemoryTaskManager.generatedId());
         updatedTask1.setId(1);
         updatedTask2.setId(2);
         updatedTask1.setStatus(Status.IN_PROGRESS);
         updatedTask2.setStatus(Status.DONE);
 
-        SubTask updatedSubTask1 = new SubTask("updatedSubTask1", "updatedSubTask1 - Epic1", manager.generatedId());
-        SubTask updatedSubTask2 = new SubTask("updatedSubTask2", "updatedSubTask2 - Epic1", manager.generatedId());
-        SubTask updatedSubTask3 = new SubTask("updatedSubTask3", "updatedSubTask3 - Epic2", manager.generatedId());
+        SubTask updatedSubTask1 = new SubTask("updatedSubTask1", "updatedSubTask1 - Epic1", inMemoryTaskManager.generatedId());
+        SubTask updatedSubTask2 = new SubTask("updatedSubTask2", "updatedSubTask2 - Epic1", inMemoryTaskManager.generatedId());
+        SubTask updatedSubTask3 = new SubTask("updatedSubTask3", "updatedSubTask3 - Epic2", inMemoryTaskManager.generatedId());
         updatedSubTask1.setId(3);
         updatedSubTask2.setId(4);
         updatedSubTask3.setId(5);
@@ -113,32 +113,32 @@ public class ConsoleTest {
         epic1UpdatedSubTasks.add(updatedSubTask2);
 
         Epic updatedEpic1 = new Epic("updatedEpic1", "Several updated First Epic SubTasks",
-                epic1UpdatedSubTasks, manager.generatedId());
+                epic1UpdatedSubTasks, inMemoryTaskManager.generatedId());
 
-        Epic updatedEpic2 = new Epic("updatedEpic2", "The only updated Second Epic SubTask!", manager.generatedId());
+        Epic updatedEpic2 = new Epic("updatedEpic2", "The only updated Second Epic SubTask!", inMemoryTaskManager.generatedId());
         updatedEpic2.addSubTask(updatedSubTask3);
 
         updatedEpic1.setId(6);
         updatedEpic2.setId(7);
 
-        manager.updateTask(updatedTask1);
-        manager.updateTask(updatedTask2);
-        manager.updateSubTask(updatedSubTask1);
-        manager.updateSubTask(updatedSubTask2);
-        manager.updateSubTask(updatedSubTask3);
-        manager.updateEpic(updatedEpic1);
-        manager.updateEpic(updatedEpic2);
+        inMemoryTaskManager.updateTask(updatedTask1);
+        inMemoryTaskManager.updateTask(updatedTask2);
+        inMemoryTaskManager.updateSubTask(updatedSubTask1);
+        inMemoryTaskManager.updateSubTask(updatedSubTask2);
+        inMemoryTaskManager.updateSubTask(updatedSubTask3);
+        inMemoryTaskManager.updateEpic(updatedEpic1);
+        inMemoryTaskManager.updateEpic(updatedEpic2);
     }
 
     private void deleteTest() {
         printDeleteWarning();
-        manager.deleteTaskById(1);
-        manager.deleteEpicById(6);
+        inMemoryTaskManager.deleteTaskById(1);
+        inMemoryTaskManager.deleteEpicById(6);
     }
 
     private void emptyEpicTest() {
         print("\nTrying to delete all subTasks from Epic2. CHECK: the Epic2 status should changed into NEW");
-        manager.deleteSubTaskById(5);
+        inMemoryTaskManager.deleteSubTaskById(5);
     }
 
     private void printTask(Task task) {
