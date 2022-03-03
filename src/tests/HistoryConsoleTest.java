@@ -1,5 +1,6 @@
 package tests;
 
+import service.HistoryManager;
 import service.TaskManager;
 import model.tasks.Epic;
 import model.tasks.SubTask;
@@ -17,11 +18,13 @@ import java.util.Random;
  */
 public class HistoryConsoleTest {
     private static int counter = 0;
-    private final TaskManager manager;
+    private final HistoryManager historyManager;
+    private final TaskManager taskManager;
     private final List<Task> tasks;
 
     public HistoryConsoleTest() {
-        manager = Managers.getDefault();
+        historyManager = Managers.getDefaultHistory();
+        taskManager = Managers.getDefault();
         tasks = createTasksList();
     }
 
@@ -55,20 +58,20 @@ public class HistoryConsoleTest {
 
         switch (taskType) {
             case 0:
-                Task task = new Task("Task", "простая задача", manager.generatedId());
-                manager.createTask(task);
+                Task task = new Task("Task", "простая задача", taskManager.generateId());
+                taskManager.createTask(task);
                 return task;
             case 1:
-                Epic epic = new Epic("Epic", "сложная задача", manager.generatedId());
-                manager.createEpic(epic);
+                Epic epic = new Epic("Epic", "сложная задача", taskManager.generateId());
+                taskManager.createEpic(epic);
                 return epic;
             case 2:
-                SubTask subTask = new SubTask("SubTask", "подзадача", manager.generatedId());
-                manager.createSubTask(subTask);
+                SubTask subTask = new SubTask("SubTask", "подзадача", taskManager.generateId());
+                taskManager.createSubTask(subTask);
                 return subTask;
             default:
-                Task defaultTask = new Task("DefaultTask", "простая задача", manager.generatedId());
-                manager.createTask(defaultTask);
+                Task defaultTask = new Task("DefaultTask", "простая задача", taskManager.generateId());
+                taskManager.createTask(defaultTask);
                 return defaultTask;
         }
     }
@@ -81,13 +84,13 @@ public class HistoryConsoleTest {
         long id = task.getId();
         try {
             SubTask subTask = (SubTask) task;
-            manager.getSubTaskById(id);
+            taskManager.getSubTaskById(id);
         } catch (ClassCastException notSubTask) {
             try {
                 Epic epic = (Epic) task;
-                manager.getEpicById(id);
+                taskManager.getEpicById(id);
             } catch (ClassCastException notEpic) {
-                manager.getTaskById(id);
+                taskManager.getTaskById(id);
             }
         }
     }
@@ -101,8 +104,8 @@ public class HistoryConsoleTest {
     }
 
     private void severalTimesTheSameTaskTest() {
-        Task task = new Task("Task", "repeated task", manager.generatedId());
-        manager.createTask(task);
+        Task task = new Task("Task", "repeated task", taskManager.generateId());
+        taskManager.createTask(task);
 
         for (int i = 0; i < 10; i++) {
             callTaskById(task);
@@ -111,7 +114,7 @@ public class HistoryConsoleTest {
 
     private void printHistory() {
         print("History:");
-        for (Task task : manager.history()) {
+        for (Task task : historyManager.getHistory()) {
             print("Name: " + task.getName() + "; description: " + task.getDescription() + "; id: " + task.getId());
         }
         print();

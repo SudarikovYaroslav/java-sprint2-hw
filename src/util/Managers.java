@@ -6,15 +6,16 @@ import service.InMemoryTaskManager;
 import service.TaskManager;
 
 public class Managers {
-    /**
-     * This is util method, which creates and returns TaskManger of right type.
-     * For now there is only one implementation of TaskManager but in the nearest future there will be others.
-     */
+
+    private static final InMemoryHistoryManager historyManger = new InMemoryHistoryManager();
+    private static final InMemoryTaskManager taskManager = new InMemoryTaskManager(historyManger);
+
+
     public static TaskManager getDefault() {
-        return new InMemoryTaskManager();
+        return taskManager;
     }
 
     public static HistoryManager getDefaultHistory() {
-        return new InMemoryHistoryManager();
+        return historyManger;
     }
 }
