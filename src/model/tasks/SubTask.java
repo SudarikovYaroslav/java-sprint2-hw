@@ -1,4 +1,4 @@
-package main.tasks;
+package model.tasks;
 
 public class SubTask extends Task {
     private Epic epic;

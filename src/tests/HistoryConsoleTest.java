@@ -1,10 +1,10 @@
-package main.tests;
+package tests;
 
-import main.managers.TaskManager;
-import main.tasks.Epic;
-import main.tasks.SubTask;
-import main.tasks.Task;
-import main.util.Managers;
+import service.TaskManager;
+import model.tasks.Epic;
+import model.tasks.SubTask;
+import model.tasks.Task;
+import util.Managers;
 
 import java.util.ArrayList;
 import java.util.List;

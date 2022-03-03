@@ -1,6 +1,6 @@
-package main.tasks;
+package model.tasks;
 
-import main.Status;
+import model.Status;
 
 /**
  * Basic "task" type

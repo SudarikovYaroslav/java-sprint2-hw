@@ -1,13 +1,11 @@
-package main.managers;
+package service;
 
-import main.tasks.Task;
+import model.tasks.Task;
 
 import java.util.List;
 
 public interface HistoryManager {
-    /**
-     * Method should marks tasks as viewed
-     */
+
     void add(Task task);
 
     List<Task> getHistory();

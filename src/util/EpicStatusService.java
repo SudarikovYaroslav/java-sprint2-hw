@@ -1,8 +1,8 @@
-package main.util;
+package util;
 
-import main.Status;
-import main.tasks.Epic;
-import main.tasks.SubTask;
+import model.Status;
+import model.tasks.Epic;
+import model.tasks.SubTask;
 
 import java.util.List;
 

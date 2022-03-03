@@ -1,6 +1,6 @@
 package main;
 
-import main.tests.HistoryConsoleTest;
+import tests.HistoryConsoleTest;
 
 public class Main {
     public static void main(String[] args) {

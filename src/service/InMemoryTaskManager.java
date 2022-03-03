@@ -1,10 +1,11 @@
-package main.managers;
+package service;
 
-import main.tasks.Epic;
-import main.tasks.SubTask;
-import main.tasks.Task;
-import main.util.EpicStatusService;
-import main.util.Managers;
+import model.tasks.Epic;
+import model.tasks.SubTask;
+import model.tasks.Task;
+import util.EpicStatusService;
+import model.IdGenerator;
+import util.Managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,15 +17,15 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Long, SubTask> subTasks;
     private final EpicStatusService epicStatusService;
     private final HistoryManager historyManager;
-    private long id;
+    private final IdGenerator idGenerator;
 
     public InMemoryTaskManager() {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subTasks = new HashMap<>();
         historyManager = Managers.getDefaultHistory();
-        id = 1;
         epicStatusService = new EpicStatusService();
+        idGenerator = new IdGenerator();
     }
 
     @Override
@@ -151,12 +152,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public long generatedId() {
-        return id++;
-    }
-
-    @Override
     public List<Task> history() {
         return historyManager.getHistory();
+    }
+
+    public long generateId() {
+        return idGenerator.generate();
     }
 }

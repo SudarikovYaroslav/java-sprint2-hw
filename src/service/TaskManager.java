@@ -1,8 +1,8 @@
-package main.managers;
+package service;
 
-import main.tasks.Epic;
-import main.tasks.SubTask;
-import main.tasks.Task;
+import model.tasks.Epic;
+import model.tasks.SubTask;
+import model.tasks.Task;
 
 import java.util.List;
 
@@ -54,8 +54,6 @@ public interface TaskManager {
     void deleteSubTaskById(long id);
 
     List<SubTask> getSubTasks(Epic epic);
-
-    long generatedId();
 
     List<Task> history();
 }
