@@ -1,6 +1,7 @@
 package tests;
 
 import service.HistoryManager;
+import service.IdGenerator;
 import service.TaskManager;
 import model.tasks.Epic;
 import model.tasks.SubTask;
@@ -21,10 +22,12 @@ public class HistoryConsoleTest {
     private final HistoryManager historyManager;
     private final TaskManager taskManager;
     private final List<Task> tasks;
+    private final IdGenerator idGenerator;
 
     public HistoryConsoleTest() {
         historyManager = Managers.getDefaultHistory();
         taskManager = Managers.getDefault();
+        idGenerator = new IdGenerator();
         tasks = createTasksList();
     }
 
@@ -58,19 +61,19 @@ public class HistoryConsoleTest {
 
         switch (taskType) {
             case 0:
-                Task task = new Task("Task", "простая задача", taskManager.generateId());
+                Task task = new Task("Task", "простая задача", idGenerator);
                 taskManager.createTask(task);
                 return task;
             case 1:
-                Epic epic = new Epic("Epic", "сложная задача", taskManager.generateId());
+                Epic epic = new Epic("Epic", "сложная задача", idGenerator);
                 taskManager.createEpic(epic);
                 return epic;
             case 2:
-                SubTask subTask = new SubTask("SubTask", "подзадача", taskManager.generateId());
+                SubTask subTask = new SubTask("SubTask", "подзадача", idGenerator);
                 taskManager.createSubTask(subTask);
                 return subTask;
             default:
-                Task defaultTask = new Task("DefaultTask", "простая задача", taskManager.generateId());
+                Task defaultTask = new Task("DefaultTask", "простая задача", idGenerator);
                 taskManager.createTask(defaultTask);
                 return defaultTask;
         }
@@ -104,7 +107,7 @@ public class HistoryConsoleTest {
     }
 
     private void severalTimesTheSameTaskTest() {
-        Task task = new Task("Task", "repeated task", taskManager.generateId());
+        Task task = new Task("Task", "repeated task", idGenerator);
         taskManager.createTask(task);
 
         for (int i = 0; i < 10; i++) {
@@ -114,7 +117,7 @@ public class HistoryConsoleTest {
 
     private void printHistory() {
         print("History:");
-        for (Task task : historyManager.getHistory()) {
+        for (Task task : historyManager.getLastViewedTasks()) {
             print("Name: " + task.getName() + "; description: " + task.getDescription() + "; id: " + task.getId());
         }
         print();

@@ -1,4 +1,4 @@
-package model;
+package service;
 
 public class IdGenerator {
     private static long id = 1;

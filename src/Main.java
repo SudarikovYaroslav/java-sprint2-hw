@@ -1,5 +1,3 @@
-package main;
-
 import tests.HistoryConsoleTest;
 
 public class Main {

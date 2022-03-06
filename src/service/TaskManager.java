@@ -54,6 +54,4 @@ public interface TaskManager {
     void deleteSubTaskById(long id);
 
     List<SubTask> getSubTasks(Epic epic);
-
-    long generateId();
 }

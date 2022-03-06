@@ -1,6 +1,7 @@
 package model.tasks;
 
 import model.Status;
+import service.IdGenerator;
 
 /**
  * Basic "task" type
@@ -11,10 +12,10 @@ public class Task {
     private long id;
     private Status status;
 
-    public Task(String name, String description, long id) {
+    public Task(String name, String description, IdGenerator idGenerator) {
         this.name = name;
         this.description = description;
-        this.id = id;
+        this.id = idGenerator.generate();
         status = Status.NEW;
     }
 

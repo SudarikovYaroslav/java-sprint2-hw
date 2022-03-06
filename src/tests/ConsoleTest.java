@@ -1,6 +1,7 @@
 package tests;
 
 import model.Status;
+import service.IdGenerator;
 import service.InMemoryTaskManager;
 import model.tasks.Epic;
 import model.tasks.SubTask;
@@ -22,25 +23,23 @@ public class ConsoleTest {
     private final SubTask subTask3;
     private final Epic epic1;
     private final Epic epic2;
+    private final IdGenerator idGenerator;
 
     public ConsoleTest(InMemoryTaskManager inMemoryTaskManager) {
+        idGenerator = new IdGenerator();
         this.inMemoryTaskManager = inMemoryTaskManager;
-        task1 = new Task("Task1", "First action", inMemoryTaskManager.generateId());
-        task2 = new Task("Task2", "Second Action", inMemoryTaskManager.generateId());
-        subTask1 = new SubTask("SubTask1", "First SubTask - First Epic",
-                inMemoryTaskManager.generateId());
-        subTask2 = new SubTask("SubTask2", "Second SubTask - First Epic",
-                inMemoryTaskManager.generateId());
-        subTask3 = new SubTask("SubTask3", "First subTask - second Epic",
-                inMemoryTaskManager.generateId());
+        task1 = new Task("Task1", "First action", idGenerator);
+        task2 = new Task("Task2", "Second Action", idGenerator);
+        subTask1 = new SubTask("SubTask1", "First SubTask - First Epic", idGenerator);
+        subTask2 = new SubTask("SubTask2", "Second SubTask - First Epic", idGenerator);
+        subTask3 = new SubTask("SubTask3", "First subTask - second Epic", idGenerator);
 
         List<SubTask> firstEpicSubTasks = new ArrayList<>();
         firstEpicSubTasks.add(subTask1);
         firstEpicSubTasks.add(subTask2);
 
-        epic1 = new Epic("Epic1", "Several First Epic SubTasks", firstEpicSubTasks,
-                inMemoryTaskManager.generateId());
-        epic2 = new Epic("Epic2", "The only Second Epic SubTask!", inMemoryTaskManager.generateId());
+        epic1 = new Epic("Epic1", "Several First Epic SubTasks", firstEpicSubTasks, idGenerator);
+        epic2 = new Epic("Epic2", "The only Second Epic SubTask!", idGenerator);
 
         epic2.addSubTask(subTask3);
     }
@@ -95,21 +94,16 @@ public class ConsoleTest {
      */
     private void updateTasks() {
         printUpdateWarning();
-        Task updatedTask1 = new Task("updatedTask1", "Update firstAction",
-                inMemoryTaskManager.generateId());
-        Task updatedTask2 = new Task("updatedTask2", "Update secondAction",
-                inMemoryTaskManager.generateId());
+        Task updatedTask1 = new Task("updatedTask1", "Update firstAction", idGenerator);
+        Task updatedTask2 = new Task("updatedTask2", "Update secondAction", idGenerator);
         updatedTask1.setId(1);
         updatedTask2.setId(2);
         updatedTask1.setStatus(Status.IN_PROGRESS);
         updatedTask2.setStatus(Status.DONE);
 
-        SubTask updatedSubTask1 = new SubTask("updatedSubTask1", "updatedSubTask1 - Epic1",
-                inMemoryTaskManager.generateId());
-        SubTask updatedSubTask2 = new SubTask("updatedSubTask2", "updatedSubTask2 - Epic1",
-                inMemoryTaskManager.generateId());
-        SubTask updatedSubTask3 = new SubTask("updatedSubTask3", "updatedSubTask3 - Epic2",
-                inMemoryTaskManager.generateId());
+        SubTask updatedSubTask1 = new SubTask("updatedSubTask1", "updatedSubTask1 - Epic1", idGenerator);
+        SubTask updatedSubTask2 = new SubTask("updatedSubTask2", "updatedSubTask2 - Epic1", idGenerator);
+        SubTask updatedSubTask3 = new SubTask("updatedSubTask3", "updatedSubTask3 - Epic2", idGenerator);
         updatedSubTask1.setId(3);
         updatedSubTask2.setId(4);
         updatedSubTask3.setId(5);
@@ -122,10 +116,10 @@ public class ConsoleTest {
         epic1UpdatedSubTasks.add(updatedSubTask2);
 
         Epic updatedEpic1 = new Epic("updatedEpic1", "Several updated First Epic SubTasks",
-                epic1UpdatedSubTasks, inMemoryTaskManager.generateId());
+                epic1UpdatedSubTasks, idGenerator);
 
         Epic updatedEpic2 = new Epic("updatedEpic2", "The only updated Second Epic SubTask!",
-                inMemoryTaskManager.generateId());
+                idGenerator);
         updatedEpic2.addSubTask(updatedSubTask3);
 
         updatedEpic1.setId(6);

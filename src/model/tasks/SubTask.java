@@ -1,10 +1,12 @@
 package model.tasks;
 
+import service.IdGenerator;
+
 public class SubTask extends Task {
     private Epic epic;
 
-    public SubTask(String name, String description, long id) {
-        super(name, description, id);
+    public SubTask(String name, String description, IdGenerator idGenerator) {
+        super(name, description, idGenerator);
     }
 
     public Epic getEpic() {
