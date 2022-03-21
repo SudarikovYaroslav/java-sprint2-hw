@@ -1,11 +1,11 @@
 package tests;
 
 import model.Status;
-import service.IdGenerator;
-import service.InMemoryTaskManager;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
+import service.IdGenerator;
+import service.InMemoryTaskManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
  * !! WARNING !!
  * Class ConsoleTest used only for console tests! It has only one public method runConsoleTest() to run testing;
  */
-public class ConsoleTest {
+public class ConsoleTest implements Test {
     private final InMemoryTaskManager inMemoryTaskManager;
     private final Task task1;
     private final Task task2;
@@ -47,7 +47,8 @@ public class ConsoleTest {
     /**
      * Run test
      */
-    public void runConsoleTest() {
+    @Override
+    public void run() {
         createTestTasks();
         printTasksCondition();
         updateTasks();

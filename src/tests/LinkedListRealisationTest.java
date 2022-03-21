@@ -17,7 +17,7 @@ import java.util.Random;
  * Fields in the class should't be final for correct processing!!!
  */
 
-public class LinkedListRealisationTest {
+public class LinkedListRealisationTest implements Test {
     private InMemoryHistoryManager historyManager;
     private InMemoryTaskManager taskManager;
     private IdGenerator idGen;
@@ -30,6 +30,7 @@ public class LinkedListRealisationTest {
         testTasks = new ArrayList<>();
     }
 
+    @Override
     public void run() {
         generateTestTasks();
         printTasks();

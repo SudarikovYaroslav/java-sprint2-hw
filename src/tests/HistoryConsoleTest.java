@@ -1,11 +1,11 @@
 package tests;
 
-import service.HistoryManager;
-import service.IdGenerator;
-import service.TaskManager;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
+import service.HistoryManager;
+import service.IdGenerator;
+import service.TaskManager;
 import util.Managers;
 
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ import java.util.Random;
  * This class should be used only for console tests of HistoryManager
  * There is only one public method run() for start testing
  */
-public class HistoryConsoleTest {
+public class HistoryConsoleTest implements Test {
     private static int counter = 0;
     private final HistoryManager historyManager;
     private final TaskManager taskManager;
@@ -31,6 +31,7 @@ public class HistoryConsoleTest {
         tasks = createTasksList();
     }
 
+    @Override
     public void run() {
         printTasks();
         callNextFiveTasks();
