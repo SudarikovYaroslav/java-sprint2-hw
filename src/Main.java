@@ -1,8 +1,8 @@
-import tests.HistoryConsoleTest;
+import tests.LinkedListRealisationTest;
 
 public class Main {
     public static void main(String[] args) {
-        HistoryConsoleTest test = new HistoryConsoleTest();
+        LinkedListRealisationTest test = new LinkedListRealisationTest();
         test.run();
     }
 }
