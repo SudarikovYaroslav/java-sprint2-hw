@@ -26,7 +26,7 @@ public class ConsoleTest implements Test {
     private final IdGenerator idGenerator;
 
     public ConsoleTest(InMemoryTaskManager inMemoryTaskManager) {
-        idGenerator = new IdGenerator();
+        idGenerator = IdGenerator.getInstance();
         this.inMemoryTaskManager = inMemoryTaskManager;
         task1 = new Task("Task1", "First action", idGenerator);
         task2 = new Task("Task2", "Second Action", idGenerator);

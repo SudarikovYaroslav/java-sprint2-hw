@@ -17,7 +17,7 @@ public class MapLinkedListTest implements Test {
     public MapLinkedListTest() {
         historyManager = new InMemoryHistoryManager();
         taskManager = new InMemoryTaskManager(historyManager);
-        idGen = new IdGenerator();
+        idGen = IdGenerator.getInstance();
     }
 
     private static void print(String s) {

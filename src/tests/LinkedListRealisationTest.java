@@ -26,7 +26,7 @@ public class LinkedListRealisationTest implements Test {
     public LinkedListRealisationTest() {
         historyManager = new InMemoryHistoryManager();
         taskManager = new InMemoryTaskManager(historyManager);
-        idGen = new IdGenerator();
+        idGen = IdGenerator.getInstance();
         testTasks = new ArrayList<>();
     }
 
@@ -137,7 +137,7 @@ public class LinkedListRealisationTest implements Test {
 
         historyManager = new InMemoryHistoryManager();
         taskManager = new InMemoryTaskManager(historyManager);
-        idGen = new IdGenerator();
+        idGen = IdGenerator.getInstance();
         testTasks = new ArrayList<>();
     }
 

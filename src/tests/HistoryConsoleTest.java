@@ -27,7 +27,7 @@ public class HistoryConsoleTest implements Test {
     public HistoryConsoleTest() {
         historyManager = Managers.getDefaultHistory();
         taskManager = Managers.getDefault();
-        idGenerator = new IdGenerator();
+        idGenerator = IdGenerator.getInstance();
         tasks = createTasksList();
     }
 
