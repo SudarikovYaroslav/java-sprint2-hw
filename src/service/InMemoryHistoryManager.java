@@ -1,18 +1,16 @@
 package service;
 
-import model.Node;
+import model.MapLinkedList;
 import model.tasks.Task;
 
-import java.util.*;
+import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private static final int HISTORY_SIZE = 10;
-    private final List<Node> lastViewedTasks;
-    private final Map<Long, Node> nodeLinks;
+    private final MapLinkedList lastViewedTasks;
 
     public InMemoryHistoryManager() {
-        lastViewedTasks = new LinkedList<>();
-        nodeLinks = new HashMap<>();
+        lastViewedTasks = new MapLinkedList();
     }
 
     @Override
@@ -23,42 +21,19 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
 
         if (lastViewedTasks.size() >= HISTORY_SIZE) {
-            remove(lastViewedTasks.get(0).getId());
+            lastViewedTasks.removeTask(lastViewedTasks.get(0));
         }
 
-        linkLast(task);
+        lastViewedTasks.linkLast(task);
     }
 
     @Override
     public void remove(long id) {
-        removeNode(nodeLinks.get(id));
+        lastViewedTasks.removeTask(id);
     }
 
     @Override
     public List<Task> getLastViewedTasks() {
-        return getTasks();
-    }
-
-    private void linkLast(Task task) {
-        Node node = new Node(task);
-        if (nodeLinks.containsKey(node.getId())) {
-            removeNode(node);
-        }
-        lastViewedTasks.add(node);
-        nodeLinks.put(node.getId(), node);
-    }
-
-    private List<Task> getTasks() {
-        List<Task> history = new ArrayList<>();
-
-        for (Node node : lastViewedTasks) {
-            history.add(node.getTask());
-        }
-        return history;
-    }
-
-    private void removeNode(Node node) {
-        lastViewedTasks.remove(node);
-        nodeLinks.remove(node.getId());
+        return lastViewedTasks.getTasks();
     }
 }

@@ -4,21 +4,40 @@ import model.tasks.Task;
 
 import java.util.Objects;
 
+/**
+ * Class used as regular node of MapLinkedList collection in HistoryManager
+ */
 public class Node {
-    private final Task task;
-    private final long id;
+    private Node prev = null;
+    private Node next = null;
+    private Task value;
 
-    public Node(Task task) {
-        this.task = task;
-        id = task.getId();
+    public Node(Task value) {
+        this.value = value;
     }
 
-    public Task getTask() {
-        return task;
+    public Task getValue() {
+        return value;
     }
 
-    public long getId() {
-        return id;
+    public void setValue(Task value) {
+        this.value = value;
+    }
+
+    public Node getPrev() {
+        return prev;
+    }
+
+    public void setPrev(Node prev) {
+        this.prev = prev;
+    }
+
+    public Node getNext() {
+        return next;
+    }
+
+    public void setNext(Node next) {
+        this.next = next;
     }
 
     @Override
@@ -26,12 +45,13 @@ public class Node {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Node node = (Node) o;
-        return id == node.id &&
-                Objects.equals(task, node.task);
+        return Objects.equals(prev, node.prev) &&
+                Objects.equals(next, node.next) &&
+                Objects.equals(value, node.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(task, id);
+        return Objects.hash(prev, next, value);
     }
 }
