@@ -16,7 +16,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task task) {
         if (task == null) {
-            System.out.println("Warning: Task in InMemoryHistoryManager.add(Task task) is null!");
+            System.out.println("Can't add task to history. Task is null");
             return;
         }
 
