@@ -2,7 +2,9 @@ package service;
 
 import model.MapLinkedList;
 import model.tasks.Task;
+import util.Util;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -35,5 +37,25 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public List<Task> getLastViewedTasks() {
         return lastViewedTasks.getTasks();
+    }
+
+    public static String toString(HistoryManager manager) {
+       StringBuilder resultBuilder = new StringBuilder();
+
+       for(Task task : manager.getLastViewedTasks()) {
+           resultBuilder.append(task.getId()).append(",");
+       }
+       return resultBuilder.toString();
+    }
+
+    static List<Long> fromString(String value) {
+        List<Long> historyID = new ArrayList<>();
+        String[] idS = value.split(",");
+
+        for (int i = 0; i < idS.length; i++) {
+            long id =  Util.getIdFromString(idS[i], "Неверный формат id при загрузке истории просмотров");
+            historyID.add(id);
+        }
+        return historyID;
     }
 }

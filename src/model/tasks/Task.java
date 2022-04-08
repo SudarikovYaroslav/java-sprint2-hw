@@ -1,7 +1,6 @@
 package model.tasks;
 
 import model.Status;
-import model.TaskLoadingException;
 import model.TaskTypes;
 import service.IdGenerator;
 

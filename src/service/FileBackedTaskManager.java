@@ -1,18 +1,21 @@
 package service;
 
 import model.Status;
-import model.TaskLoadingException;
+import model.ManagerLoadException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
+import static util.Util.getStatusFromString;
+import static util.Util.getIdFromString;
 
 import java.io.File;
+import java.util.List;
 
-public class FileBackedTasksManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
 
     private final File file;
 
-    public FileBackedTasksManager(InMemoryHistoryManager historyManager, File file) {
+    public FileBackedTaskManager(InMemoryHistoryManager historyManager, File file) {
         super(historyManager);
         this.file = file;
     }
@@ -116,7 +119,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     public void save() {
     }
 
-    private Task taskFromString(String data) throws TaskLoadingException {
+    //todo
+    public static void loadFromFile(File file) {
+    }
+
+    private Task taskFromString(String data) throws ManagerLoadException {
         String[] arr = data.split(",");
         long id = getIdFromString(arr[1], "Неверный формат id при загрузке Task");
         String name = arr[2];
@@ -152,7 +159,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
     /**
      * Загрузка SubTask-ов должна выполняется ПОСЛЕ первого этапа загрузки эпиков epicFromString(String data)
      */
-    private SubTask subTaskFromString(String data) throws TaskLoadingException {
+    private SubTask subTaskFromString(String data) throws ManagerLoadException {
         String[] arr = data.split(",");
         long id = getIdFromString(arr[1], "Неверный формат id при загрузке SubTask");
         String name = arr[2];
@@ -164,7 +171,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
         if (epics.containsKey(epicId)) {
             epic = epics.get(epicId);
         } else {
-            throw new TaskLoadingException("null epic при загрузке SubTask");
+            throw new ManagerLoadException("null epic при загрузке SubTask");
         }
         return new SubTask(id, name, description, status, epic);
     }
@@ -173,48 +180,42 @@ public class FileBackedTasksManager extends InMemoryTaskManager implements TaskM
      * Второй этап загрузки эпиков: добавляет в эпики их подзадачи по ID хранящимся в Set<Long> subTasksId
      * внутри каждого эпика. Выполняется ПОСЛЕ ЗАГРУЗКИ SubTask-ов
      */
-    private Epic fillEpicWithSubTasks(Epic epic) throws TaskLoadingException {
+    private Epic fillEpicWithSubTasks(Epic epic) throws ManagerLoadException {
         if (epic.getSubTasksId().size() == 0) return epic;
 
         for (Long id : epic.getSubTasksId()) {
             if (subTasks.containsKey(id)) {
                 epic.addSubTask(subTasks.get(id));
             } else {
-                throw new TaskLoadingException("Не выполнена загрузка SubTask-ов");
+                throw new ManagerLoadException("Не выполнена загрузка SubTask-ов");
             }
         }
         return epic;
     }
 
-    private Status getStatusFromString(String data) {
-        Status status;
+    /**
+     * Загружает историю просмотров из файла-хранилища
+     */
+    private  void loadHistory(String data) throws ManagerLoadException {
+        List<Long> idS = InMemoryHistoryManager.fromString(data);
 
-        switch (data) {
-            case "NEW":
-                status = Status.NEW;
-                break;
-            case "IN_PROGRESS":
-                status = Status.IN_PROGRESS;
-                break;
-            case "DONE":
-                status = Status.DONE;
-            default:
-                status = Status.IN_PROGRESS;
-        }
-        return status;
-    }
-
-    private long getIdFromString(String data, String expMessage) {
-        long id = 0;
-        try {
-            id = Long.parseLong(data);
-        } catch (NumberFormatException e) {
-            try {
-                throw new TaskLoadingException(expMessage);
-            } catch (TaskLoadingException exception) {
-                exception.printStackTrace();
+        for (Long id : idS) {
+            if (tasks.containsKey(id)) {
+                historyManager.add(tasks.get(id));
+                continue;
             }
+
+            if (epics.containsKey(id)) {
+                historyManager.add(epics.get(id));
+                continue;
+            }
+
+            if (subTasks.containsKey(id)) {
+                historyManager.add(subTasks.get(id));
+                continue;
+            }
+
+            throw new ManagerLoadException("Ошибка загрузки истории просмотров");
         }
-        return id;
     }
 }
