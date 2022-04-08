@@ -1,6 +1,8 @@
 package model.tasks;
 
 import model.Status;
+import model.TaskLoadingException;
+import model.TaskTypes;
 import service.IdGenerator;
 
 import java.util.Objects;
@@ -9,16 +11,27 @@ import java.util.Objects;
  * Basic "task" type
  */
 public class Task {
-    private String name;
-    private String description;
-    private long id;
-    private Status status;
+    protected String name;
+    protected String description;
+    protected long id;
+    protected Status status;
 
     public Task(String name, String description, IdGenerator idGenerator) {
         this.name = name;
         this.description = description;
         this.id = idGenerator.generate();
         status = Status.NEW;
+    }
+
+    /**
+     * WARNING!!!
+     * This constructor MUST BE used only when Task loaded from the file storage
+     */
+    public Task(long id, String name, String description, Status status) {
+        this.id = id;
+        this.name = name;
+        this.status = status;
+        this.description = description;
     }
 
     public long getId() {
@@ -55,7 +68,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task:" + name + " description=" + description;
+        return TaskTypes.TASK + "," + id + "," + name + "," + status + "," + description;
     }
 
     @Override
