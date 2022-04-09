@@ -1,129 +1,269 @@
 package service;
 
 import model.Status;
-import model.ManagerLoadException;
+import model.TaskTypes;
+import model.exceptions.ManagerLoadException;
+import model.exceptions.ManagerSaveException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
-import static util.Util.getStatusFromString;
-import static util.Util.getIdFromString;
 
-import java.io.File;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+
+import static util.Util.getIdFromString;
+import static util.Util.getStatusFromString;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
 
-    private final File file;
+    private final Path fileBacked;
 
-    public FileBackedTaskManager(InMemoryHistoryManager historyManager, File file) {
+    public FileBackedTaskManager(InMemoryHistoryManager historyManager, Path fileBacked) {
         super(historyManager);
-        this.file = file;
+        this.fileBacked = fileBacked;
     }
 
     @Override
     public void deleteTasks() {
         super.deleteTasks();
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void deleteEpics() {
         super.deleteEpics();
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void deleteSubTasks() {
         super.deleteSubTasks();
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public Task getTaskById(long id) {
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
         return super.getTaskById(id);
     }
 
     @Override
     public Epic getEpicById(long id) {
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
         return super.getEpicById(id);
     }
 
     @Override
     public SubTask getSubTaskById(long id) {
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
         return super.getSubTaskById(id);
     }
 
     @Override
     public void createTask(Task task) {
         super.createTask(task);
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void createEpic(Epic epic) {
         super.createEpic(epic);
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void createSubTask(SubTask subTask) {
         super.createSubTask(subTask);
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void updateTask(Task task) {
         super.updateTask(task);
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void updateEpic(Epic epic) {
         super.updateEpic(epic);
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void updateSubTask(SubTask subTask) {
         super.updateSubTask(subTask);
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void deleteTaskById(long id) {
         super.deleteTaskById(id);
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void deleteEpicById(long id) {
         super.deleteEpicById(id);
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void deleteSubTaskById(long id) {
         super.deleteSubTaskById(id);
-        save();
+        try {
+            save();
+        } catch (ManagerSaveException e) {
+            e.printStackTrace();
+        }
     }
 
-    //todo
-    // сохранять: Все задачи, подзадачи, эпики и историю просмотра любых задач
-    // Инициализация всех типов задач при загрузке реализована с помощью специальных конструкторов, которые должны
-    // использоваться исключительно для загрузки задач из файла - хранилища, во избежании фатальных ошибок связанных
-    // с некорректной инициализацией задач и коллизий ID, которые могут возникать при использовании этих конструкторов
-    // напрямую при попытке создания объектов задач вне процесса загрузки
-    public void save() {
+    public void save() throws ManagerSaveException {
+        if (!Files.exists(fileBacked)) throw new ManagerSaveException("Указанный файл для записи не существует");
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileBacked.toFile()))) {
+            writer.write("type,id,name,description,status,id...\n");
+
+            for (Task task : tasks.values()) {
+                writer.write(task.toString() + "\n");
+            }
+
+            for (Epic epic : epics.values()) {
+                writer.write(epic.toString() + "\n");
+            }
+
+            for (SubTask subTask : subTasks.values()) {
+                writer.write(subTasks.toString() + "\n");
+            }
+
+            writer.write("");
+            writer.write(InMemoryHistoryManager.toString(historyManager));
+
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка при сохранении данных");
+        }
     }
 
-    //todo
-    public static void loadFromFile(File file) {
+
+    /**
+     * WARNING!!!
+     * Инициализация всех типов задач при загрузке реализована с помощью специальных конструкторов, которые должны
+     * использоваться исключительно для загрузки задач из файла - хранилища, во избежании фатальных ошибок связанных
+     * с некорректной инициализацией задач и коллизий id, которые могут возникать при использовании этих конструкторов
+     * напрямую при попытке создания объектов задач вне процесса загрузки (так как они требуют записать id,
+     * а не использовать idGenerator, гарантирующий, что коллизий id среди задач не будет)
+     */
+    public void loadFromFile(Path fileBacked) throws ManagerLoadException {
+        if (fileBacked == null) throw new ManagerLoadException("Не указан файл для загрузки");
+        if (!Files.exists(fileBacked)) throw new ManagerLoadException("Указанный файл для загрузки не существует");
+
+        try {
+            //Почему-то у меня в библиотеке нет метода Files.readString(Path.of(path)) (X.X)
+            // хотя стоит openjdk version "11.0.14" 2022-01-18 LTS);
+            String mixedLine = new String(Files.readAllBytes(fileBacked));
+            String[] arr = mixedLine.split("");
+            String allTasksInLine = arr[0];
+            String historyInLine = arr[1];
+
+            String[] data = allTasksInLine.split("\n");
+
+            for (int i = 1; i < data.length; i++) {
+                String item = data[i];
+
+                //первичная загрузка задач
+                switch (TaskTypes.valueOf(item)) {
+                    case TASK:
+                        Task task = taskFromString(item);
+                        tasks.put(task.getId(), task);
+                        break;
+                    case EPIC:
+                        Epic epic = epicFromString(item);
+                        epics.put(epic.getId(), epic);
+                        break;
+                    case SUB_TASK:
+                        SubTask subTask = subTaskFromString(item);
+                        subTasks.put(subTask.getId(), subTask);
+                        break;
+                }
+
+                //догружаем все epic-и до валидного состояния
+                for (Epic epic : epics.values()) {
+                    try {
+                        fillEpicWithSubTasks(epic);
+                    } catch (ManagerLoadException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                //заполняем историю просмотров
+                loadHistory(historyInLine);
+            }
+
+        } catch (IOException e) {
+            throw new ManagerLoadException("Ошибка при загрузке резервной копии");
+        }
     }
 
-    private Task taskFromString(String data) throws ManagerLoadException {
+    private Task taskFromString(String data) {
         String[] arr = data.split(",");
         long id = getIdFromString(arr[1], "Неверный формат id при загрузке Task");
         String name = arr[2];
@@ -180,8 +320,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
      * Второй этап загрузки эпиков: добавляет в эпики их подзадачи по ID хранящимся в Set<Long> subTasksId
      * внутри каждого эпика. Выполняется ПОСЛЕ ЗАГРУЗКИ SubTask-ов
      */
-    private Epic fillEpicWithSubTasks(Epic epic) throws ManagerLoadException {
-        if (epic.getSubTasksId().size() == 0) return epic;
+    private void fillEpicWithSubTasks(Epic epic) throws ManagerLoadException {
+        if (epic.getSubTasksId().size() == 0) return;
 
         for (Long id : epic.getSubTasksId()) {
             if (subTasks.containsKey(id)) {
@@ -190,13 +330,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 throw new ManagerLoadException("Не выполнена загрузка SubTask-ов");
             }
         }
-        return epic;
     }
 
     /**
      * Загружает историю просмотров из файла-хранилища
      */
-    private  void loadHistory(String data) throws ManagerLoadException {
+    private void loadHistory(String data) throws ManagerLoadException {
         List<Long> idS = InMemoryHistoryManager.fromString(data);
 
         for (Long id : idS) {

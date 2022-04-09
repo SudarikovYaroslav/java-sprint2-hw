@@ -1,24 +1,22 @@
 package util;
 
 import model.Status;
-import model.ManagerLoadException;
+import model.exceptions.ManagerLoadException;
 
 public class Util {
     public static Status getStatusFromString(String data) {
-        Status status;
+        Status status = Status.IN_PROGRESS; // default value
 
         switch (data) {
             case "NEW":
                 status = Status.NEW;
                 break;
             case "IN_PROGRESS":
-                status = Status.IN_PROGRESS;
                 break;
             case "DONE":
                 status = Status.DONE;
-            default:
-                status = Status.IN_PROGRESS;
         }
+
         return status;
     }
 
