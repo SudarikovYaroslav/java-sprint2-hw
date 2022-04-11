@@ -28,6 +28,70 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         this.fileBacked = fileBacked;
     }
 
+    /**
+     * WARNING!!!
+     * Инициализация всех типов задач при загрузке реализована с помощью специальных конструкторов, которые должны
+     * использоваться исключительно для загрузки задач из файла - хранилища, во избежании фатальных ошибок связанных
+     * с некорректной инициализацией задач и коллизий id, которые могут возникать при использовании этих конструкторов
+     * напрямую при попытке создания объектов задач вне процесса загрузки (так как они требуют записать id,
+     * а не использовать idGenerator, гарантирующий, что коллизий id среди задач не будет)
+     */
+    public static FileBackedTaskManager loadFromFile(Path fileBacked) throws ManagerLoadException {
+        if (fileBacked == null) throw new ManagerLoadException("Не указан файл для загрузки");
+        if (!Files.exists(fileBacked)) throw new ManagerLoadException("Указанный файл для загрузки не существует");
+
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(historyManager, fileBacked);
+
+        try {
+            String mixedLine = new String(Files.readAllBytes(fileBacked));
+            String[] arr = mixedLine.split(" \n");
+            String allTasksInLine = arr[0];
+            String historyInLine = arr[1];
+
+            String[] entries = allTasksInLine.split("\n");
+
+            for (int i = 1; i < entries.length; i++) {
+                String entry = entries[i];
+                String[] fields = entry.split(",");
+                String taskType = fields[0];
+
+                //первичная загрузка задач
+                switch (TaskTypes.valueOf(taskType)) {
+                    case TASK:
+                        Task task = taskManager.taskFromString(entry);
+                        taskManager.createTask(task);
+                        break;
+                    case EPIC:
+                        Epic epic = taskManager.epicFromString(entry);
+                        taskManager.createEpic(epic);
+                        break;
+                    case SUB_TASK:
+                        SubTask subTask = taskManager.subTaskFromString(entry);
+                        taskManager.createSubTask(subTask);
+                        break;
+                }
+            }
+
+            //догружаем все epic-и до валидного состояния
+            for (Epic epic : taskManager.getEpicsList()) {
+                try {
+                    taskManager.fillEpicWithSubTasks(epic);
+                } catch (ManagerLoadException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            //заполняем историю просмотров
+            taskManager.loadHistory(historyInLine);
+
+        } catch (IOException e) {
+            throw new ManagerLoadException("Ошибка при загрузке резервной копии");
+        }
+
+        return taskManager;
+    }
+
     @Override
     public void deleteTasks() {
         super.deleteTasks();
@@ -205,71 +269,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при сохранении данных");
         }
-    }
-
-
-    /**
-     * WARNING!!!
-     * Инициализация всех типов задач при загрузке реализована с помощью специальных конструкторов, которые должны
-     * использоваться исключительно для загрузки задач из файла - хранилища, во избежании фатальных ошибок связанных
-     * с некорректной инициализацией задач и коллизий id, которые могут возникать при использовании этих конструкторов
-     * напрямую при попытке создания объектов задач вне процесса загрузки (так как они требуют записать id,
-     * а не использовать idGenerator, гарантирующий, что коллизий id среди задач не будет)
-     */
-    public static FileBackedTaskManager loadFromFile(Path fileBacked) throws ManagerLoadException {
-        if (fileBacked == null) throw new ManagerLoadException("Не указан файл для загрузки");
-        if (!Files.exists(fileBacked)) throw new ManagerLoadException("Указанный файл для загрузки не существует");
-
-        HistoryManager historyManager = Managers.getDefaultHistory();
-        FileBackedTaskManager taskManager = new FileBackedTaskManager(historyManager, fileBacked);
-
-        try {
-            String mixedLine = new String(Files.readAllBytes(fileBacked));
-            String[] arr = mixedLine.split(" \n");
-            String allTasksInLine = arr[0];
-            String historyInLine = arr[1];
-
-            String[] entries = allTasksInLine.split("\n");
-
-            for (int i = 1; i < entries.length; i++) {
-                String entry = entries[i];
-                String[] fields = entry.split(",");
-                String taskType = fields[0];
-
-                //первичная загрузка задач
-                switch (TaskTypes.valueOf(taskType)) {
-                    case TASK:
-                        Task task = taskManager.taskFromString(entry);
-                        taskManager.createTask(task);
-                        break;
-                    case EPIC:
-                        Epic epic = taskManager.epicFromString(entry);
-                        taskManager.createEpic(epic);
-                        break;
-                    case SUB_TASK:
-                        SubTask subTask = taskManager.subTaskFromString(entry);
-                        taskManager.createSubTask(subTask);
-                        break;
-                }
-            }
-
-            //догружаем все epic-и до валидного состояния
-            for (Epic epic : taskManager.getEpicsList()) {
-                try {
-                    taskManager.fillEpicWithSubTasks(epic);
-                } catch (ManagerLoadException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            //заполняем историю просмотров
-            taskManager.loadHistory(historyInLine);
-
-        } catch (IOException e) {
-            throw new ManagerLoadException("Ошибка при загрузке резервной копии");
-        }
-
-        return taskManager;
     }
 
     private Task taskFromString(String data) {

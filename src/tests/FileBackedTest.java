@@ -17,10 +17,10 @@ import java.util.List;
 /**
  * This class should be used only for tests of FileBackedTaskManager
  */
-public class FileBackedTest implements Test{
+public class FileBackedTest implements Test {
 
-    private List<Task> tasks;
     private final IdGenerator idGenerator = IdGenerator.getInstance();
+    private final List<Task> tasks;
     private HistoryManager historyManager;
     private FileBackedTaskManager taskManager;
 
@@ -88,7 +88,6 @@ public class FileBackedTest implements Test{
         for (SubTask subTask : taskManager.getSubTasksList()) {
             print(subTask.toString());
         }
-
 
         print("HISTORY:");
         print(InMemoryHistoryManager.toString(taskManager.getHistoryManager()));
