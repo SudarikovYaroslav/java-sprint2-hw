@@ -39,7 +39,7 @@ public class Util {
         return id;
     }
 
-    public static Path createFileBacked() {
+    public static Path getBacked() {
         Path uniPath = Paths.get("").toAbsolutePath();
         Path fileBacked = Paths.get(uniPath + "\\FileBacked.txt");
 

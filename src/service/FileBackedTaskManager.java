@@ -7,6 +7,7 @@ import model.exceptions.ManagerSaveException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
+import util.Managers;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -215,9 +216,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
      * напрямую при попытке создания объектов задач вне процесса загрузки (так как они требуют записать id,
      * а не использовать idGenerator, гарантирующий, что коллизий id среди задач не будет)
      */
-    public void loadFromFile(Path fileBacked) throws ManagerLoadException {
+    public static FileBackedTaskManager loadFromFile(Path fileBacked) throws ManagerLoadException {
         if (fileBacked == null) throw new ManagerLoadException("Не указан файл для загрузки");
         if (!Files.exists(fileBacked)) throw new ManagerLoadException("Указанный файл для загрузки не существует");
+
+        HistoryManager historyManager = Managers.getDefaultHistory();
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(historyManager, fileBacked);
 
         try {
             String mixedLine = new String(Files.readAllBytes(fileBacked));
@@ -235,35 +239,37 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 //первичная загрузка задач
                 switch (TaskTypes.valueOf(taskType)) {
                     case TASK:
-                        Task task = taskFromString(entry);
-                        tasks.put(task.getId(), task);
+                        Task task = taskManager.taskFromString(entry);
+                        taskManager.createTask(task);
                         break;
                     case EPIC:
-                        Epic epic = epicFromString(entry);
-                        epics.put(epic.getId(), epic);
+                        Epic epic = taskManager.epicFromString(entry);
+                        taskManager.createEpic(epic);
                         break;
                     case SUB_TASK:
-                        SubTask subTask = subTaskFromString(entry);
-                        subTasks.put(subTask.getId(), subTask);
+                        SubTask subTask = taskManager.subTaskFromString(entry);
+                        taskManager.createSubTask(subTask);
                         break;
                 }
             }
 
             //догружаем все epic-и до валидного состояния
-            for (Epic epic : epics.values()) {
+            for (Epic epic : taskManager.getEpicsList()) {
                 try {
-                    fillEpicWithSubTasks(epic);
+                    taskManager.fillEpicWithSubTasks(epic);
                 } catch (ManagerLoadException e) {
                     e.printStackTrace();
                 }
             }
 
             //заполняем историю просмотров
-            loadHistory(historyInLine);
+            taskManager.loadHistory(historyInLine);
 
         } catch (IOException e) {
             throw new ManagerLoadException("Ошибка при загрузке резервной копии");
         }
+
+        return taskManager;
     }
 
     private Task taskFromString(String data) {
@@ -279,7 +285,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
      * Первый этап загрузки эпиков: загружает эпик без подзадач, но со всеми Id своих SubTask-ов.
      * Выполняется ДО ЗАГРУЗКИ SubTask-ов
      */
-    private  Epic epicFromString(String data) {
+    private Epic epicFromString(String data) {
         String[] arr = data.split(",");
         long id = getIdFromString(arr[1], "Неверный формат id при загрузке Epic");
         String name = arr[2];
@@ -302,7 +308,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     /**
      * Загрузка SubTask-ов должна выполняется ПОСЛЕ первого этапа загрузки эпиков epicFromString(String data)
      */
-    private  SubTask subTaskFromString(String data) throws ManagerLoadException {
+    private SubTask subTaskFromString(String data) throws ManagerLoadException {
         String[] arr = data.split(",");
         long id = getIdFromString(arr[1], "Неверный формат id при загрузке SubTask");
         String name = arr[2];

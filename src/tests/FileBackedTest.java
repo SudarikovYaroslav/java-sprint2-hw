@@ -27,7 +27,7 @@ public class FileBackedTest implements Test{
     public FileBackedTest() {
         tasks = new ArrayList<>();
         historyManager = Managers.getDefaultHistory();
-        taskManager = new FileBackedTaskManager(historyManager, Util.createFileBacked());
+        taskManager = new FileBackedTaskManager(historyManager, Util.getBacked());
     }
 
     @Override
@@ -77,27 +77,38 @@ public class FileBackedTest implements Test{
 
     private void printCondition() {
         print("----CONDITION----");
-        for (Task task : tasks) {
+        for (Task task : taskManager.getTasksList()) {
             print(task.toString());
         }
+
+        for (Epic epic : taskManager.getEpicsList()) {
+            print(epic.toString());
+        }
+
+        for (SubTask subTask : taskManager.getSubTasksList()) {
+            print(subTask.toString());
+        }
+
+
         print("HISTORY:");
-        print(InMemoryHistoryManager.toString(historyManager));
+        print(InMemoryHistoryManager.toString(taskManager.getHistoryManager()));
         print("\n");
     }
 
-    //history manager намеренно создаю минуя класс Managers, чтобы получить чистую историю
     private void reload() {
-        print("Reboot has been started!\nPlease check, the history and condition get empty.");
-        tasks = new ArrayList<>();
+        //создаём новые объекты менеджеров для имитации перезагрузки программы
+        //history manager намеренно создаю минуя класс Managers, чтобы очистить историю просмотров
         historyManager = new InMemoryHistoryManager();
-        taskManager = new FileBackedTaskManager(historyManager, Util.createFileBacked());
+        taskManager = new FileBackedTaskManager(historyManager, Util.getBacked());
+        print("Reboot has been started!\nPlease check, the history and condition get empty.");
         printCondition();
 
         try {
-            taskManager.loadFromFile(Util.createFileBacked());
+            taskManager = FileBackedTaskManager.loadFromFile(Util.getBacked());
         } catch (ManagerLoadException e) {
             e.printStackTrace();
         }
+
         reloadTasksList();
     }
 
