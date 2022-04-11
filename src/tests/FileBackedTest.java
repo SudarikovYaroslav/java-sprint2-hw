@@ -108,14 +108,6 @@ public class FileBackedTest implements Test{
         } catch (ManagerLoadException e) {
             e.printStackTrace();
         }
-
-        reloadTasksList();
-    }
-
-    private void reloadTasksList() {
-        tasks.addAll(taskManager.getTasksList());
-        tasks.addAll(taskManager.getEpicsList());
-        tasks.addAll(taskManager.getSubTasksList());
     }
 
     private void print(Object o) {
