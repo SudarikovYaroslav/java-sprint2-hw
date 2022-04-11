@@ -1,8 +1,9 @@
-import tests.LinkedListRealisationTest;
+import tests.FileBackedTest;
+import tests.Test;
 
 public class Main {
     public static void main(String[] args) {
-        LinkedListRealisationTest test = new LinkedListRealisationTest();
+        Test test = new FileBackedTest();
         test.run();
     }
 }

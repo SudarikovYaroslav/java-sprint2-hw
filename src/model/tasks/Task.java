@@ -67,8 +67,9 @@ public class Task {
 
     @Override
     public String toString() {
-        return TaskTypes.TASK + "," + id + "," + name + "," + status + "," + description;
+        return TaskTypes.TASK + "," + id + "," + name + "," + description + "," + status;
     }
+
 
     @Override
     public boolean equals(Object o) {

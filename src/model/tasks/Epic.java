@@ -77,4 +77,19 @@ public class Epic extends Task {
 
         return resultBuilder.toString();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        Epic epic = (Epic) o;
+        return Objects.equals(subTasks, epic.subTasks) &&
+                Objects.equals(subTasksId, epic.subTasksId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), subTasks, subTasksId);
+    }
 }

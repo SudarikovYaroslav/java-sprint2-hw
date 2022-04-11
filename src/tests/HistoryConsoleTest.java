@@ -19,8 +19,8 @@ import java.util.Random;
  */
 public class HistoryConsoleTest implements Test {
     private static int counter = 0;
-    private final HistoryManager historyManager;
-    private final TaskManager taskManager;
+    protected final HistoryManager historyManager;
+    protected final TaskManager taskManager;
     private final List<Task> tasks;
     private final IdGenerator idGenerator;
 
@@ -46,7 +46,7 @@ public class HistoryConsoleTest implements Test {
         printHistory();
     }
 
-    private List<Task> createTasksList() {
+    protected List<Task> createTasksList() {
         List<Task> tasks = new ArrayList<>();
 
         for (int i = 0; i < 15; i++) {
@@ -56,7 +56,7 @@ public class HistoryConsoleTest implements Test {
         return tasks;
     }
 
-    private Task createTask() {
+    protected Task createTask() {
         Random random = new Random();
         int taskType = random.nextInt(3);
 
@@ -84,7 +84,7 @@ public class HistoryConsoleTest implements Test {
      * Because of each type of task in TaskManger should has it's own method to get task type by id
      * Method defines which concrete type of "Task" is variable task
      */
-    private void callTaskById(Task task) {
+    protected void callTaskById(Task task) {
         long id = task.getId();
         try {
             SubTask subTask = (SubTask) task;
@@ -99,7 +99,7 @@ public class HistoryConsoleTest implements Test {
         }
     }
 
-    private void callNextFiveTasks() {
+    protected void callNextFiveTasks() {
         int border = counter + 5;
         while (counter < border) {
             callTaskById(tasks.get(counter));
@@ -107,7 +107,7 @@ public class HistoryConsoleTest implements Test {
         }
     }
 
-    private void severalTimesTheSameTaskTest() {
+    protected void severalTimesTheSameTaskTest() {
         Task task = new Task("Task", "repeated task", idGenerator);
         taskManager.createTask(task);
 
@@ -116,7 +116,7 @@ public class HistoryConsoleTest implements Test {
         }
     }
 
-    private void printHistory() {
+    protected void printHistory() {
         print("History:");
         for (Task task : historyManager.getLastViewedTasks()) {
             print("Name: " + task.getName() + "; description: " + task.getDescription() + "; id: " + task.getId());
@@ -124,15 +124,15 @@ public class HistoryConsoleTest implements Test {
         print();
     }
 
-    private void printWarning() {
+    protected void printWarning() {
         print("WARNING!\nCheck for first five tasks in history was deleted,\nand there are should be 5 last new tasks");
     }
 
-    private void printRepeatedWarning() {
+    protected void printRepeatedWarning() {
         print("WARNING!\nNow the same task, was called 10 times.\nHistory should contain 10 callings of the same task");
     }
 
-    private void printTasks() {
+    protected void printTasks() {
         print("TasksList:");
         for (Task task : tasks) {
             print("Name: " + task.getName() + "; description: " + task.getDescription() + "; id: " + task.getId());
@@ -140,11 +140,11 @@ public class HistoryConsoleTest implements Test {
         print();
     }
 
-    private void print(String message) {
+    protected void print(String message) {
         System.out.println(message);
     }
 
-    private void print() {
+    protected void print() {
         print("\n");
     }
 }

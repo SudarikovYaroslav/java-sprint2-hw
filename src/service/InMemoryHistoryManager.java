@@ -48,7 +48,7 @@ public class InMemoryHistoryManager implements HistoryManager {
        return resultBuilder.toString();
     }
 
-    static List<Long> fromString(String value) {
+    public static List<Long> fromString(String value) {
         List<Long> historyID = new ArrayList<>();
         String[] idS = value.split(",");
 

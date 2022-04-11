@@ -22,7 +22,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     private final Path fileBacked;
 
-    public FileBackedTaskManager(InMemoryHistoryManager historyManager, Path fileBacked) {
+    public FileBackedTaskManager(HistoryManager historyManager, Path fileBacked) {
         super(historyManager);
         this.fileBacked = fileBacked;
     }
@@ -59,32 +59,35 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     @Override
     public Task getTaskById(long id) {
+        Task result = super.getTaskById(id);
         try {
             save();
         } catch (ManagerSaveException e) {
             e.printStackTrace();
         }
-        return super.getTaskById(id);
+        return result;
     }
 
     @Override
     public Epic getEpicById(long id) {
+        Epic result = super.getEpicById(id);
         try {
             save();
         } catch (ManagerSaveException e) {
             e.printStackTrace();
         }
-        return super.getEpicById(id);
+        return result;
     }
 
     @Override
     public SubTask getSubTaskById(long id) {
+        SubTask result = super.getSubTaskById(id);
         try {
             save();
         } catch (ManagerSaveException e) {
             e.printStackTrace();
         }
-        return super.getSubTaskById(id);
+        return result;
     }
 
     @Override
@@ -192,10 +195,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             }
 
             for (SubTask subTask : subTasks.values()) {
-                writer.write(subTasks.toString() + "\n");
+                writer.write(subTask.toString() + "\n");
             }
 
-            writer.write("");
+            writer.write(" \n");
             writer.write(InMemoryHistoryManager.toString(historyManager));
 
         } catch (IOException e) {
@@ -217,46 +220,46 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         if (!Files.exists(fileBacked)) throw new ManagerLoadException("Указанный файл для загрузки не существует");
 
         try {
-            //Почему-то у меня в библиотеке нет метода Files.readString(Path.of(path)) (X.X)
-            // хотя стоит openjdk version "11.0.14" 2022-01-18 LTS);
             String mixedLine = new String(Files.readAllBytes(fileBacked));
-            String[] arr = mixedLine.split("");
+            String[] arr = mixedLine.split(" \n");
             String allTasksInLine = arr[0];
             String historyInLine = arr[1];
 
-            String[] data = allTasksInLine.split("\n");
+            String[] entries = allTasksInLine.split("\n");
 
-            for (int i = 1; i < data.length; i++) {
-                String item = data[i];
+            for (int i = 1; i < entries.length; i++) {
+                String entry = entries[i];
+                String[] fields = entry.split(",");
+                String taskType = fields[0];
 
                 //первичная загрузка задач
-                switch (TaskTypes.valueOf(item)) {
+                switch (TaskTypes.valueOf(taskType)) {
                     case TASK:
-                        Task task = taskFromString(item);
+                        Task task = taskFromString(entry);
                         tasks.put(task.getId(), task);
                         break;
                     case EPIC:
-                        Epic epic = epicFromString(item);
+                        Epic epic = epicFromString(entry);
                         epics.put(epic.getId(), epic);
                         break;
                     case SUB_TASK:
-                        SubTask subTask = subTaskFromString(item);
+                        SubTask subTask = subTaskFromString(entry);
                         subTasks.put(subTask.getId(), subTask);
                         break;
                 }
-
-                //догружаем все epic-и до валидного состояния
-                for (Epic epic : epics.values()) {
-                    try {
-                        fillEpicWithSubTasks(epic);
-                    } catch (ManagerLoadException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                //заполняем историю просмотров
-                loadHistory(historyInLine);
             }
+
+            //догружаем все epic-и до валидного состояния
+            for (Epic epic : epics.values()) {
+                try {
+                    fillEpicWithSubTasks(epic);
+                } catch (ManagerLoadException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            //заполняем историю просмотров
+            loadHistory(historyInLine);
 
         } catch (IOException e) {
             throw new ManagerLoadException("Ошибка при загрузке резервной копии");
@@ -276,7 +279,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
      * Первый этап загрузки эпиков: загружает эпик без подзадач, но со всеми Id своих SubTask-ов.
      * Выполняется ДО ЗАГРУЗКИ SubTask-ов
      */
-    private Epic epicFromString(String data) {
+    private  Epic epicFromString(String data) {
         String[] arr = data.split(",");
         long id = getIdFromString(arr[1], "Неверный формат id при загрузке Epic");
         String name = arr[2];
@@ -299,7 +302,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     /**
      * Загрузка SubTask-ов должна выполняется ПОСЛЕ первого этапа загрузки эпиков epicFromString(String data)
      */
-    private SubTask subTaskFromString(String data) throws ManagerLoadException {
+    private  SubTask subTaskFromString(String data) throws ManagerLoadException {
         String[] arr = data.split(",");
         long id = getIdFromString(arr[1], "Неверный формат id при загрузке SubTask");
         String name = arr[2];

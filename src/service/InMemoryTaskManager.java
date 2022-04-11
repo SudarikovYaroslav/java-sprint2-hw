@@ -13,9 +13,9 @@ public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Long, Epic> epics;
     protected final HashMap<Long, SubTask> subTasks;
     protected final EpicStatusService epicStatusService;
-    protected final InMemoryHistoryManager historyManager;
+    protected final HistoryManager historyManager;
 
-    public InMemoryTaskManager(InMemoryHistoryManager historyManager) {
+    public InMemoryTaskManager(HistoryManager historyManager) {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subTasks = new HashMap<>();
