@@ -22,17 +22,6 @@ public class Task {
         status = Status.NEW;
     }
 
-    /**
-     * WARNING!!!
-     * This constructor MUST BE used only when Task loaded from the file storage
-     */
-    public Task(long id, String name, String description, Status status) {
-        this.id = id;
-        this.name = name;
-        this.status = status;
-        this.description = description;
-    }
-
     public long getId() {
         return id;
     }

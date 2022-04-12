@@ -1,6 +1,6 @@
 package tests;
 
-import model.exceptions.ManagerLoadException;
+import model.exceptions.TasksLoadException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -11,21 +11,16 @@ import service.InMemoryHistoryManager;
 import util.Managers;
 import util.Util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class should be used only for tests of FileBackedTaskManager
  */
 public class FileBackedTest implements Test {
 
-    private final IdGenerator idGenerator = IdGenerator.getInstance();
-    private final List<Task> tasks;
+    private IdGenerator idGenerator = IdGenerator.getInstance();
     private HistoryManager historyManager;
     private FileBackedTaskManager taskManager;
 
     public FileBackedTest() {
-        tasks = new ArrayList<>();
         historyManager = Managers.getDefaultHistory();
         taskManager = new FileBackedTaskManager(historyManager, Util.getBacked());
     }
@@ -39,6 +34,9 @@ public class FileBackedTest implements Test {
         printCondition();
         reload();
         printWarning();
+        printCondition();
+        print("Add one new Task, check id is OK");
+        addNewTask();
         printCondition();
     }
 
@@ -60,13 +58,6 @@ public class FileBackedTest implements Test {
         taskManager.createSubTask(subTask1);
         taskManager.createSubTask(subTask2);
         taskManager.createEpic(epic2);
-
-        tasks.add(task1);
-        tasks.add(task2);
-        tasks.add(epic1);
-        tasks.add(subTask1);
-        tasks.add(subTask2);
-        tasks.add(epic2);
     }
 
     private void makeSeveralCalls() {
@@ -101,10 +92,11 @@ public class FileBackedTest implements Test {
         taskManager = new FileBackedTaskManager(historyManager, Util.getBacked());
         print("Reboot has been started!\nPlease check, the history and condition get empty.");
         printCondition();
+        IdGenerator.setStartIdValue(-1);
 
         try {
             taskManager = FileBackedTaskManager.loadFromFile(Util.getBacked());
-        } catch (ManagerLoadException e) {
+        } catch (TasksLoadException e) {
             e.printStackTrace();
         }
     }
@@ -115,5 +107,10 @@ public class FileBackedTest implements Test {
 
     private void printWarning() {
         print("Reboot has been performed!\nPlease check: condition has to be the same as before reboot!");
+    }
+
+    private void addNewTask() {
+        Task task3 = new Task("Task3", "simple task", idGenerator);
+        taskManager.createTask(task3);
     }
 }

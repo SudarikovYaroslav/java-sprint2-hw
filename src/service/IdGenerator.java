@@ -16,8 +16,15 @@ public class IdGenerator {
         return instance;
     }
 
+    public static void setStartIdValue(long value) {
+        id = value;
+    }
+
+    public static Long peekCurrentIdValue() {
+        return id;
+    }
+
     public long generate() {
         return id++;
     }
-
 }

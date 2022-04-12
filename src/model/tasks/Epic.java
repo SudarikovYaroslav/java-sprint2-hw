@@ -9,7 +9,7 @@ import java.util.*;
 public class Epic extends Task {
     private final List<SubTask> subTasks = new ArrayList<>();
     //Множество id используется для корректной загрузки Epic-ов
-    private final Set<Long> subTasksId = new HashSet<>();
+    private Set<Long> subTasksId = new HashSet<>();
 
     public Epic(String name, String description, List<SubTask> subTasks, IdGenerator idGenerator) {
         super(name, description, idGenerator);
@@ -18,15 +18,6 @@ public class Epic extends Task {
 
     public Epic(String name, String description, IdGenerator idGenerator) {
         super(name, description, idGenerator);
-    }
-
-    /**
-     * WARNING!
-     * This constructor MUST BE used only when Epic loaded from the file storage
-     */
-    public Epic(long id, String name, String description, Status status, Long... subTask) {
-        super(id, name, description, status);
-        subTasksId.addAll(Arrays.asList(subTask));
     }
 
     public List<SubTask> getSubTasks() {
@@ -54,6 +45,10 @@ public class Epic extends Task {
         for (SubTask item : subTasks) {
             subTasksId.add(item.getId());
         }
+    }
+
+    public void addSubTasksId (Long[] ids) {
+        subTasksId.addAll(Arrays.asList(ids));
     }
 
     private void linkWithSubTasks(List<SubTask> subTasks) {

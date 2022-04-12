@@ -13,15 +13,6 @@ public class SubTask extends Task {
         super(name, description, idGenerator);
     }
 
-    /**
-     * WARNING!
-     * This constructor MUST BE used only when SubTask loaded from the file storage
-     */
-    public SubTask(long id, String name, String description, Status status, Epic epic) {
-        super(id, name, description, status);
-        this.epic = epic;
-    }
-
     public Epic getEpic() {
         return epic;
     }
