@@ -95,7 +95,7 @@ public class FileBackedTest implements Test {
        idGenerator.setStartIdValue(-1);
 
         try {
-            taskManager = FileBackedTaskManager.loadFromFile(Util.getBacked());
+            taskManager = Managers.loadFromFile(Util.getBacked());
         } catch (TaskLoadException e) {
             e.printStackTrace();
         }
