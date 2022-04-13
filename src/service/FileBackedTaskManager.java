@@ -203,7 +203,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileBacked.toFile()))) {
             writer.write("type,id,name,description,status,id...,#" +
-                    IdGenerator.peekCurrentIdValue() + LINE_DELIMITER);
+                    idGenerator.peekCurrentIdValue() + LINE_DELIMITER);
 
             for (Task task : tasks.values()) {
                 writer.write(task.toString() + LINE_DELIMITER);
@@ -231,7 +231,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String name = taskFields[NAME_COLUMN_INDEX];
         String description = taskFields[DESCRIPTION_COLUMN_INDEX];
         Status status = getStatusFromString(taskFields[STATUS_COLUMN_INDEX]);
-        long currentIdValue = IdGenerator.peekCurrentIdValue();
+        long currentIdValue = idGenerator.peekCurrentIdValue();
 
         Task task = new Task(name, description, idGenerator);
         task.setId(id);
@@ -260,7 +260,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 subTasksId[i] = getIdFromString(ids[i], "Неверный формат id при загрузке Epic.SubTasks");
             }
         }
-        long currentIdValue = IdGenerator.peekCurrentIdValue();
+        long currentIdValue = idGenerator.peekCurrentIdValue();
         Epic epic = new Epic(name, description, idGenerator);
         epic.setId(id);
         epic.setStatus(status);
@@ -288,7 +288,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             throw new TaskLoadException("null epic при загрузке SubTask id: " + id);
         }
 
-        long currentIdValue = IdGenerator.peekCurrentIdValue();
+        long currentIdValue = idGenerator.peekCurrentIdValue();
         SubTask subTask = new SubTask(name, description, idGenerator);
         subTask.setId(id);
         subTask.setStatus(status);

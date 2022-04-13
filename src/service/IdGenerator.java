@@ -20,7 +20,7 @@ public class IdGenerator {
         id = value;
     }
 
-    public static Long peekCurrentIdValue() {
+    public Long peekCurrentIdValue() {
         return id;
     }
 
