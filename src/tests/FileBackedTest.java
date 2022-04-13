@@ -1,6 +1,6 @@
 package tests;
 
-import model.exceptions.TasksLoadException;
+import model.exceptions.TaskLoadException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -22,7 +22,7 @@ public class FileBackedTest implements Test {
 
     public FileBackedTest() {
         historyManager = Managers.getDefaultHistory();
-        taskManager = new FileBackedTaskManager(historyManager, Util.getBacked());
+        taskManager = new FileBackedTaskManager(historyManager, Util.getBacked(), idGenerator);
     }
 
     @Override
@@ -89,14 +89,14 @@ public class FileBackedTest implements Test {
         //создаём новые объекты менеджеров для имитации перезагрузки программы
         //history manager намеренно создаю минуя класс Managers, чтобы очистить историю просмотров
         historyManager = new InMemoryHistoryManager();
-        taskManager = new FileBackedTaskManager(historyManager, Util.getBacked());
+        taskManager = new FileBackedTaskManager(historyManager, Util.getBacked(), IdGenerator.getInstance());
         print("Reboot has been started!\nPlease check, the history and condition get empty.");
         printCondition();
-        IdGenerator.setStartIdValue(-1);
+       idGenerator.setStartIdValue(-1);
 
         try {
             taskManager = FileBackedTaskManager.loadFromFile(Util.getBacked());
-        } catch (TasksLoadException e) {
+        } catch (TaskLoadException e) {
             e.printStackTrace();
         }
     }

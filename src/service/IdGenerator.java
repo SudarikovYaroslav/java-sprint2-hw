@@ -16,7 +16,7 @@ public class IdGenerator {
         return instance;
     }
 
-    public static void setStartIdValue(long value) {
+    public void setStartIdValue(long value) {
         id = value;
     }
 

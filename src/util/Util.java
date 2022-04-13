@@ -1,7 +1,7 @@
 package util;
 
 import model.Status;
-import model.exceptions.TasksLoadException;
+import model.exceptions.TaskLoadException;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,8 +41,8 @@ public class Util {
             id = Long.parseLong(data);
         } catch (NumberFormatException e) {
             try {
-                throw new TasksLoadException(expMessage);
-            } catch (TasksLoadException exception) {
+                throw new TaskLoadException(expMessage);
+            } catch (TaskLoadException exception) {
                 exception.printStackTrace();
             }
         }

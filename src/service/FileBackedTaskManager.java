@@ -2,8 +2,8 @@ package service;
 
 import model.Status;
 import model.TaskTypes;
-import model.exceptions.TasksLoadException;
-import model.exceptions.TasksSaveException;
+import model.exceptions.TaskLoadException;
+import model.exceptions.TaskSaveException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -21,14 +21,10 @@ import static util.Util.getIdFromString;
 import static util.Util.getStatusFromString;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
-
-    private final Path fileBacked;
-    private final IdGenerator idGenerator;
-
     private static final String LINE_DELIMITER = "\n";
     private static final String EMPTY_LINE_DELIMITER = " \n";
     private static final String META_LINE_DELIMITER = "#";
-    private static final String ENTRY_DELIMITER = ",";
+    private static final String TASK_IN_LINE_DELIMITER = ",";
     private static final String IDS_DELIMITER = "\\.";
     private static final int ALL_TASKS_IN_LINE_INDEX = 0;
     private static final int HISTORY_IN_LINE_INDEX = 1;
@@ -40,11 +36,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     private static final int DESCRIPTION_COLUMN_INDEX = 3;
     private static final int STATUS_COLUMN_INDEX = 4;
     private static final int IDS_COLUMN_INDEX = 5;
+    private final Path fileBacked;
+    private final IdGenerator idGenerator;
 
-    public FileBackedTaskManager(HistoryManager historyManager, Path fileBacked) {
+    public FileBackedTaskManager(HistoryManager historyManager, Path fileBacked, IdGenerator idGenerator) {
         super(historyManager);
         this.fileBacked = fileBacked;
-        idGenerator = IdGenerator.getInstance();
+        this.idGenerator = idGenerator;
     }
 
     @Override
@@ -52,7 +50,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.deleteTasks();
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -62,7 +60,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.deleteEpics();
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -72,7 +70,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.deleteSubTasks();
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -82,7 +80,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         Task result = super.getTaskById(id);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
         return result;
@@ -93,7 +91,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         Epic result = super.getEpicById(id);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
         return result;
@@ -104,7 +102,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         SubTask result = super.getSubTaskById(id);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
         return result;
@@ -115,7 +113,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.createTask(task);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -125,7 +123,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.createEpic(epic);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -135,7 +133,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.createSubTask(subTask);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -145,7 +143,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.updateTask(task);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -155,7 +153,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.updateEpic(epic);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -165,7 +163,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.updateSubTask(subTask);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -175,7 +173,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.deleteTaskById(id);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -185,7 +183,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.deleteEpicById(id);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
@@ -195,54 +193,50 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         super.deleteSubTaskById(id);
         try {
             save();
-        } catch (TasksSaveException e) {
+        } catch (TaskSaveException e) {
             e.printStackTrace();
         }
     }
 
-    /*
-     По поводу избежания коллизий id при загрузке: решил при сохранении, просто записать в файл текущий id из
-     генератора, а потом при загрузке установить его как стартовый, а чтобы id в генераторе при сборке тасков вперёд
-     не уходил во время загрузки, немного модифицировал методы task/epic/subTask FromString()
-    */
-    public static FileBackedTaskManager loadFromFile(Path tasksFilePath) throws TasksLoadException {
-        if (tasksFilePath == null) throw new TasksLoadException("Не указан файл для загрузки");
-        if (!Files.exists(tasksFilePath)) throw new TasksLoadException("Указанный файл для загрузки не существует");
+    public static FileBackedTaskManager loadFromFile(Path tasksFilePath) throws TaskLoadException {
+        if (tasksFilePath == null) throw new TaskLoadException("Не указан файл для загрузки");
+        if (!Files.exists(tasksFilePath)) throw new TaskLoadException("Указанный файл для загрузки не существует");
 
         HistoryManager historyManager = Managers.getDefaultHistory();
-        FileBackedTaskManager taskManager = new FileBackedTaskManager(historyManager, tasksFilePath);
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(historyManager, tasksFilePath,
+                IdGenerator.getInstance());
 
         try {
             String mixedLine = new String(Files.readAllBytes(tasksFilePath));
-            String[] arr = mixedLine.split(EMPTY_LINE_DELIMITER);
-            String allTasksInLine = arr[ALL_TASKS_IN_LINE_INDEX];
-            String historyInLine = arr[HISTORY_IN_LINE_INDEX];
+            String[] tasksAndHistoryLines = mixedLine.split(EMPTY_LINE_DELIMITER);
+            String allTasksInLine = tasksAndHistoryLines[ALL_TASKS_IN_LINE_INDEX];
+            String historyInLine = tasksAndHistoryLines[HISTORY_IN_LINE_INDEX];
 
-            String[] entries = allTasksInLine.split(LINE_DELIMITER);
+            String[] tasksLines = allTasksInLine.split(LINE_DELIMITER);
 
-            String metaLine = entries[META_LINE_INDEX];
+            String metaLine = tasksLines[META_LINE_INDEX];
             String[] metaData = metaLine.split(META_LINE_DELIMITER);
             long currentIdValue = Util.getIdFromString(metaData[CURRENT_ID_INDEX], "неверный формат id " +
                     "при загрузке " + "текущего значения id");
-            IdGenerator.setStartIdValue(currentIdValue);
+            IdGenerator.getInstance().setStartIdValue(currentIdValue);
 
-            for (int i = 1; i < entries.length; i++) {
-                String entry = entries[i];
-                String[] fields = entry.split(ENTRY_DELIMITER);
+            for (int i = 1; i < tasksLines.length; i++) {
+                String taskInLine = tasksLines[i];
+                String[] fields = taskInLine.split(TASK_IN_LINE_DELIMITER);
                 String taskType = fields[TYPE_COLUMN_INDEX];
 
                 //первичная загрузка задач
                 switch (TaskTypes.valueOf(taskType)) {
                     case TASK:
-                        Task task = taskManager.taskFromString(entry);
+                        Task task = taskManager.taskFromString(taskInLine);
                         taskManager.createTask(task);
                         break;
                     case EPIC:
-                        Epic epic = taskManager.epicFromString(entry);
+                        Epic epic = taskManager.epicFromString(taskInLine);
                         taskManager.createEpic(epic);
                         break;
                     case SUB_TASK:
-                        SubTask subTask = taskManager.subTaskFromString(entry);
+                        SubTask subTask = taskManager.subTaskFromString(taskInLine);
                         taskManager.createSubTask(subTask);
                         break;
                 }
@@ -252,7 +246,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             for (Epic epic : taskManager.getEpicsList()) {
                 try {
                     taskManager.fillEpicWithSubTasks(epic);
-                } catch (TasksLoadException e) {
+                } catch (TaskLoadException e) {
                     e.printStackTrace();
                 }
             }
@@ -261,14 +255,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             taskManager.loadHistory(historyInLine);
 
         } catch (IOException e) {
-            throw new TasksLoadException("Ошибка при загрузке резервной копии", e);
+            throw new TaskLoadException("Ошибка при загрузке резервной копии", e);
         }
 
         return taskManager;
     }
 
-    public void save() throws TasksSaveException {
-        if (!Files.exists(fileBacked)) throw new TasksSaveException("Указанный файл для записи не существует");
+    public void save() throws TaskSaveException {
+        if (!Files.exists(fileBacked)) throw new TaskSaveException("Указанный файл для записи не существует");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileBacked.toFile()))) {
             writer.write("type,id,name,description,status,id...,#" +
@@ -290,22 +284,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             writer.write(InMemoryHistoryManager.toString(historyManager));
 
         } catch (IOException e) {
-            throw new TasksSaveException("Ошибка при сохранении данных");
+            throw new TaskSaveException("Ошибка при сохранении данных");
         }
     }
 
-    private Task taskFromString(String data) {
-        String[] arr = data.split(ENTRY_DELIMITER);
-        long id = getIdFromString(arr[ID_COLUMN_INDEX], "Неверный формат id при загрузке Task");
-        String name = arr[NAME_COLUMN_INDEX];
-        String description = arr[DESCRIPTION_COLUMN_INDEX];
-        Status status = getStatusFromString(arr[STATUS_COLUMN_INDEX]);
+    private Task taskFromString(String taskInLine) {
+        String[] taskFields = taskInLine.split(TASK_IN_LINE_DELIMITER);
+        long id = getIdFromString(taskFields[ID_COLUMN_INDEX], "Неверный формат id при загрузке Task");
+        String name = taskFields[NAME_COLUMN_INDEX];
+        String description = taskFields[DESCRIPTION_COLUMN_INDEX];
+        Status status = getStatusFromString(taskFields[STATUS_COLUMN_INDEX]);
         long currentIdValue = IdGenerator.peekCurrentIdValue();
 
         Task task = new Task(name, description, idGenerator);
         task.setId(id);
         task.setStatus(status);
-        IdGenerator.setStartIdValue(currentIdValue);
+        idGenerator.setStartIdValue(currentIdValue);
         return task;
     }
 
@@ -313,16 +307,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
      * Первый этап загрузки эпиков: загружает эпик без подзадач, но со всеми Id своих SubTask-ов.
      * Выполняется ДО ЗАГРУЗКИ SubTask-ов
      */
-    private Epic epicFromString(String data) {
-        String[] arr = data.split(ENTRY_DELIMITER);
-        long id = getIdFromString(arr[ID_COLUMN_INDEX], "Неверный формат id при загрузке Epic");
-        String name = arr[NAME_COLUMN_INDEX];
-        String description = arr[DESCRIPTION_COLUMN_INDEX];
-        Status status = getStatusFromString(arr[STATUS_COLUMN_INDEX]);
+    private Epic epicFromString(String epicInLine) {
+        String[] epicFields = epicInLine.split(TASK_IN_LINE_DELIMITER);
+        long id = getIdFromString(epicFields[ID_COLUMN_INDEX], "Неверный формат id при загрузке Epic");
+        String name = epicFields[NAME_COLUMN_INDEX];
+        String description = epicFields[DESCRIPTION_COLUMN_INDEX];
+        Status status = getStatusFromString(epicFields[STATUS_COLUMN_INDEX]);
         Long[] subTasksId = new Long[0]; // default empty arr
 
-        if (arr.length > 5) {
-            String[] ids = arr[IDS_COLUMN_INDEX].split(IDS_DELIMITER);
+        if (epicFields.length > 5) {
+            String[] ids = epicFields[IDS_COLUMN_INDEX].split(IDS_DELIMITER);
             subTasksId = new Long[ids.length];
 
             for (int i = 0; i < ids.length; i++) {
@@ -334,26 +328,27 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         epic.setId(id);
         epic.setStatus(status);
         epic.addSubTasksId(subTasksId);
-        IdGenerator.setStartIdValue(currentIdValue);
+        idGenerator.setStartIdValue(currentIdValue);
         return epic;
     }
 
     /**
      * Загрузка SubTask-ов должна выполняется ПОСЛЕ первого этапа загрузки эпиков epicFromString(String data)
      */
-    private SubTask subTaskFromString(String data) throws TasksLoadException {
-        String[] arr = data.split(ENTRY_DELIMITER);
-        long id = getIdFromString(arr[ID_COLUMN_INDEX], "Неверный формат id при загрузке SubTask");
-        String name = arr[NAME_COLUMN_INDEX];
-        String description = arr[DESCRIPTION_COLUMN_INDEX];
-        Status status = getStatusFromString(arr[STATUS_COLUMN_INDEX]);
-        Long epicId = getIdFromString(arr[IDS_COLUMN_INDEX], "Неверный формат EpicId при загрузке SubTask");
+    private SubTask subTaskFromString(String subTaskInLine) throws TaskLoadException {
+        String[] subTaskFields = subTaskInLine.split(TASK_IN_LINE_DELIMITER);
+        long id = getIdFromString(subTaskFields[ID_COLUMN_INDEX], "Неверный формат id при загрузке SubTask");
+        String name = subTaskFields[NAME_COLUMN_INDEX];
+        String description = subTaskFields[DESCRIPTION_COLUMN_INDEX];
+        Status status = getStatusFromString(subTaskFields[STATUS_COLUMN_INDEX]);
+        Long epicId = getIdFromString(subTaskFields[IDS_COLUMN_INDEX], "Неверный формат EpicId при " +
+                "загрузке SubTask");
         Epic epic;
 
         if (epics.containsKey(epicId)) {
             epic = epics.get(epicId);
         } else {
-            throw new TasksLoadException("null epic при загрузке SubTask id:" + id);
+            throw new TaskLoadException("null epic при загрузке SubTask id: " + id);
         }
 
         long currentIdValue = IdGenerator.peekCurrentIdValue();
@@ -361,7 +356,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         subTask.setId(id);
         subTask.setStatus(status);
         subTask.setEpic(epic);
-        IdGenerator.setStartIdValue(currentIdValue);
+        idGenerator.setStartIdValue(currentIdValue);
         return subTask;
     }
 
@@ -369,14 +364,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
      * Второй этап загрузки эпиков: добавляет в эпики их подзадачи по ID хранящимся в Set<Long> subTasksId
      * внутри каждого эпика. Выполняется ПОСЛЕ ЗАГРУЗКИ SubTask-ов
      */
-    private void fillEpicWithSubTasks(Epic epic) throws TasksLoadException {
+    private void fillEpicWithSubTasks(Epic epic) throws TaskLoadException {
         if (epic.getSubTasksId().size() == 0) return;
 
         for (Long id : epic.getSubTasksId()) {
             if (subTasks.containsKey(id)) {
                 epic.addSubTask(subTasks.get(id));
             } else {
-                throw new TasksLoadException("Не выполнена загрузка SubTask-ов");
+                throw new TaskLoadException("Не выполнена загрузка SubTask-ов");
             }
         }
     }
@@ -384,7 +379,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     /**
      * Загружает историю просмотров из файла-хранилища
      */
-    private void loadHistory(String data) throws TasksLoadException {
+    private void loadHistory(String data) throws TaskLoadException {
         List<Long> ids = InMemoryHistoryManager.fromString(data);
 
         for (Long id : ids) {
@@ -404,7 +399,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 continue;
             }
 
-            throw new TasksLoadException("Ошибка загрузки истории просмотров + id:" + id);
+            throw new TaskLoadException("Ошибка загрузки истории просмотров + id: " + id);
         }
     }
 }
