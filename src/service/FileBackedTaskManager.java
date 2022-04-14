@@ -36,6 +36,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     public static final int DESCRIPTION_COLUMN_INDEX = 3;
     public static final int STATUS_COLUMN_INDEX = 4;
     public static final int IDS_COLUMN_INDEX = 5;
+
     private final Path fileBacked;
     private final IdGenerator idGenerator;
 
@@ -225,7 +226,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
     }
 
-    public Task taskFromString(String taskInLine) {
+    public Task convertStringToTask(String taskInLine) {
         String[] taskFields = taskInLine.split(TASK_IN_LINE_DELIMITER);
         long id = getIdFromString(taskFields[ID_COLUMN_INDEX], "Неверный формат id при загрузке Task");
         String name = taskFields[NAME_COLUMN_INDEX];
@@ -244,7 +245,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
      * Первый этап загрузки эпиков: загружает эпик без подзадач, но со всеми Id своих SubTask-ов.
      * Выполняется ДО ЗАГРУЗКИ SubTask-ов
      */
-    public Epic epicFromString(String epicInLine) {
+    public Epic convertStringToEpic(String epicInLine) {
         String[] epicFields = epicInLine.split(TASK_IN_LINE_DELIMITER);
         long id = getIdFromString(epicFields[ID_COLUMN_INDEX], "Неверный формат id при загрузке Epic");
         String name = epicFields[NAME_COLUMN_INDEX];
@@ -272,7 +273,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     /**
      * Загрузка SubTask-ов должна выполняется ПОСЛЕ первого этапа загрузки эпиков epicFromString(String data)
      */
-    public SubTask subTaskFromString(String subTaskInLine) throws TaskLoadException {
+    public SubTask convertStringToSubTask(String subTaskInLine) throws TaskLoadException {
         String[] subTaskFields = subTaskInLine.split(TASK_IN_LINE_DELIMITER);
         long id = getIdFromString(subTaskFields[ID_COLUMN_INDEX], "Неверный формат id при загрузке SubTask");
         String name = subTaskFields[NAME_COLUMN_INDEX];

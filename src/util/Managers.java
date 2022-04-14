@@ -60,15 +60,15 @@ public class Managers {
                 //первичная загрузка задач
                 switch (TaskTypes.valueOf(taskType)) {
                     case TASK:
-                        Task task = taskManager.taskFromString(taskInLine);
+                        Task task = taskManager.convertStringToTask(taskInLine);
                         taskManager.createTask(task);
                         break;
                     case EPIC:
-                        Epic epic = taskManager.epicFromString(taskInLine);
+                        Epic epic = taskManager.convertStringToEpic(taskInLine);
                         taskManager.createEpic(epic);
                         break;
                     case SUB_TASK:
-                        SubTask subTask = taskManager.subTaskFromString(taskInLine);
+                        SubTask subTask = taskManager.convertStringToSubTask(taskInLine);
                         taskManager.createSubTask(subTask);
                         break;
                 }
