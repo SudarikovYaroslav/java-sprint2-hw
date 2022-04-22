@@ -1,14 +1,12 @@
 package service;
 
 import model.Status;
-import model.TaskTypes;
+import model.exceptions.TaskCreateException;
 import model.exceptions.TaskLoadException;
 import model.exceptions.TaskSaveException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
-import util.Managers;
-import util.Util;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -110,7 +108,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void createTask(Task task) {
+    public void createTask(Task task) throws TaskCreateException {
         super.createTask(task);
         try {
             save();
@@ -120,7 +118,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void createEpic(Epic epic) {
+    public void createEpic(Epic epic) throws TaskCreateException {
         super.createEpic(epic);
         try {
             save();
@@ -130,7 +128,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void createSubTask(SubTask subTask) {
+    public void createSubTask(SubTask subTask) throws TaskCreateException {
         super.createSubTask(subTask);
         try {
             save();

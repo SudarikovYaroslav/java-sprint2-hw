@@ -1,5 +1,6 @@
-package tests.myOldFashionedTests;
+package tests.consoleLogTests;
 
+import model.exceptions.TaskCreateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -60,24 +61,29 @@ public class HistoryConsoleTest implements Test {
         Random random = new Random();
         int taskType = random.nextInt(3);
 
-        switch (taskType) {
-            case 0:
-                Task task = new Task("Task", "простая задача", idGenerator);
-                taskManager.createTask(task);
-                return task;
-            case 1:
-                Epic epic = new Epic("Epic", "сложная задача", idGenerator);
-                taskManager.createEpic(epic);
-                return epic;
-            case 2:
-                SubTask subTask = new SubTask("SubTask", "подзадача", idGenerator);
-                taskManager.createSubTask(subTask);
-                return subTask;
-            default:
-                Task defaultTask = new Task("DefaultTask", "простая задача", idGenerator);
-                taskManager.createTask(defaultTask);
-                return defaultTask;
+        try {
+            switch (taskType) {
+                case 0:
+                    Task task = new Task("Task", "простая задача", idGenerator);
+                    taskManager.createTask(task);
+                    return task;
+                case 1:
+                    Epic epic = new Epic("Epic", "сложная задача", idGenerator);
+                    taskManager.createEpic(epic);
+                    return epic;
+                case 2:
+                    SubTask subTask = new SubTask("SubTask", "подзадача", idGenerator);
+                    taskManager.createSubTask(subTask);
+                    return subTask;
+                default:
+                    Task defaultTask = new Task("DefaultTask", "простая задача", idGenerator);
+                    taskManager.createTask(defaultTask);
+                    return defaultTask;
+            }
+        } catch (TaskCreateException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
     /**
@@ -109,7 +115,11 @@ public class HistoryConsoleTest implements Test {
 
     protected void severalTimesTheSameTaskTest() {
         Task task = new Task("Task", "repeated task", idGenerator);
-        taskManager.createTask(task);
+        try {
+            taskManager.createTask(task);
+        } catch (TaskCreateException e) {
+            e.printStackTrace();
+        }
 
         for (int i = 0; i < 10; i++) {
             callTaskById(task);

@@ -1,5 +1,6 @@
 package service;
 
+import model.exceptions.TaskCreateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -26,11 +27,11 @@ public interface TaskManager {
 
     SubTask getSubTaskById(long id);
 
-    void createTask(Task task);
+    void createTask(Task task) throws TaskCreateException;
 
-    void createEpic(Epic epic);
+    void createEpic(Epic epic) throws TaskCreateException;
 
-    void createSubTask(SubTask subTask);
+    void createSubTask(SubTask subTask) throws TaskCreateException;
 
     /**
      * Method gets new version of task with right id as parameter

@@ -1,5 +1,6 @@
-package tests.myOldFashionedTests;
+package tests.consoleLogTests;
 
+import model.exceptions.TaskCreateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -54,13 +55,17 @@ public class LinkedListRealisationTest implements Test {
 
         Epic epic2 = new Epic("Epic2", "epic without subTasks", idGen);
 
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
-        taskManager.createSubTask(subTask1);
-        taskManager.createSubTask(subTask2);
-        taskManager.createSubTask(subTask3);
-        taskManager.createEpic(epic1);
-        taskManager.createEpic(epic2);
+        try {
+            taskManager.createTask(task1);
+            taskManager.createTask(task2);
+            taskManager.createSubTask(subTask1);
+            taskManager.createSubTask(subTask2);
+            taskManager.createSubTask(subTask3);
+            taskManager.createEpic(epic1);
+            taskManager.createEpic(epic2);
+        } catch (TaskCreateException e) {
+            e.printStackTrace();
+        }
 
         testTasks.add(task1);
         testTasks.add(task2);
@@ -145,7 +150,13 @@ public class LinkedListRealisationTest implements Test {
         print("\n=============RemoveTest=============");
         print("Try to add Task to the history");
         Task task = new Task("Task", "task", idGen);
-        taskManager.createTask(task);
+
+        try {
+            taskManager.createTask(task);
+        } catch (TaskCreateException e) {
+            e.printStackTrace();
+        }
+
         taskManager.getTaskById(task.getId());
         printHistory();
         print("\nNow delete Task, check it was deleted from the history:");
@@ -160,10 +171,15 @@ public class LinkedListRealisationTest implements Test {
         epic1.addSubTask(subTask1);
         epic1.addSubTask(subTask2);
         epic1.addSubTask(subTask3);
-        taskManager.createSubTask(subTask1);
-        taskManager.createSubTask(subTask2);
-        taskManager.createSubTask(subTask3);
-        taskManager.createEpic(epic1);
+
+        try {
+            taskManager.createSubTask(subTask1);
+            taskManager.createSubTask(subTask2);
+            taskManager.createSubTask(subTask3);
+            taskManager.createEpic(epic1);
+        } catch (TaskCreateException e) {
+            e.printStackTrace();
+        }
 
         taskManager.getEpicById(epic1.getId());
         taskManager.getSubTaskById(subTask1.getId());

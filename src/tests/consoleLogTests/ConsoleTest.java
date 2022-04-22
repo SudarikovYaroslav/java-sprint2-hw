@@ -1,6 +1,7 @@
-package tests.myOldFashionedTests;
+package tests.consoleLogTests;
 
 import model.Status;
+import model.exceptions.TaskCreateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -66,13 +67,17 @@ public class ConsoleTest implements Test {
 
     private void createTestTasks() {
         printStartTestMessage();
-        inMemoryTaskManager.createTask(task1);
-        inMemoryTaskManager.createTask(task2);
-        inMemoryTaskManager.createSubTask(subTask1);
-        inMemoryTaskManager.createSubTask(subTask2);
-        inMemoryTaskManager.createSubTask(subTask3);
-        inMemoryTaskManager.createEpic(epic1);
-        inMemoryTaskManager.createEpic(epic2);
+        try {
+            inMemoryTaskManager.createTask(task1);
+            inMemoryTaskManager.createTask(task2);
+            inMemoryTaskManager.createSubTask(subTask1);
+            inMemoryTaskManager.createSubTask(subTask2);
+            inMemoryTaskManager.createSubTask(subTask3);
+            inMemoryTaskManager.createEpic(epic1);
+            inMemoryTaskManager.createEpic(epic2);
+        } catch (TaskCreateException e) {
+            e.printStackTrace();
+        }
     }
 
     private void printTasksCondition() {

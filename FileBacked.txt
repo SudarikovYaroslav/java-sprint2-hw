@@ -1,10 +1,2 @@
-type,id,name,description,status,id...,#8
-TASK,1,Task,simple task,NEW
-TASK,2,Task,simple task,NEW
-TASK,7,Task3,simple task,NEW
-EPIC,3,Epic,complex task,NEW,4.5.
-EPIC,6,Epic2,brand new complex task,NEW
-SUB_TASK,4,SubTask1,sub task,NEW,3
-SUB_TASK,5,SubTask2,sub task,NEW,3
+type,id,name,description,status,id...,#28
  
-1,3,5,

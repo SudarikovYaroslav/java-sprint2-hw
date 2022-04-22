@@ -1,6 +1,7 @@
 package util;
 
 import model.TaskTypes;
+import model.exceptions.TaskCreateException;
 import model.exceptions.TaskLoadException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
@@ -58,19 +59,23 @@ public class Managers {
                 String taskType = fields[FileBackedTaskManager.TYPE_COLUMN_INDEX];
 
                 //первичная загрузка задач
-                switch (TaskTypes.valueOf(taskType)) {
-                    case TASK:
-                        Task task = taskManager.convertStringToTask(taskInLine);
-                        taskManager.createTask(task);
-                        break;
-                    case EPIC:
-                        Epic epic = taskManager.convertStringToEpic(taskInLine);
-                        taskManager.createEpic(epic);
-                        break;
-                    case SUB_TASK:
-                        SubTask subTask = taskManager.convertStringToSubTask(taskInLine);
-                        taskManager.createSubTask(subTask);
-                        break;
+                try {
+                    switch (TaskTypes.valueOf(taskType)) {
+                        case TASK:
+                            Task task = taskManager.convertStringToTask(taskInLine);
+                            taskManager.createTask(task);
+                            break;
+                        case EPIC:
+                            Epic epic = taskManager.convertStringToEpic(taskInLine);
+                            taskManager.createEpic(epic);
+                            break;
+                        case SUB_TASK:
+                            SubTask subTask = taskManager.convertStringToSubTask(taskInLine);
+                            taskManager.createSubTask(subTask);
+                            break;
+                    }
+                } catch (TaskCreateException e) {
+                    e.printStackTrace();
                 }
             }
 

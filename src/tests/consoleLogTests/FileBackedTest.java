@@ -1,5 +1,6 @@
-package tests.myOldFashionedTests;
+package tests.consoleLogTests;
 
+import model.exceptions.TaskCreateException;
 import model.exceptions.TaskLoadException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
@@ -52,12 +53,16 @@ public class FileBackedTest implements Test {
         subTask2.setEpic(epic1);
         Epic epic2 = new Epic("Epic2", "brand new complex task", idGenerator);
 
-        taskManager.createTask(task1);
-        taskManager.createTask(task2);
-        taskManager.createEpic(epic1);
-        taskManager.createSubTask(subTask1);
-        taskManager.createSubTask(subTask2);
-        taskManager.createEpic(epic2);
+        try {
+            taskManager.createTask(task1);
+            taskManager.createTask(task2);
+            taskManager.createEpic(epic1);
+            taskManager.createSubTask(subTask1);
+            taskManager.createSubTask(subTask2);
+            taskManager.createEpic(epic2);
+        } catch (TaskCreateException e) {
+            e.printStackTrace();
+        }
     }
 
     private void makeSeveralCalls() {
@@ -111,6 +116,10 @@ public class FileBackedTest implements Test {
 
     private void addNewTask() {
         Task task3 = new Task("Task3", "simple task", idGenerator);
-        taskManager.createTask(task3);
+        try {
+            taskManager.createTask(task3);
+        } catch (TaskCreateException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,4 +1,4 @@
-package tests.myOldFashionedTests;
+package tests.consoleLogTests;
 
 import model.MapLinkedList;
 import model.tasks.Task;

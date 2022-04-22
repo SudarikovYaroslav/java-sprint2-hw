@@ -1,5 +1,6 @@
 package service;
 
+import model.exceptions.TaskCreateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -88,17 +89,35 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createTask(Task task) {
+    public void createTask(Task task) throws TaskCreateException{
+        if (task == null) throw new TaskCreateException("При создании task == null");
+        if (task.getId() <= 0) throw new TaskCreateException(
+                "При создании Task id должен быть больше 0. Actual: " + task.getId());
+        if (tasks.containsKey(task.getId())) throw new TaskCreateException(
+                "Task с id: " + task.getId() + " уже существует");
+
         tasks.put(task.getId(), task);
     }
 
     @Override
-    public void createEpic(Epic epic) {
+    public void createEpic(Epic epic) throws TaskCreateException{
+        if (epic == null) throw new TaskCreateException("При создании Epic == null");
+        if (epic.getId() <= 0) throw new TaskCreateException(
+                "При создании Epic id должен быть больше 0. Actual: " + epic.getId());
+        if (tasks.containsKey(epic.getId())) throw new TaskCreateException(
+                "Epic с id: " + epic.getId() + " уже существует");
+
         epics.put(epic.getId(), epic);
     }
 
     @Override
-    public void createSubTask(SubTask subTask) {
+    public void createSubTask(SubTask subTask) throws TaskCreateException{
+        if (subTask == null) throw new TaskCreateException("При создании SubTask == null");
+        if (subTask.getId() <= 0) throw new TaskCreateException(
+                "При создании SubTask id должен быть больше 0. Actual: " + subTask.getId());
+        if (tasks.containsKey(subTask.getId())) throw new TaskCreateException(
+                "SubTask с id: " + subTask.getId() + " уже существует");
+
         subTasks.put(subTask.getId(), subTask);
     }
 

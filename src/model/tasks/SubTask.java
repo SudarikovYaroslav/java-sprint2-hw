@@ -27,6 +27,14 @@ public class SubTask extends Task {
     }
 
     @Override
+    public void setStatus(Status status) {
+        super.setStatus(status);
+        if (epic != null) {
+            epic.calculateStatus();
+        }
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -38,13 +46,5 @@ public class SubTask extends Task {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), epic);
-    }
-
-    @Override
-    public void setStatus(Status status) {
-        super.setStatus(status);
-        if (epic != null) {
-            epic.calculateStatus();
-        }
     }
 }
