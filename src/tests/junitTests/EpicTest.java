@@ -1,6 +1,6 @@
-package model.tasks;
-
 import model.Status;
+import model.tasks.Epic;
+import model.tasks.SubTask;
 import org.junit.jupiter.api.Test;
 import service.EpicStatusService;
 import service.IdGenerator;

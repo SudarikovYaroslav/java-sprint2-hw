@@ -43,6 +43,8 @@ public class SubTask extends Task {
     @Override
     public void setStatus(Status status) {
         super.setStatus(status);
-        epic.calculateStatus();
+        if (epic != null) {
+            epic.calculateStatus();
+        }
     }
 }
