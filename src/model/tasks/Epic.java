@@ -2,6 +2,7 @@ package model.tasks;
 
 import model.Status;
 import model.TaskTypes;
+import service.EpicStatusService;
 import service.IdGenerator;
 
 import java.util.*;
@@ -9,7 +10,8 @@ import java.util.*;
 public class Epic extends Task {
     private final List<SubTask> subTasks = new ArrayList<>();
     //Множество id используется для корректной загрузки Epic-ов
-    private Set<Long> subTasksId = new HashSet<>();
+    private final Set<Long> subTasksId = new HashSet<>();
+    private final EpicStatusService epicStatusService = new EpicStatusService();
 
     public Epic(String name, String description, List<SubTask> subTasks, IdGenerator idGenerator) {
         super(name, description, idGenerator);
@@ -31,11 +33,14 @@ public class Epic extends Task {
     public void addSubTask(SubTask subTask) {
         subTask.setEpic(this);
         subTasks.add(subTask);
+        subTasksId.add(subTask.getId());
+        calculateStatus();
     }
 
     public void deleteSubTaskById(long id) {
         subTasks.removeIf(subTask -> subTask.getId() == id);
         subTasksId.remove(id);
+        calculateStatus();
     }
 
     public void addSubTasks(List<SubTask> subTasks) {
@@ -45,6 +50,8 @@ public class Epic extends Task {
         for (SubTask item : subTasks) {
             subTasksId.add(item.getId());
         }
+
+        calculateStatus();
     }
 
     public void addSubTasksId (Long[] ids) {
@@ -55,6 +62,10 @@ public class Epic extends Task {
         for (SubTask subTask : subTasks) {
             subTask.setEpic(this);
         }
+    }
+
+    public void calculateStatus() {
+        status = epicStatusService.calculateStatus(this);
     }
 
     @Override

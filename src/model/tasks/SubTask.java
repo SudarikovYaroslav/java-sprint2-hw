@@ -39,4 +39,10 @@ public class SubTask extends Task {
     public int hashCode() {
         return Objects.hash(super.hashCode(), epic);
     }
+
+    @Override
+    public void setStatus(Status status) {
+        super.setStatus(status);
+        epic.calculateStatus();
+    }
 }

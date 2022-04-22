@@ -1,4 +1,4 @@
-package tests;
+package tests.myOldFashionedTests;
 
 import model.MapLinkedList;
 import model.tasks.Task;

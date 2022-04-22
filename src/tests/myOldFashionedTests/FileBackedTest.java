@@ -1,4 +1,4 @@
-package tests;
+package tests.myOldFashionedTests;
 
 import model.exceptions.TaskLoadException;
 import model.tasks.Epic;
