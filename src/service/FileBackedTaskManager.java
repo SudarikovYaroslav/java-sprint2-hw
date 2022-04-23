@@ -1,10 +1,7 @@
 package service;
 
 import model.Status;
-import model.exceptions.TaskCreateException;
-import model.exceptions.TaskLoadException;
-import model.exceptions.TaskSaveException;
-import model.exceptions.TaskUpdateException;
+import model.exceptions.*;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -169,7 +166,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void deleteTaskById(long id) {
+    public void deleteTaskById(long id) throws TaskDeleteException {
         super.deleteTaskById(id);
         try {
             save();
@@ -179,7 +176,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void deleteEpicById(long id) {
+    public void deleteEpicById(long id) throws TaskDeleteException {
         super.deleteEpicById(id);
         try {
             save();
@@ -189,7 +186,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void deleteSubTaskById(long id) {
+    public void deleteSubTaskById(long id) throws TaskDeleteException {
         super.deleteSubTaskById(id);
         try {
             save();

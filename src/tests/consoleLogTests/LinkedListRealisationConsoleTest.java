@@ -1,6 +1,7 @@
 package tests.consoleLogTests;
 
 import model.exceptions.TaskCreateException;
+import model.exceptions.TaskDeleteException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -160,7 +161,11 @@ public class LinkedListRealisationConsoleTest implements Test {
         taskManager.getTaskById(task.getId());
         printHistory();
         print("\nNow delete Task, check it was deleted from the history:");
-        taskManager.deleteTaskById(task.getId());
+        try {
+            taskManager.deleteTaskById(task.getId());
+        } catch (TaskDeleteException e) {
+            e.printStackTrace();
+        }
         printHistory();
         print("\nNow trying create new Epic with three subTasks and make call of every task");
 
@@ -188,7 +193,11 @@ public class LinkedListRealisationConsoleTest implements Test {
 
         printHistory();
         print("\nTrying to delete Epic. Please check, epic with all it's subTasks should be deleted from the history:");
-        taskManager.deleteEpicById(epic1.getId());
+        try {
+            taskManager.deleteEpicById(epic1.getId());
+        } catch (TaskDeleteException e) {
+            e.printStackTrace();
+        }
         printHistory();
     }
 }

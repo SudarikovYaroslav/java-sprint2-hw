@@ -2,6 +2,7 @@ package tests.consoleLogTests;
 
 import model.Status;
 import model.exceptions.TaskCreateException;
+import model.exceptions.TaskDeleteException;
 import model.exceptions.TaskUpdateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
@@ -150,13 +151,21 @@ public class InMemoryTaskManagerConsoleTest implements Test {
 
     private void deleteTest() {
         printDeleteWarning();
-        inMemoryTaskManager.deleteTaskById(1);
-        inMemoryTaskManager.deleteEpicById(6);
+        try {
+            inMemoryTaskManager.deleteTaskById(1);
+            inMemoryTaskManager.deleteEpicById(6);
+        } catch (TaskDeleteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void emptyEpicTest() {
         print("\nTrying to delete all subTasks from Epic2. CHECK: the Epic2 status should changed into NEW");
-        inMemoryTaskManager.deleteSubTaskById(5);
+        try {
+            inMemoryTaskManager.deleteSubTaskById(5);
+        } catch (TaskDeleteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void printTask(Task task) {

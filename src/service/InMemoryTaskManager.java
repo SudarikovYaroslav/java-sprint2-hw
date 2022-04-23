@@ -1,6 +1,8 @@
 package service;
 
 import model.exceptions.TaskCreateException;
+import model.exceptions.TaskDeleteException;
+import model.exceptions.TaskLoadException;
 import model.exceptions.TaskUpdateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
@@ -154,7 +156,6 @@ public class InMemoryTaskManager implements TaskManager {
                 "Epic с id: " + epic.getId() + " не существует. Обновление невозможно!"
         );
 
-        epic.setStatus(epicStatusService.calculateStatus(epic));
         epics.put(epic.getId(), epic);
 
         for (SubTask subTask : epic.getSubTasks()) {
@@ -167,7 +168,7 @@ public class InMemoryTaskManager implements TaskManager {
      */
     @Override
     public void updateSubTask(SubTask subTask) throws TaskUpdateException {
-        if (subTask == null) throw new TaskUpdateException("Обновляемый SubTask = null");
+        if (subTask == null) throw new TaskUpdateException("Обновляемая SubTask = null");
         if (subTask.getId() <= 0) throw new TaskUpdateException(
                 "id обновляемой SubTask должен быть больше 0! Actual: " + subTask.getId()
         );
@@ -179,13 +180,21 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTaskById(long id) {
+    public void deleteTaskById(long id) throws TaskDeleteException {
+        if (!tasks.containsKey(id)) throw new TaskDeleteException(
+                "Task с id: " + id + " не существует. Удаление не возможно!"
+        );
+
         historyManager.remove(id);
         tasks.remove(id);
     }
 
     @Override
-    public void deleteEpicById(long id) {
+    public void deleteEpicById(long id) throws TaskDeleteException {
+        if (!epics.containsKey(id)) throw new TaskDeleteException(
+                "Epic с id: " + id + " не существует. Удаление не возможно!"
+        );
+
         List<SubTask> innerSubTasks = epics.get(id).getSubTasks();
         historyManager.remove(id);
         epics.remove(id);
@@ -197,7 +206,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteSubTaskById(long id) {
+    public void deleteSubTaskById(long id) throws TaskDeleteException {
+        if (!subTasks.containsKey(id)) throw new TaskDeleteException(
+                "SubTask с id: " + id + " не существует. Удаление не возможно!"
+        );
+
         Epic epic = subTasks.get(id).getEpic();
         epic.deleteSubTaskById(id);
         historyManager.remove(id);
@@ -207,6 +220,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<SubTask> getSubTasks(Epic epic) {
+        if (epic == null) throw  new NullPointerException("Epic = null! при попытке getSubTasks()");
         return epic.getSubTasks();
     }
 }
