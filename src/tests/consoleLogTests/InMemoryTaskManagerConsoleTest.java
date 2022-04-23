@@ -2,10 +2,12 @@ package tests.consoleLogTests;
 
 import model.Status;
 import model.exceptions.TaskCreateException;
+import model.exceptions.TaskUpdateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
 import service.IdGenerator;
+import service.InMemoryHistoryManager;
 import service.InMemoryTaskManager;
 
 import java.util.ArrayList;
@@ -15,7 +17,7 @@ import java.util.List;
  * !! WARNING !!
  * Class ConsoleTest used only for console tests! It has only one public method runConsoleTest() to run testing;
  */
-public class ConsoleTest implements Test {
+public class InMemoryTaskManagerConsoleTest implements Test {
     private final InMemoryTaskManager inMemoryTaskManager;
     private final Task task1;
     private final Task task2;
@@ -25,10 +27,12 @@ public class ConsoleTest implements Test {
     private final Epic epic1;
     private final Epic epic2;
     private final IdGenerator idGenerator;
+    private final InMemoryHistoryManager historyManager;
 
-    public ConsoleTest(InMemoryTaskManager inMemoryTaskManager) {
+    public InMemoryTaskManagerConsoleTest() {
         idGenerator = IdGenerator.getInstance();
-        this.inMemoryTaskManager = inMemoryTaskManager;
+        historyManager = new InMemoryHistoryManager();
+        inMemoryTaskManager = new InMemoryTaskManager(historyManager);
         task1 = new Task("Task1", "First action", idGenerator);
         task2 = new Task("Task2", "Second Action", idGenerator);
         subTask1 = new SubTask("SubTask1", "First SubTask - First Epic", idGenerator);
@@ -131,13 +135,17 @@ public class ConsoleTest implements Test {
         updatedEpic1.setId(6);
         updatedEpic2.setId(7);
 
-        inMemoryTaskManager.updateTask(updatedTask1);
-        inMemoryTaskManager.updateTask(updatedTask2);
-        inMemoryTaskManager.updateSubTask(updatedSubTask1);
-        inMemoryTaskManager.updateSubTask(updatedSubTask2);
-        inMemoryTaskManager.updateSubTask(updatedSubTask3);
-        inMemoryTaskManager.updateEpic(updatedEpic1);
-        inMemoryTaskManager.updateEpic(updatedEpic2);
+        try {
+            inMemoryTaskManager.updateTask(updatedTask1);
+            inMemoryTaskManager.updateTask(updatedTask2);
+            inMemoryTaskManager.updateSubTask(updatedSubTask1);
+            inMemoryTaskManager.updateSubTask(updatedSubTask2);
+            inMemoryTaskManager.updateSubTask(updatedSubTask3);
+            inMemoryTaskManager.updateEpic(updatedEpic1);
+            inMemoryTaskManager.updateEpic(updatedEpic2);
+        } catch (TaskUpdateException e) {
+            e.printStackTrace();
+        }
     }
 
     private void deleteTest() {

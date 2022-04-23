@@ -18,13 +18,13 @@ import java.util.Random;
  * Fields in the class should't be final for correct processing!!!
  */
 
-public class LinkedListRealisationTest implements Test {
+public class LinkedListRealisationConsoleTest implements Test {
     private InMemoryHistoryManager historyManager;
     private InMemoryTaskManager taskManager;
     private IdGenerator idGen;
     private ArrayList<Task> testTasks;
 
-    public LinkedListRealisationTest() {
+    public LinkedListRealisationConsoleTest() {
         historyManager = new InMemoryHistoryManager();
         taskManager = new InMemoryTaskManager(historyManager);
         idGen = IdGenerator.getInstance();

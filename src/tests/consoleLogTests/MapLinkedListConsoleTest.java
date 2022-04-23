@@ -8,13 +8,13 @@ import service.InMemoryTaskManager;
 
 import java.util.List;
 
-public class MapLinkedListTest implements Test {
+public class MapLinkedListConsoleTest implements Test {
 
     private final InMemoryHistoryManager historyManager;
     private final InMemoryTaskManager taskManager;
     private final IdGenerator idGen;
 
-    public MapLinkedListTest() {
+    public MapLinkedListConsoleTest() {
         historyManager = new InMemoryHistoryManager();
         taskManager = new InMemoryTaskManager(historyManager);
         idGen = IdGenerator.getInstance();

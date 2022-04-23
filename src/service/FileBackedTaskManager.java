@@ -4,6 +4,7 @@ import model.Status;
 import model.exceptions.TaskCreateException;
 import model.exceptions.TaskLoadException;
 import model.exceptions.TaskSaveException;
+import model.exceptions.TaskUpdateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -138,7 +139,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Task task) throws TaskUpdateException {
         super.updateTask(task);
         try {
             save();
@@ -148,7 +149,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void updateEpic(Epic epic) {
+    public void updateEpic(Epic epic) throws TaskUpdateException {
         super.updateEpic(epic);
         try {
             save();
@@ -158,7 +159,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void updateSubTask(SubTask subTask) {
+    public void updateSubTask(SubTask subTask) throws TaskUpdateException {
         super.updateSubTask(subTask);
         try {
             save();

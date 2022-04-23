@@ -1,5 +1,6 @@
 import model.Status;
 import model.exceptions.TaskCreateException;
+import model.exceptions.TaskUpdateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -18,6 +19,45 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     protected TaskManager taskManager;
     protected IdGenerator idGenerator;
 
+    private void linkEpicWithSubTask(Epic epic, SubTask subTask) throws TaskCreateException {
+        subTask.setEpic(epic);
+        taskManager.createSubTask(subTask);
+        epic.addSubTask(subTask);
+        assertNotNull(subTask.getEpic());
+        assertEquals(Status.NEW, epic.getStatus());
+    }
+
+    private Task testTaskTemplateGen() {
+        return new Task("TestTask", "TestDescription", idGenerator);
+    }
+
+    private Epic testEpicTemplateGen() {
+        return new Epic("TestEpic", "TestEpic description", idGenerator);
+    }
+
+    private SubTask testSubTaskTemplateGen() {
+        return new SubTask("TestSubTask", "TestSubTask description", idGenerator);
+    }
+
+    private Task testInProgressTaskTemplateGen() {
+        Task task = new Task("TestUpdatedTask", "Task in progress status", idGenerator);
+        task.setStatus(Status.IN_PROGRESS);
+        return task;
+    }
+    private Epic testInProgressEpicTemplateGen() {
+        Epic epic = new Epic("TestUpdatedEpic", "Epic in progress status", idGenerator);
+        epic.setStatus(Status.IN_PROGRESS);
+        return epic;
+    }
+
+    private SubTask testInProgressSubTaskTemplateGen() {
+        SubTask subTask = new SubTask("TestUpdatedSubTask", "SubTask in progress status", idGenerator);
+        subTask.setStatus(Status.IN_PROGRESS);
+        return subTask;
+    }
+
+
+
     @BeforeEach
     protected abstract void preparation();
 
@@ -28,14 +68,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkStandardTasksListAddedRight() throws TaskCreateException {
-        Task task = new Task("TestTask", "TestDescription", idGenerator);
+        Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         assertEquals(1, taskManager.getTasksList().size());
     }
 
     @Test
     public void checkTasksIdValidatesAndTasksListIsEmpty() {
-        Task task = new Task("TestTask", "TestDescription", idGenerator);
+        Task task = testTaskTemplateGen();
         task.setId(-1);
 
         TaskCreateException ex = assertThrows(
@@ -53,14 +93,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkStandardEpicsListAddedRight() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
+        Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         assertEquals(1, taskManager.getEpicsList().size());
     }
 
     @Test
     public void checkEpicIdValidatesAndEpicsListIsEmpty() {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
+        Epic epic = testEpicTemplateGen();
         epic.setId(-1);
 
         TaskCreateException ex = assertThrows(
@@ -78,20 +118,16 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkStandardSubTasksListAddedRight() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
-        SubTask subTask = new SubTask("TestSubTask", "TestSubTask description", idGenerator);
-        subTask.setEpic(epic);
-        taskManager.createSubTask(subTask);
-        epic.addSubTask(subTask);
-        assertNotNull(subTask.getEpic());
-        assertEquals(Status.NEW, epic.getStatus());
+        Epic epic = testEpicTemplateGen();
+        SubTask subTask = testSubTaskTemplateGen();
+        linkEpicWithSubTask(epic, subTask);
         assertEquals(1, taskManager.getSubTasksList().size());
     }
 
     @Test
     public void checkSubTaskIdValidatesAndSubTasksListIsEmpty() {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
-        SubTask subTask = new SubTask("TestSubTask", "TestSubTask description", idGenerator);
+        Epic epic = testEpicTemplateGen();
+        SubTask subTask = testSubTaskTemplateGen();
         subTask.setId(-1);
         subTask.setEpic(epic);
         TaskCreateException ex = assertThrows(
@@ -103,7 +139,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkDeleteTaskFunctionDeleteTaskFromTasksList() throws TaskCreateException {
-        Task task = new Task("TestTask", "TestDescription", idGenerator);
+        Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         taskManager.deleteTasks();
         assertEquals(0, taskManager.getTasksList().size());
@@ -117,7 +153,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkDeleteEpicFunctionDeleteEpicFromEpicsList() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
+        Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         taskManager.deleteEpics();
         assertEquals(0, taskManager.getEpicsList().size());
@@ -131,13 +167,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkDeleteSubTaskFunctionDeleteSubTaskFromEpicsList() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
-        SubTask subTask = new SubTask("TestSubTask", "TestSubTask description", idGenerator);
-        subTask.setEpic(epic);
-        taskManager.createSubTask(subTask);
-        epic.addSubTask(subTask);
-        assertNotNull(subTask.getEpic());
-        assertEquals(Status.NEW, epic.getStatus());
+        Epic epic = testEpicTemplateGen();
+        SubTask subTask = testSubTaskTemplateGen();
+        linkEpicWithSubTask(epic, subTask);
         taskManager.deleteSubTasks();
         assertEquals(0, taskManager.getSubTasksList().size());
     }
@@ -150,7 +182,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkGetTaskByIdStandard() throws TaskCreateException {
-        Task task = new Task("TestTask", "TestDescription", idGenerator);
+        Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long controlId = task.getId();
         assertEquals(task, taskManager.getTaskById(controlId));
@@ -163,7 +195,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkGetTaskByIdWithIncorrectId() throws TaskCreateException {
-        Task task = new Task("TestTask", "TestDescription", idGenerator);
+        Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long testId = 2L;
         assertNotEquals(task.getId(), testId);
@@ -173,7 +205,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkGetEpicByIdStandard() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
+        Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         long id = epic.getId();
         assertEquals(epic, taskManager.getEpicById(id));
@@ -186,7 +218,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkGetEpicByIdWithIncorrectId() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
+        Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         long testId = 2L;
         assertNotEquals(testId, epic.getId());
@@ -196,13 +228,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkGetSubTaskByIdStandard() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
-        SubTask subTask = new SubTask("TestSubTask", "TestSubTask description", idGenerator);
-        subTask.setEpic(epic);
-        taskManager.createSubTask(subTask);
-        epic.addSubTask(subTask);
-        assertNotNull(subTask.getEpic());
-        assertEquals(Status.NEW, epic.getStatus());
+        Epic epic = testEpicTemplateGen();
+        SubTask subTask = testSubTaskTemplateGen();
+        linkEpicWithSubTask(epic, subTask);
         long id  = subTask.getId();
         assertEquals(subTask, taskManager.getSubTaskById(id));
     }
@@ -214,13 +242,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkGetSubTaskByIdWithIncorrectId() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
-        SubTask subTask = new SubTask("TestSubTask", "TestSubTask description", idGenerator);
-        subTask.setEpic(epic);
-        taskManager.createSubTask(subTask);
-        epic.addSubTask(subTask);
-        assertNotNull(subTask.getEpic());
-        assertEquals(Status.NEW, epic.getStatus());
+        Epic epic = testEpicTemplateGen();
+        SubTask subTask = testSubTaskTemplateGen();
+        linkEpicWithSubTask(epic,subTask);
         long testId = 2L;
         assertNotEquals(testId, subTask.getId());
         assertNull(taskManager.getSubTaskById(testId));
@@ -228,7 +252,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkCreateTaskStandard() throws TaskCreateException {
-        Task task = new Task("TestTask", "TestDescription", idGenerator);
+        Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         assertEquals(1, taskManager.getTasksList().size());
         assertEquals(task, taskManager.getTasksList().get(0));
@@ -246,7 +270,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkCreateTaskWithIncorrectId() {
-        Task task = new Task("TestTask", "TestDescription", idGenerator);
+        Task task = testTaskTemplateGen();
         task.setId(0);
         TaskCreateException ex = assertThrows(
                 TaskCreateException.class,
@@ -264,7 +288,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkCreateEpicStandard() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
+        Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         assertEquals(1, taskManager.getEpicsList().size());
         assertEquals(epic, taskManager.getEpicsList().get(0));
@@ -282,7 +306,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkCreateEpicWithIncorrectId() {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
+        Epic epic = testEpicTemplateGen();
         epic.setId(0);
         TaskCreateException ex = assertThrows(
                 TaskCreateException.class,
@@ -300,14 +324,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkCreateSubTaskStandard() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
-        SubTask subTask = new SubTask("TestSubTask", "TestSubTask description", idGenerator);
-        subTask.setEpic(epic);
-        taskManager.createSubTask(subTask);
-        epic.addSubTask(subTask);
-        assertNotNull(subTask.getEpic());
-        assertEquals(Status.NEW, epic.getStatus());
-
+        Epic epic = testEpicTemplateGen();
+        SubTask subTask = testSubTaskTemplateGen();
+        linkEpicWithSubTask(epic, subTask);
         assertEquals(1, taskManager.getSubTasksList().size());
         assertEquals(subTask, taskManager.getSubTasksList().get(0));
     }
@@ -324,8 +343,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkCreateSubTaskWithIncorrectId() throws TaskCreateException {
-        Epic epic = new Epic("TestEpic", "TestEpic description", idGenerator);
-        SubTask subTask = new SubTask("TestSubTask", "TestSubTask description", idGenerator);
+        Epic epic = testEpicTemplateGen();
+        SubTask subTask = testSubTaskTemplateGen();
         subTask.setEpic(epic);
         taskManager.createSubTask(subTask);
         epic.addSubTask(subTask);
@@ -350,7 +369,13 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateTaskStandard() {
-
+    public void checkUpdateTaskStandard() throws TaskCreateException, TaskUpdateException {
+        Task task = testTaskTemplateGen();
+        Task updatedTask = testInProgressTaskTemplateGen();
+        long id = task.getId();
+        updatedTask.setId(id);
+        taskManager.createTask(task);
+        taskManager.updateTask(updatedTask);
+        assertEquals(Status.IN_PROGRESS, taskManager.getTaskById(id).getStatus());
     }
 }

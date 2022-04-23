@@ -1,6 +1,7 @@
 package service;
 
 import model.exceptions.TaskCreateException;
+import model.exceptions.TaskUpdateException;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
@@ -36,17 +37,17 @@ public interface TaskManager {
     /**
      * Method gets new version of task with right id as parameter
      */
-    void updateTask(Task task);
+    void updateTask(Task task) throws TaskUpdateException;
 
     /**
      * Method gets new version of epic with right id as parameter
      */
-    void updateEpic(Epic epic);
+    void updateEpic(Epic epic) throws TaskUpdateException;
 
     /**
      * Method gets new version of SubTask with right id as parameter
      */
-    void updateSubTask(SubTask subTask);
+    void updateSubTask(SubTask subTask) throws TaskUpdateException;
 
     void deleteTaskById(long id);
 

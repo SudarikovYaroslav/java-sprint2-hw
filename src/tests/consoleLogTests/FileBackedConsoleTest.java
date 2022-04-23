@@ -15,13 +15,13 @@ import util.Util;
 /**
  * This class should be used only for tests of FileBackedTaskManager
  */
-public class FileBackedTest implements Test {
+public class FileBackedConsoleTest implements Test {
 
     private IdGenerator idGenerator = IdGenerator.getInstance();
     private HistoryManager historyManager;
     private FileBackedTaskManager taskManager;
 
-    public FileBackedTest() {
+    public FileBackedConsoleTest() {
         historyManager = Managers.getDefaultHistory();
         taskManager = new FileBackedTaskManager(historyManager, Util.getBacked(), idGenerator);
     }
