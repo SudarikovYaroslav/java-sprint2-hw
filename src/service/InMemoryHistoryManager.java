@@ -38,8 +38,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task task) {
         if (task == null) {
-            System.out.println("Can't add task to history. Task is null");
-            return;
+            throw new NullPointerException("Нельзя добавить в историю просмотров Task = null !");
         }
 
         if (lastViewedTasks.size() >= HISTORY_SIZE) {

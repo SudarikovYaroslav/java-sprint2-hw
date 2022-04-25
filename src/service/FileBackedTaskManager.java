@@ -333,7 +333,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 continue;
             }
 
-            throw new TaskLoadException("Ошибка загрузки истории просмотров + id: " + id);
+            throw new TaskLoadException("Ошибка загрузки истории просмотров id: " + id);
         }
     }
 }
