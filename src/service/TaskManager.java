@@ -57,4 +57,6 @@ public interface TaskManager {
     void deleteSubTaskById(long id) throws TaskDeleteException;
 
     List<SubTask> getSubTasks(Epic epic);
+
+    void addTask(Task task);
 }

@@ -1,5 +1,7 @@
 import model.exceptions.TaskCreateException;
 import model.exceptions.TaskDeleteException;
+import model.tasks.Epic;
+import model.tasks.SubTask;
 import model.tasks.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +29,30 @@ public class InMemoryHistoryManagerTest {
         long id = task.getId();
         taskManager.getTaskById(id);
         assertEquals(1, historyManager.getLastViewedTasks().size());
+    }
+
+    @Test
+    public void addTaskWhenNull() {
+        Task task = null;
+        NullPointerException ex = assertThrows(
+                NullPointerException.class,
+                () -> historyManager.add(task)
+        );
+        assertEquals("Нельзя добавить в историю просмотров Task = null !", ex.getMessage());
+    }
+
+    @Test
+    public void maxHistorySizeTest() throws TaskCreateException {
+        final int MAX_HISTORY_SIZE = 10;
+
+        for (int i = 0; i < (MAX_HISTORY_SIZE + 1); i++) {
+            Task task = testTaskTemplateGen();
+            taskManager.createTask(task);
+            long id = task.getId();
+            taskManager.getTaskById(id);
+        }
+
+        assertEquals(MAX_HISTORY_SIZE, historyManager.getLastViewedTasks().size());
     }
 
     @Test
@@ -83,7 +109,40 @@ public class InMemoryHistoryManagerTest {
         assertEquals(0, historyManager.getLastViewedTasks().size());
     }
 
+    @Test
+    public void checkHistoryEmptyWhenDeleteEpicContainedSubTasks() throws TaskDeleteException, TaskCreateException {
+        Epic epic = testEpicTemplateGen();
+        SubTask subTask1 = testSubTaskTemplateGen();
+        SubTask subTask2 = testSubTaskTemplateGen();
+        subTask1.setEpic(epic);
+        subTask2.setEpic(epic);
+        epic.addSubTask(subTask1);
+        epic.addSubTask(subTask2);
+
+        taskManager.createEpic(epic);
+        taskManager.createSubTask(subTask1);
+        taskManager.createSubTask(subTask2);
+
+        long epicId = epic.getId();
+        long sub1Id = subTask1.getId();
+        long sub2Id = subTask2.getId();
+        taskManager.getEpicById(epicId);
+        taskManager.getSubTaskById(sub1Id);
+        taskManager.getSubTaskById(sub2Id);
+
+        taskManager.deleteEpicById(epicId);
+        assertEquals(0, historyManager.getLastViewedTasks().size());
+    }
+
     private Task testTaskTemplateGen() {
         return new Task("TestTask", "TestDescription", idGenerator);
+    }
+
+    private Epic testEpicTemplateGen() {
+        return new Epic("TestEpic", "TestEpic description", idGenerator);
+    }
+
+    private SubTask testSubTaskTemplateGen() {
+        return new SubTask("TestSubTask", "TestSubTask description", idGenerator);
     }
 }
