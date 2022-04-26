@@ -1,6 +1,5 @@
 package model.tasks;
 
-import model.Status;
 import model.TaskTypes;
 import model.exceptions.TaskTimeException;
 import service.EpicStatusService;
@@ -38,12 +37,14 @@ public class Epic extends Task {
         subTasks.add(subTask);
         subTasksId.add(subTask.getId());
         calculateStatus();
+        duration = countDuration();
     }
 
     public void deleteSubTaskById(long id) {
         subTasks.removeIf(subTask -> subTask.getId() == id);
         subTasksId.remove(id);
         calculateStatus();
+        duration = countDuration();
     }
 
     public void addSubTasks(List<SubTask> subTasks) {
@@ -55,6 +56,7 @@ public class Epic extends Task {
         }
 
         calculateStatus();
+        duration = countDuration();
     }
 
     public void addSubTasksId (Long[] ids) {
@@ -111,12 +113,39 @@ public class Epic extends Task {
     }
 
     @Override
+    public LocalDateTime getStartTime() {
+        if (subTasks.isEmpty()) return startTime;
+
+        LocalDateTime resultStartTime = LocalDateTime.MAX;
+
+        for (SubTask subTask : subTasks) {
+            LocalDateTime subTaskStartTime = subTask.getStartTime();
+            if (subTaskStartTime == null) continue;
+            if (subTaskStartTime.isBefore(resultStartTime)) resultStartTime = subTaskStartTime;
+        }
+
+        if (resultStartTime == LocalDateTime.MAX) return startTime;
+        return  resultStartTime;
+    }
+
+    @Override
     public void setDuration(Duration duration) {
         if (subTasks.isEmpty()) {
             this.duration = duration;
             return;
         }
-        this.duration = countDuration();
+
+        Duration subTasksDuration = countDuration();
+
+        // если  subTasksDuration == null, значит у подзадач не установлены параметры времени
+        // устанавливаем эпику собственную продолжительность. Если появится подзадача с установленной duration,
+        // у Epic тоже пересчитается duration
+        if (subTasksDuration == null) {
+            this.duration = duration;
+            return;
+        }
+
+        this.duration = subTasksDuration;
     }
 
     @Override
@@ -127,14 +156,28 @@ public class Epic extends Task {
                 + " рассчитать EndTime невозможно!"
         );
 
-        LocalDateTime resultEndTime = LocalDateTime.of(0, 0,0,0,0);
+        LocalDateTime resultEndTime = LocalDateTime.MIN;
 
         for (SubTask subTask : subTasks) {
-            if (subTask.getEndTime().isAfter(resultEndTime)) {
-                resultEndTime = subTask.getEndTime();
+            LocalDateTime subTaskEndTime = subTask.getEndTime();
+            if (subTaskEndTime == null) continue;
+            if (subTaskEndTime.isAfter(resultEndTime)) {
+                resultEndTime = subTaskEndTime;
             }
         }
+
+        //если true значит у подзадач не установлены параметры начала и продолжительности
+        if (resultEndTime.equals(LocalDateTime.MIN)) {
+            //проверяем задавались ли самому Epic параметры времени - нет возвращаем null
+            if (duration != null && startTime != null) return startTime.plus(duration);
+            return null;
+        }
         return resultEndTime;
+    }
+
+    @Override
+    public Duration getDuration() {
+        return countDuration();
     }
 
     private Duration countDuration() {
@@ -144,6 +187,12 @@ public class Epic extends Task {
             if (subTask.getDuration() != null) resultDuration = resultDuration.plus(subTask.duration);
         }
 
-        return duration;
+        //если resultDuration не изменилось, у подзадач не установлены параметры времени
+        if (resultDuration.equals(Duration.ofSeconds(0))) {
+            //проверяем установлена ли продолжительность у самого Epic
+            if (duration != null) return duration;
+            return null;
+        }
+        return resultDuration;
     }
 }
