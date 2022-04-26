@@ -2,8 +2,13 @@ package model.tasks;
 
 import model.Status;
 import model.TaskTypes;
+import model.exceptions.TaskTimeException;
 import service.IdGenerator;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalAmount;
 import java.util.Objects;
 
 /**
@@ -14,12 +19,38 @@ public class Task {
     protected String description;
     protected long id;
     protected Status status;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
     public Task(String name, String description, IdGenerator idGenerator) {
         this.name = name;
         this.description = description;
         this.id = idGenerator.generate();
         status = Status.NEW;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() throws TaskTimeException {
+        if (startTime == null || duration == null) throw new TaskTimeException(
+                "В Task id: " + getId() + "; startTime = " + getStartTime() + " duration = " + getDuration()
+                + " рассчитать EndTime невозможно!"
+        );
+        return startTime.plus(duration);
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
     public long getId() {

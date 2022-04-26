@@ -2,9 +2,12 @@ package model.tasks;
 
 import model.Status;
 import model.TaskTypes;
+import model.exceptions.TaskTimeException;
 import service.EpicStatusService;
 import service.IdGenerator;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class Epic extends Task {
@@ -105,5 +108,42 @@ public class Epic extends Task {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), subTasks);
+    }
+
+    @Override
+    public void setDuration(Duration duration) {
+        if (subTasks.isEmpty()) {
+            this.duration = duration;
+            return;
+        }
+        this.duration = countDuration();
+    }
+
+    @Override
+    public LocalDateTime getEndTime() throws TaskTimeException {
+        if (subTasks.isEmpty() && duration != null && startTime != null) return startTime.plus(duration);
+        if (subTasks.isEmpty() && (duration == null || startTime == null)) throw new TaskTimeException(
+                "В Epic id: " + getId() + "; startTime = " + getStartTime() + " duration = " + getDuration()
+                + " рассчитать EndTime невозможно!"
+        );
+
+        LocalDateTime resultEndTime = LocalDateTime.of(0, 0,0,0,0);
+
+        for (SubTask subTask : subTasks) {
+            if (subTask.getEndTime().isAfter(resultEndTime)) {
+                resultEndTime = subTask.getEndTime();
+            }
+        }
+        return resultEndTime;
+    }
+
+    private Duration countDuration() {
+        Duration resultDuration = Duration.ofSeconds(0);
+
+        for (SubTask subTask : subTasks) {
+            if (subTask.getDuration() != null) resultDuration = resultDuration.plus(subTask.duration);
+        }
+
+        return duration;
     }
 }

@@ -2,8 +2,10 @@ package model.tasks;
 
 import model.Status;
 import model.TaskTypes;
+import model.exceptions.TaskTimeException;
 import service.IdGenerator;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class SubTask extends Task {
@@ -46,5 +48,14 @@ public class SubTask extends Task {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), epic);
+    }
+
+    @Override
+    public LocalDateTime getEndTime() throws TaskTimeException {
+        if (startTime == null || duration == null) throw new TaskTimeException(
+                "В SubTask id: " + getId() + "; startTime = " + getStartTime() + " duration = " + getDuration()
+                        + " рассчитать EndTime невозможно!"
+        );
+        return startTime.plus(duration);
     }
 }
