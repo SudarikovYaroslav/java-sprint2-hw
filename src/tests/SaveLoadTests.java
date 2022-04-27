@@ -1,3 +1,5 @@
+package test;
+
 import main.model.exceptions.TaskCreateException;
 import main.model.exceptions.TaskDeleteException;
 import main.model.exceptions.TaskLoadException;
@@ -22,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /*
  Методы этого класса должны были находиться в классе FileInBackedTaskManagerTest!,
- но из за Error java can not find symbol class: TaskManagerTest, возникающей по непонятной причине при малейших
+ но из за Error java can not find symbol class: test.TaskManagerTest, возникающей по непонятной причине при малейших
  изменениях в классе FileInBackedTaskManagerTest, ДАЖЕ ЕСЛИ ПРОСТО УБРАТЬ ЛИШНЮЮ ПУСТУЮ СТРОКУ,
  пришлось вынести эти тесты в отдельный класс. Причину возникновения ошибки установить не удалось. При её возникновении
  переставала компилироваться вся программа, по этой же причине в дженерик классах менеджеров не указан тип-параметр так

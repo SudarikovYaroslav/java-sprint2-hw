@@ -1,3 +1,5 @@
+package test;
+
 import main.model.Status;
 import main.model.exceptions.TaskCreateException;
 import main.model.exceptions.TaskDeleteException;
