@@ -37,14 +37,14 @@ public class Epic extends Task {
         subTasks.add(subTask);
         subTasksId.add(subTask.getId());
         calculateStatus();
-        duration = countDuration();
+        duration = countSubTasksDuration();
     }
 
     public void deleteSubTaskById(long id) {
         subTasks.removeIf(subTask -> subTask.getId() == id);
         subTasksId.remove(id);
         calculateStatus();
-        duration = countDuration();
+        duration = countSubTasksDuration();
     }
 
     public void addSubTasks(List<SubTask> subTasks) {
@@ -56,10 +56,10 @@ public class Epic extends Task {
         }
 
         calculateStatus();
-        duration = countDuration();
+        duration = countSubTasksDuration();
     }
 
-    public void addSubTasksId (Long[] ids) {
+    public void addSubTasksId(Long[] ids) {
         subTasksId.addAll(Arrays.asList(ids));
     }
 
@@ -98,13 +98,11 @@ public class Epic extends Task {
 
         if (this.getSubTasks().size() != epic.getSubTasks().size()) return false;
 
-        boolean subTasksEquals = true;
-
         for (int i = 0; i < epic.getSubTasks().size(); i++) {
             if (this.getSubTasks().get(i).getId() != epic.getSubTasks().get(i).getId()) return false;
         }
 
-        return subTasksEquals;
+        return true;
     }
 
     @Override
@@ -112,6 +110,39 @@ public class Epic extends Task {
         return Objects.hash(super.hashCode(), subTasks);
     }
 
+    /**
+     * startTime эпика равно самому раннему startTime из его подзадач. Если у эпика нет подзадач, или у них
+     * не установлены параметры времени, эпику установится startTime, переданное аргументом. При добавлении
+     * эпику подзадач, значение startTime будет пересчитано
+     * */
+    @Override
+    public void setStartTime(LocalDateTime startTime) {
+        if (subTasks.isEmpty()) {
+            this.startTime = startTime;
+            return;
+        }
+
+        LocalDateTime earliestStartTime = LocalDateTime.MAX;
+
+        for (SubTask subTask : subTasks) {
+            LocalDateTime subTaskStartTime = subTask.getStartTime();
+            if (subTaskStartTime == null) continue;
+            if (subTaskStartTime.isBefore(earliestStartTime)) earliestStartTime = subTaskStartTime;
+        }
+
+        // если стартовое время не изменилось - у подзадач не установлены параметры времени
+        // устанавливаем эпику собственное startTime
+        if (earliestStartTime.equals(LocalDateTime.MAX)) {
+            this.startTime = startTime;
+            return;
+        }
+        this.startTime = earliestStartTime;
+    }
+
+    /**
+     * Возвращает самое раннее startTime из подзадач эпика. Если у эпика нет подзадач, или у подзадач не установлены
+     * параметры времени, вернётся собственное startTime эпика или null, если оно не было установлено
+     * */
     @Override
     public LocalDateTime getStartTime() {
         if (subTasks.isEmpty()) return startTime;
@@ -124,36 +155,54 @@ public class Epic extends Task {
             if (subTaskStartTime.isBefore(resultStartTime)) resultStartTime = subTaskStartTime;
         }
 
-        if (resultStartTime == LocalDateTime.MAX) return startTime;
-        return  resultStartTime;
+        // если стартовое время не изменилось - у подзадач не установлены параметры времени
+        if (resultStartTime.equals(LocalDateTime.MAX)) return startTime;
+        return resultStartTime;
     }
 
+    /**
+     * duration эпика всегда равна сумме duration его подзадач. Только в случае, если у эпика нет подзадач или в
+     * подзадачах не установлены параметры времени, эпику установится duration, переданное аргументом. При добавлении
+     * новых подзадач, значение duration эпика будет пересчитано
+     */
     @Override
     public void setDuration(Duration duration) {
         if (subTasks.isEmpty()) {
             this.duration = duration;
             return;
         }
-
-        Duration subTasksDuration = countDuration();
-
+        Duration subTasksDuration = countSubTasksDuration();
         // если  subTasksDuration == null, значит у подзадач не установлены параметры времени
-        // устанавливаем эпику собственную продолжительность. Если появится подзадача с установленной duration,
-        // у Epic тоже пересчитается duration
+        // устанавливаем эпику собственную продолжительность.
         if (subTasksDuration == null) {
             this.duration = duration;
             return;
         }
-
         this.duration = subTasksDuration;
     }
 
+    /**
+     * duration эпика равна сумме duration его подзадач. Если у подзадач не установлены параметры времени,
+     * вернётся собственное duration эпика или null, если оно не установлено
+     */
+    @Override
+    public Duration getDuration() {
+        Duration subTasksDuration = countSubTasksDuration();
+        if (subTasksDuration != null) return subTasksDuration;
+        return duration;
+    }
+
+    /**
+     * endTime эпика равно самому позднему endTime из его подзадач. Если у эпика нет подзадач или у них не установлены
+     * параметры времени, вернётся endTime, рассчитанное из собственных значений startTime и duration текущего эпика
+     * или null, если они не установлены
+     * */
     @Override
     public LocalDateTime getEndTime() throws TaskTimeException {
         if (subTasks.isEmpty() && duration != null && startTime != null) return startTime.plus(duration);
         if (subTasks.isEmpty() && (duration == null || startTime == null)) throw new TaskTimeException(
                 "В Epic id: " + getId() + "; startTime = " + getStartTime() + " duration = " + getDuration()
-                + " рассчитать EndTime невозможно!"
+                        + " рассчитать EndTime невозможно!"
         );
 
         LocalDateTime resultEndTime = LocalDateTime.MIN;
@@ -175,12 +224,12 @@ public class Epic extends Task {
         return resultEndTime;
     }
 
-    @Override
-    public Duration getDuration() {
-        return countDuration();
-    }
-
-    private Duration countDuration() {
+    /**
+     * рассчитывает суммарную duration всех подзадач эпика. Если у эпика нет подзадач или у них не установлены
+     * параметры времени, возвращает null
+     */
+    private Duration countSubTasksDuration() {
+        if (subTasks.isEmpty()) return null;
         Duration resultDuration = Duration.ofSeconds(0);
 
         for (SubTask subTask : subTasks) {
@@ -189,8 +238,6 @@ public class Epic extends Task {
 
         //если resultDuration не изменилось, у подзадач не установлены параметры времени
         if (resultDuration.equals(Duration.ofSeconds(0))) {
-            //проверяем установлена ли продолжительность у самого Epic
-            if (duration != null) return duration;
             return null;
         }
         return resultDuration;

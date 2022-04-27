@@ -26,14 +26,22 @@ public class Task {
         this.id = idGenerator.generate();
         status = Status.NEW;
     }
-
     public void setDuration(Duration duration) {
         this.duration = duration;
+    }
+
+    public Duration getDuration() {
+        return duration;
     }
 
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
 
     public LocalDateTime getEndTime() throws TaskTimeException {
         if (startTime == null || duration == null) throw new TaskTimeException(
@@ -41,14 +49,6 @@ public class Task {
                         + " рассчитать EndTime невозможно!"
         );
         return startTime.plus(duration);
-    }
-
-    public Duration getDuration() {
-        return duration;
-    }
-
-    public LocalDateTime getStartTime() {
-        return startTime;
     }
 
     public long getId() {
@@ -104,4 +104,5 @@ public class Task {
     public int hashCode() {
         return Objects.hash(name, description, id, status);
     }
+
 }
