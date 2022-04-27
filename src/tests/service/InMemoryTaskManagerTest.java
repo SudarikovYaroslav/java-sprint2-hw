@@ -1,10 +1,11 @@
+package service;
 
 import org.junit.jupiter.api.BeforeEach;
 import main.service.IdGenerator;
 import main.service.InMemoryHistoryManager;
 import main.service.InMemoryTaskManager;
 
-public class InMemoryTaskManagerTest extends TaskManagerTest {
+public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
     @BeforeEach
     protected void preparation() {

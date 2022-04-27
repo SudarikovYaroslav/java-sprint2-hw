@@ -4,6 +4,7 @@ import main.model.Status;
 import main.model.TaskTypes;
 import main.model.exceptions.TaskTimeException;
 import main.service.IdGenerator;
+import main.util.Util;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -85,7 +86,8 @@ public class Task {
 
     @Override
     public String toString() {
-        return TaskTypes.TASK + "," + id + "," + name + "," + description + "," + status;
+        return TaskTypes.TASK + "," + id + "," + name + "," + description + "," + status
+                + "," + Util.convertStartTimeToString(startTime) + "," + Util.convertDurationInToString(duration);
     }
 
 

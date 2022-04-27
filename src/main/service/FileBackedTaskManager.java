@@ -5,12 +5,15 @@ import main.model.exceptions.*;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
+import main.util.Util;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static main.util.Util.getIdFromString;
@@ -31,7 +34,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     public static final int NAME_COLUMN_INDEX = 2;
     public static final int DESCRIPTION_COLUMN_INDEX = 3;
     public static final int STATUS_COLUMN_INDEX = 4;
-    public static final int IDS_COLUMN_INDEX = 5;
+    public static final int IDS_COLUMN_INDEX = 7;
+    public static final int START_TIME_COLUMN_INDEX = 5;
+    public static final int DURATION_COLUMN_INDEX = 6;
 
     private final Path fileBacked;
     private final IdGenerator idGenerator;
@@ -199,7 +204,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         if (!Files.exists(fileBacked)) throw new TaskSaveException("Указанный файл для записи не существует");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileBacked.toFile()))) {
-            writer.write("type,id,name,description,status,id...,#" +
+            writer.write("type,id,name,description,status,startTime,duration,id...,#" +
                     idGenerator.peekCurrentIdValue() + LINE_DELIMITER);
 
             for (Task task : tasks.values()) {
@@ -229,10 +234,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String description = taskFields[DESCRIPTION_COLUMN_INDEX];
         Status status = getStatusFromString(taskFields[STATUS_COLUMN_INDEX]);
         long currentIdValue = idGenerator.peekCurrentIdValue();
+        LocalDateTime startTime = Util.convertStringToLocalDateTime(taskFields[START_TIME_COLUMN_INDEX]);
+        Duration duration = Util.convertStringToDuration(taskFields[DURATION_COLUMN_INDEX]);
 
         Task task = new Task(name, description, idGenerator);
         task.setId(id);
         task.setStatus(status);
+        task.setStartTime(startTime);
+        task.setDuration(duration);
+
         idGenerator.setStartIdValue(currentIdValue);
         return task;
     }
@@ -247,9 +257,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String name = epicFields[NAME_COLUMN_INDEX];
         String description = epicFields[DESCRIPTION_COLUMN_INDEX];
         Status status = getStatusFromString(epicFields[STATUS_COLUMN_INDEX]);
+        LocalDateTime startTime = Util.convertStringToLocalDateTime(epicFields[START_TIME_COLUMN_INDEX]);
+        Duration duration = Util.convertStringToDuration(epicFields[DURATION_COLUMN_INDEX]);
+
         Long[] subTasksId = new Long[0]; // default empty arr
 
-        if (epicFields.length > 5) {
+        if (epicFields.length > IDS_COLUMN_INDEX) {
             String[] ids = epicFields[IDS_COLUMN_INDEX].split(IDS_DELIMITER);
             subTasksId = new Long[ids.length];
 
@@ -258,10 +271,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             }
         }
         long currentIdValue = idGenerator.peekCurrentIdValue();
+
         Epic epic = new Epic(name, description, idGenerator);
         epic.setId(id);
         epic.setStatus(status);
+        epic.setStartTime(startTime);
+        epic.setDuration(duration);
         epic.addSubTasksId(subTasksId);
+
         idGenerator.setStartIdValue(currentIdValue);
         return epic;
     }
@@ -275,6 +292,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String name = subTaskFields[NAME_COLUMN_INDEX];
         String description = subTaskFields[DESCRIPTION_COLUMN_INDEX];
         Status status = getStatusFromString(subTaskFields[STATUS_COLUMN_INDEX]);
+        LocalDateTime startTime = Util.convertStringToLocalDateTime(subTaskFields[START_TIME_COLUMN_INDEX]);
+        Duration duration = Util.convertStringToDuration(subTaskFields[DURATION_COLUMN_INDEX]);
+
         Long epicId = getIdFromString(subTaskFields[IDS_COLUMN_INDEX], "Неверный формат EpicId при " +
                 "загрузке SubTask");
         Epic epic;
@@ -286,10 +306,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
 
         long currentIdValue = idGenerator.peekCurrentIdValue();
+
         SubTask subTask = new SubTask(name, description, idGenerator);
         subTask.setId(id);
         subTask.setStatus(status);
         subTask.setEpic(epic);
+        subTask.setStartTime(startTime);
+        subTask.setDuration(duration);
+
         idGenerator.setStartIdValue(currentIdValue);
         return subTask;
     }

@@ -1,4 +1,3 @@
-type,id,name,description,status,id...,#277
-EPIC,275,TestEpic,TestEpic description,NEW,276.
-SUB_TASK,276,TestSubTask,TestSubTask description,NEW,275
+type,id,name,description,status,startTime,duration,id...,#2
+TASK,1,Task,test task,NEW,27.04.2022 15:07,D9000000
  
