@@ -125,7 +125,7 @@ public class SaveLoadTests {
 
     @Test
     public void convertStringToSubTaskWithNullEpicTest() throws TaskCreateException, TaskSaveException {
-        String subTaskLine = "SUB_TASK,1,TestSubTask,TestSubTask description,NEW,2";
+        String subTaskLine = "SUB_TASK,1,TestSubTask,TestSubTask description,NEW,null,null,2";
         long id = 1L;
         TaskLoadException ex = assertThrows(
                 TaskLoadException.class,

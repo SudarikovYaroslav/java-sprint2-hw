@@ -43,7 +43,11 @@ public class Managers {
             String mixedLine = new String(Files.readAllBytes(tasksFilePath));
             String[] tasksAndHistoryLines = mixedLine.split(FileBackedTaskManager.EMPTY_LINE_DELIMITER);
             String allTasksInLine = tasksAndHistoryLines[FileBackedTaskManager.ALL_TASKS_IN_LINE_INDEX];
-            String historyInLine = tasksAndHistoryLines[FileBackedTaskManager.HISTORY_IN_LINE_INDEX];
+
+            String historyInLine = null;
+            if (isHistoryPresent(tasksAndHistoryLines)) {
+                historyInLine = tasksAndHistoryLines[FileBackedTaskManager.HISTORY_IN_LINE_INDEX];
+            }
 
             String[] tasksLines = allTasksInLine.split(FileBackedTaskManager.LINE_DELIMITER);
 
@@ -89,12 +93,18 @@ public class Managers {
             }
 
             //заполняем историю просмотров
-            taskManager.loadHistory(historyInLine);
+            if (historyInLine != null) {
+                taskManager.loadHistory(historyInLine);
+            }
 
         } catch (IOException e) {
             throw new TaskLoadException("Ошибка при загрузке резервной копии", e);
         }
 
         return taskManager;
+    }
+
+    private static boolean isHistoryPresent(String[] tasksAndHistoryLines) {
+        return tasksAndHistoryLines.length == 2;
     }
 }

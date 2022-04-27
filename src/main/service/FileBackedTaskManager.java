@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static main.util.Util.getIdFromString;
@@ -40,6 +41,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     private final Path fileBacked;
     private final IdGenerator idGenerator;
+    private final TimeParametersManager timeParametersManager = new TimeParametersManager();
 
     public FileBackedTaskManager(HistoryManager historyManager, Path fileBacked, IdGenerator idGenerator) {
         super(historyManager);
@@ -234,8 +236,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String description = taskFields[DESCRIPTION_COLUMN_INDEX];
         Status status = getStatusFromString(taskFields[STATUS_COLUMN_INDEX]);
         long currentIdValue = idGenerator.peekCurrentIdValue();
-        LocalDateTime startTime = Util.convertStringToLocalDateTime(taskFields[START_TIME_COLUMN_INDEX]);
-        Duration duration = Util.convertStringToDuration(taskFields[DURATION_COLUMN_INDEX]);
+        LocalDateTime startTime = timeParametersManager
+                .convertStringToLocalDateTime(taskFields[START_TIME_COLUMN_INDEX]);
+        Duration duration = timeParametersManager.convertStringToDuration(taskFields[DURATION_COLUMN_INDEX]);
 
         Task task = new Task(name, description, idGenerator);
         task.setId(id);
@@ -257,8 +260,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String name = epicFields[NAME_COLUMN_INDEX];
         String description = epicFields[DESCRIPTION_COLUMN_INDEX];
         Status status = getStatusFromString(epicFields[STATUS_COLUMN_INDEX]);
-        LocalDateTime startTime = Util.convertStringToLocalDateTime(epicFields[START_TIME_COLUMN_INDEX]);
-        Duration duration = Util.convertStringToDuration(epicFields[DURATION_COLUMN_INDEX]);
+        LocalDateTime startTime = timeParametersManager
+                .convertStringToLocalDateTime(epicFields[START_TIME_COLUMN_INDEX]);
+        Duration duration = timeParametersManager.convertStringToDuration(epicFields[DURATION_COLUMN_INDEX]);
 
         Long[] subTasksId = new Long[0]; // default empty arr
 
@@ -292,8 +296,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String name = subTaskFields[NAME_COLUMN_INDEX];
         String description = subTaskFields[DESCRIPTION_COLUMN_INDEX];
         Status status = getStatusFromString(subTaskFields[STATUS_COLUMN_INDEX]);
-        LocalDateTime startTime = Util.convertStringToLocalDateTime(subTaskFields[START_TIME_COLUMN_INDEX]);
-        Duration duration = Util.convertStringToDuration(subTaskFields[DURATION_COLUMN_INDEX]);
+        LocalDateTime startTime = timeParametersManager
+                .convertStringToLocalDateTime(subTaskFields[START_TIME_COLUMN_INDEX]);
+        Duration duration = timeParametersManager.convertStringToDuration(subTaskFields[DURATION_COLUMN_INDEX]);
 
         Long epicId = getIdFromString(subTaskFields[IDS_COLUMN_INDEX], "Неверный формат EpicId при " +
                 "загрузке SubTask");
@@ -337,8 +342,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     /**
      * Загружает историю просмотров из файла-хранилища
      */
-    public void loadHistory(String data) throws TaskLoadException {
-        List<Long> ids = InMemoryHistoryManager.fromString(data);
+    public void loadHistory(String historyInLine) throws TaskLoadException {
+        List<Long> ids = InMemoryHistoryManager.fromString(historyInLine);
 
         for (Long id : ids) {
 

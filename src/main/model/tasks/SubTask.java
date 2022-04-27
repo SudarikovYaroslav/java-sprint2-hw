@@ -12,6 +12,7 @@ import java.util.Objects;
 public class SubTask extends Task {
     private Epic epic;
 
+
     public SubTask(String name, String description, IdGenerator idGenerator) {
         super(name, description, idGenerator);
     }
@@ -27,7 +28,8 @@ public class SubTask extends Task {
     @Override
     public String toString() {
         return TaskTypes.SUB_TASK + "," + id + "," + name + "," + description + "," + status
-                + "," + Util.convertStartTimeToString(startTime) + "," + Util.convertDurationInToString(duration) + ","
+                + "," + timeParametersManager.convertStartTimeToString(startTime) + ","
+                + timeParametersManager.convertDurationInToString(duration) + ","
                 + epic.getId();
     }
 

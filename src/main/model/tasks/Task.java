@@ -4,6 +4,7 @@ import main.model.Status;
 import main.model.TaskTypes;
 import main.model.exceptions.TaskTimeException;
 import main.service.IdGenerator;
+import main.service.TimeParametersManager;
 import main.util.Util;
 
 import java.time.Duration;
@@ -20,6 +21,7 @@ public class Task {
     protected Status status;
     protected Duration duration;
     protected LocalDateTime startTime;
+    protected final TimeParametersManager timeParametersManager = new TimeParametersManager();
 
     public Task(String name, String description, IdGenerator idGenerator) {
         this.name = name;
@@ -87,7 +89,8 @@ public class Task {
     @Override
     public String toString() {
         return TaskTypes.TASK + "," + id + "," + name + "," + description + "," + status
-                + "," + Util.convertStartTimeToString(startTime) + "," + Util.convertDurationInToString(duration);
+                + "," + timeParametersManager.convertStartTimeToString(startTime) + ","
+                + timeParametersManager.convertDurationInToString(duration);
     }
 
 
