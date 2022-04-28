@@ -3,6 +3,7 @@ package main.service;
 import main.model.exceptions.TaskCreateException;
 import main.model.exceptions.TaskDeleteException;
 import main.model.exceptions.TaskUpdateException;
+import main.model.exceptions.TimeIntersectionException;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;

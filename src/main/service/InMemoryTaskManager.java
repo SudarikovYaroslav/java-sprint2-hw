@@ -1,15 +1,16 @@
 package main.service;
 
-import main.model.exceptions.TaskCreateException;
-import main.model.exceptions.TaskDeleteException;
-import main.model.exceptions.TaskUpdateException;
+import main.model.IntersectionAlerts;
+import main.model.exceptions.*;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
+
     protected final HashMap<Long, Task> tasks;
     protected final HashMap<Long, Epic> epics;
     protected final HashMap<Long, SubTask> subTasks;
@@ -94,13 +95,22 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createTask(Task task) throws TaskCreateException{
+    public void createTask(Task task) throws TaskCreateException {
         if (task == null) throw new TaskCreateException("При создании task == null");
         if (task.getId() <= 0) throw new TaskCreateException(
                 "При создании Task id должен быть больше 0. Actual: " + task.getId());
         if (tasks.containsKey(task.getId())) throw new TaskCreateException(
                 "Task с id: " + task.getId() + " уже существует"
         );
+
+        try {
+            IntersectionAlerts check = checkTimeIntersections(task);
+            if(check.isIntersection()) {
+                throw new TimeIntersectionException(check.getAlerts().toString());
+            }
+        } catch (TimeIntersectionException e) {
+            e.printStackTrace();
+        }
 
         tasks.put(task.getId(), task);
         prioritizedTasks.add(task);
@@ -115,6 +125,16 @@ public class InMemoryTaskManager implements TaskManager {
                 "Epic с id: " + epic.getId() + " уже существует"
         );
 
+        try {
+            IntersectionAlerts check = checkTimeIntersections(epic);
+            if(check.isIntersection()) {
+                throw new TimeIntersectionException(check.getAlerts().toString());
+            }
+        } catch (TimeIntersectionException e) {
+            e.printStackTrace();
+        }
+
+
         epics.put(epic.getId(), epic);
         prioritizedTasks.add(epic);
     }
@@ -127,6 +147,15 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.containsKey(subTask.getId())) throw new TaskCreateException(
                 "SubTask с id: " + subTask.getId() + " уже существует"
         );
+
+        try {
+            IntersectionAlerts check = checkTimeIntersections(subTask);
+            if(check.isIntersection()) {
+                throw new TimeIntersectionException(check.getAlerts().toString());
+            }
+        } catch (TimeIntersectionException e) {
+            e.printStackTrace();
+        }
 
         subTasks.put(subTask.getId(), subTask);
         prioritizedTasks.add(subTask);
@@ -145,6 +174,15 @@ public class InMemoryTaskManager implements TaskManager {
                 "Task с id: " + task.getId() + " не существует. Обновление невозможно!"
         );
 
+        try {
+            IntersectionAlerts check = checkTimeIntersections(task);
+            if(check.isIntersection()) {
+                throw new TimeIntersectionException(check.getAlerts().toString());
+            }
+        } catch (TimeIntersectionException e) {
+            e.printStackTrace();
+        }
+
         tasks.put(task.getId(), task);
         prioritizedTasks.add(task);
     }
@@ -161,6 +199,15 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epics.containsKey(epic.getId())) throw new TaskUpdateException(
                 "Epic с id: " + epic.getId() + " не существует. Обновление невозможно!"
         );
+
+        try {
+            IntersectionAlerts check = checkTimeIntersections(epic);
+            if(check.isIntersection()) {
+                throw new TimeIntersectionException(check.getAlerts().toString());
+            }
+        } catch (TimeIntersectionException e) {
+            e.printStackTrace();
+        }
 
         epics.put(epic.getId(), epic);
 
@@ -182,6 +229,15 @@ public class InMemoryTaskManager implements TaskManager {
         if (!subTasks.containsKey(subTask.getId())) throw new TaskUpdateException(
                 "SubTask с id: " + subTask.getId() + " не существует. Обновление невозможно!"
         );
+
+        try {
+            IntersectionAlerts check = checkTimeIntersections(subTask);
+            if(check.isIntersection()) {
+                throw new TimeIntersectionException(check.getAlerts().toString());
+            }
+        } catch (TimeIntersectionException e) {
+            e.printStackTrace();
+        }
 
         subTasks.put(subTask.getId(), subTask);
         prioritizedTasks.add(subTask);
@@ -283,5 +339,104 @@ public class InMemoryTaskManager implements TaskManager {
         for (SubTask subTask : subTasks) {
             prioritizedTasks.remove(subTask);
         }
+    }
+
+    /**
+     * Возвращает IntersectionAlerts со значениями boolean true и Optional<String> "id startTime: value endTime: value"
+     * или boolean true и Optional<String> "id startTime: value"
+     * если задача имеет пересечение по времени с существующей задачей c id, началом startTime и завершением endTime.
+     * Или boolean false и null, если пересечений не выявлено
+     */
+    protected IntersectionAlerts checkTimeIntersections(Task task) {
+        if (task == null) throw new NullPointerException();
+        if (task.getStartTime() == null) return new IntersectionAlerts(false, Optional.empty());
+
+        // у task установлено только startTime
+        if (task.getStartTime() != null && task.getDuration() == null) {
+            return searchIfTaskHaveStartTimeOnly(task);
+        }
+
+        // У task установлены startTime и duration
+        return searchIfTaskHaveStartTimeAndDuration(task);
+    }
+
+    protected IntersectionAlerts searchIfTaskHaveStartTimeOnly(Task task) {
+        boolean intersection;
+        for (Task existsTask : getPrioritizedTasks()) {
+            if (existsTask.getStartTime() == null) continue;
+
+            if (existsTask.getStartTime() != null && existsTask.getDuration() == null) {
+                if (task.getStartTime().equals(existsTask.getStartTime()))
+                    return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+            }
+
+            if (existsTask.getStartTime() != null && existsTask.getDuration() != null ) {
+                intersection = checkIfTaskPeriodIncludesTimePoint(existsTask, task.getStartTime());
+                if (intersection)
+                    return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+            }
+        }
+        return new IntersectionAlerts(false, Optional.empty());
+    }
+
+    protected IntersectionAlerts searchIfTaskHaveStartTimeAndDuration(Task task) {
+        boolean intersection;
+        boolean startIntersection;
+        boolean endIntersection;
+        try {
+            for (Task existsTask : getPrioritizedTasks()) {
+                if (existsTask.getStartTime() == null) continue;
+
+                // если у существующей задачи установлено только startTime без duration,
+                // проверяем пересечение нашей задачи со startTime уже существующей
+                if (existsTask.getStartTime() != null && existsTask.getDuration() == null) {
+                    intersection = checkIfTaskPeriodIncludesTimePoint(task, existsTask.getStartTime());
+                    if (intersection)
+                        return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+                }
+
+                // проверяем пересечение времени исполнения нашей задачи и существующей
+                if (existsTask.getStartTime() != null && existsTask.getDuration() != null) {
+                    startIntersection = checkIfTaskPeriodIncludesTimePoint(existsTask, task.getStartTime());
+                    endIntersection = checkIfTaskPeriodIncludesTimePoint(existsTask, task.getEndTime());
+                    if (startIntersection || endIntersection)
+                        return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+                }
+            }
+        } catch (TaskTimeException e) {
+            e.printStackTrace();
+        }
+        return new IntersectionAlerts(false, Optional.empty());
+    }
+
+    /**
+     * Проверяет, попала ли переданная точка времени во интервал между task.startTime и task.EndTime
+     */
+    protected boolean checkIfTaskPeriodIncludesTimePoint(Task task, LocalDateTime timePoint) {
+        try {
+            LocalDateTime start = task.getStartTime();
+            LocalDateTime end = task.getEndTime();
+
+            if (timePoint.isAfter(start) && timePoint.isBefore(end)) return true;
+
+        } catch (TaskTimeException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    protected String createAlertMessage(Task task) {
+        String alert = "Пересечение по времени с " + task.getId() + " startTime: " + task.getStartTime();
+
+        if (task.getDuration() == null) {
+            return alert;
+        }
+
+        try {
+            alert += " endTime: " + task.getEndTime();
+        } catch (TaskTimeException e) {
+            e.printStackTrace();
+        }
+        return alert;
     }
 }

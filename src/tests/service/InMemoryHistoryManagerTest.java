@@ -5,9 +5,9 @@ import main.model.exceptions.TaskDeleteException;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
+import main.service.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import main.service.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

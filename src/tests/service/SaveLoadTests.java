@@ -1,9 +1,6 @@
 package service;
 
-import main.model.exceptions.TaskCreateException;
-import main.model.exceptions.TaskDeleteException;
-import main.model.exceptions.TaskLoadException;
-import main.model.exceptions.TaskSaveException;
+import main.model.exceptions.*;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
@@ -124,7 +121,7 @@ public class SaveLoadTests {
     }
 
     @Test
-    public void convertStringToSubTaskWithNullEpicTest() throws TaskCreateException, TaskSaveException {
+    public void convertStringToSubTaskWithNullEpicTest() {
         String subTaskLine = "SUB_TASK,1,TestSubTask,TestSubTask description,NEW,null,null,2";
         long id = 1L;
         TaskLoadException ex = assertThrows(

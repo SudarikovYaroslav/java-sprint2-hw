@@ -4,19 +4,18 @@ import main.model.Status;
 import main.model.exceptions.TaskCreateException;
 import main.model.exceptions.TaskDeleteException;
 import main.model.exceptions.TaskUpdateException;
+import main.model.exceptions.TimeIntersectionException;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
-import org.junit.jupiter.api.Test;
 import main.service.IdGenerator;
 import main.service.InMemoryHistoryManager;
 import main.service.TaskManager;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -151,7 +150,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void  checkDeleteTaskFunctionWorkWithEmptyTasksList() throws TaskCreateException {
+    public void  checkDeleteTaskFunctionWorkWithEmptyTasksList() {
         taskManager.deleteTasks();
         assertEquals(0, taskManager.getTasksList().size());
     }
@@ -194,7 +193,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetTaskByIdWhenTasksEmpty() throws TaskCreateException {
+    public void checkGetTaskByIdWhenTasksEmpty() {
         assertNull(taskManager.getTaskById(1));
     }
 
@@ -217,7 +216,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetEpicByIdWhenEpicsEmpty() throws TaskCreateException {
+    public void checkGetEpicByIdWhenEpicsEmpty() {
         assertNull(taskManager.getTaskById(1));
     }
 
@@ -241,7 +240,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetSubTaskByIdWhenSubTasksEmpty() throws TaskCreateException {
+    public void checkGetSubTaskByIdWhenSubTasksEmpty() {
         assertNull(taskManager.getTaskById(1));
     }
 
@@ -662,7 +661,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetSubTasksFromNullEpic() throws TaskCreateException {
+    public void checkGetSubTasksFromNullEpic() {
         Epic epic = null;
 
         NullPointerException ex = assertThrows(
@@ -678,61 +677,120 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task taskLatest = testTaskTemplateGen();
         Task taskEarliest = testTaskTemplateGen();
         Task taskMiddle = testTaskTemplateGen();
-        Task taskMiddleSameTime = testTaskTemplateGen();
 
         taskLatest.setStartTime(LocalDateTime.of(28,4,22,18,30));
         taskEarliest.setStartTime(LocalDateTime.of(28,4,21,18,30));
         taskMiddle.setStartTime(LocalDateTime.of(28,4,22,10,0));
-        taskMiddleSameTime.setStartTime(LocalDateTime.of(28,4,22,10,0));
 
         taskManager.createTask(taskLatest);
         taskManager.createTask(taskEarliest);
         taskManager.createTask(taskMiddle);
-        taskManager.createTask(taskMiddleSameTime);
 
         List<Task> testList = new ArrayList<>(taskManager.getPrioritizedTasks());
 
+        for (Task task : testList) {
+            System.out.println(task);
+        }
+
         final int EARLIEST_POS = 0;
-        final int LATEST_POS = 3;
+        final int LATEST_POS = 2;
         final int MIDDLE_POS = 1;
-        final int MIDDLE_SAME_TIME_POS = 2;
 
         assertEquals(taskEarliest, testList.get(EARLIEST_POS));
         assertEquals(taskMiddle, testList.get(MIDDLE_POS));
         assertEquals(taskLatest, testList.get(LATEST_POS));
-        assertEquals(taskMiddleSameTime, testList.get(MIDDLE_SAME_TIME_POS));
     }
 
     @Test
-    public void checkDeleteTaskFromPrioritizedSet() throws TaskCreateException {
+    public void checkDeleteTaskFromPrioritizedSet() throws TaskCreateException, TaskDeleteException {
         Task task = testTaskTemplateGen();
+        long id = task.getId();
+
         taskManager.createTask(task);
+        assertNotEquals(0, taskManager.getPrioritizedTasks().size());
+
+        taskManager.deleteTaskById(id);
+        assertEquals(0, taskManager.getPrioritizedTasks().size());
+    }
+
+    @Test
+    public void checkDeleteEpicFromPrioritizedSet() throws TaskCreateException, TaskDeleteException {
+        Epic epic = testEpicTemplateGen();
+        long id = epic.getId();
+
+        taskManager.createEpic(epic);
+        assertNotEquals(0, taskManager.getPrioritizedTasks().size());
+
+        taskManager.deleteEpicById(id);
+        assertEquals(0, taskManager.getPrioritizedTasks().size());
+    }
+
+    @Test
+    public void checkDeleteSubTaskFromPrioritizedSet() throws TaskCreateException, TaskDeleteException {
+        SubTask subTask = testSubTaskTemplateGen();
+        Epic epic = testEpicTemplateGen();
+        subTask.setEpic(epic);
+        epic.addSubTask(subTask);
+        long id = subTask.getId();
+
+        taskManager.createEpic(epic);
+        taskManager.createSubTask(subTask);
+        assertNotEquals(0, taskManager.getPrioritizedTasks().size());
+
+        taskManager.deleteSubTaskById(id);
+        assertEquals(0, taskManager.getPrioritizedTasks().size());
+    }
+
+    @Test
+    public  void checkDeleteTasksFromPrioritizedSet() throws TaskCreateException {
+        Task task = testTaskTemplateGen();
+        Task task1 = testTaskTemplateGen();
+        task1.setStartTime(LocalDateTime.of(28,4,22,18,30));
+        taskManager.createTask(task1);
+        taskManager.createTask(task);
+        assertNotEquals(0, taskManager.getPrioritizedTasks().size());
+
         taskManager.deleteTasks();
         assertEquals(0, taskManager.getPrioritizedTasks().size());
     }
 
     @Test
-    public void checkDeleteEpicFromPrioritizedSet() {
+    public  void checkDeleteEpicsFromPrioritizedSet() throws TaskCreateException {
+        Epic epic = testEpicTemplateGen();
+        taskManager.createEpic(epic);
+        assertNotEquals(0, taskManager.getPrioritizedTasks().size());
 
+        taskManager.deleteEpics();
+        assertEquals(0, taskManager.getPrioritizedTasks().size());
     }
 
     @Test
-    public void checkDeleteDubTaskFromPrioritizedSet() {
+    public  void checkDeleteSubTasksFromPrioritizedSet() throws TaskCreateException {
+        SubTask subTask1 = testSubTaskTemplateGen();
+        SubTask subTask2 = testSubTaskTemplateGen();
+        Epic epic = testEpicTemplateGen();
+        subTask1.setEpic(epic);
+        subTask2.setEpic(epic);
+        epic.addSubTask(subTask1);
+        epic.addSubTask(subTask2);
+        subTask2.setStartTime(LocalDateTime.now());
 
+        taskManager.createEpic(epic);
+        taskManager.createSubTask(subTask1);
+        taskManager.createSubTask(subTask2);
+        assertNotEquals(0, taskManager.getPrioritizedTasks().size());
+
+        taskManager.deleteSubTasks();
+        assertEquals(0, taskManager.getPrioritizedTasks().size());
     }
 
     @Test
-    public  void checkDeleteTasksFromPrioritizedSet() {
+    public void checkTimeIntersectionsTest() throws TaskCreateException {
+        Task checkedTask = testTaskTemplateGen();
+        Task existsTestTask = testTaskTemplateGen();
 
-    }
-
-    @Test
-    public  void checkDeleteEpicsFromPrioritizedSet() {
-
-    }
-
-    @Test
-    public  void checkDeleteSubTasksFromPrioritizedSet() {
-
+        //все поля тасков null
+        taskManager.createTask(existsTestTask);
+        
     }
 }
