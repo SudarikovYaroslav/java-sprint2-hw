@@ -1,4 +1,2 @@
-type,id,name,description,status,startTime,duration,id...,#16
-EPIC,14,TestEpic,TestEpic description,NEW,null,null,15.
-SUB_TASK,15,TestSubTask,TestSubTask description,NEW,null,null,14
+type,id,name,description,status,startTime,duration,id...,#2
  

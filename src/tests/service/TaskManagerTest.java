@@ -675,22 +675,64 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void checkGetPrioritizedTasks() throws TaskCreateException {
-        Task task1 = testTaskTemplateGen();
-        Task task2 = testTaskTemplateGen();
-        Task task3 = testTaskTemplateGen();
-        task1.setStartTime(LocalDateTime.of(28,4,22,18,30));
-        task2.setStartTime(LocalDateTime.of(28,4,21,18,30));
-        task3.setStartTime(LocalDateTime.of(28,4,22,10,0));
+        Task taskLatest = testTaskTemplateGen();
+        Task taskEarliest = testTaskTemplateGen();
+        Task taskMiddle = testTaskTemplateGen();
+        Task taskMiddleSameTime = testTaskTemplateGen();
 
-        /*taskManager.createTask(task1);
-        taskManager.createTask(task2);
-        taskManager.createTask(task3);
+        taskLatest.setStartTime(LocalDateTime.of(28,4,22,18,30));
+        taskEarliest.setStartTime(LocalDateTime.of(28,4,21,18,30));
+        taskMiddle.setStartTime(LocalDateTime.of(28,4,22,10,0));
+        taskMiddleSameTime.setStartTime(LocalDateTime.of(28,4,22,10,0));
 
-        List<Task> testList = new ArrayList<>();
+        taskManager.createTask(taskLatest);
+        taskManager.createTask(taskEarliest);
+        taskManager.createTask(taskMiddle);
+        taskManager.createTask(taskMiddleSameTime);
 
+        List<Task> testList = new ArrayList<>(taskManager.getPrioritizedTasks());
 
-        assertEquals(task2, testList.get(0));
-        assertEquals(task3, testList.get(1));
-        assertEquals(task1, testList.get(3));*/
+        final int EARLIEST_POS = 0;
+        final int LATEST_POS = 3;
+        final int MIDDLE_POS = 1;
+        final int MIDDLE_SAME_TIME_POS = 2;
+
+        assertEquals(taskEarliest, testList.get(EARLIEST_POS));
+        assertEquals(taskMiddle, testList.get(MIDDLE_POS));
+        assertEquals(taskLatest, testList.get(LATEST_POS));
+        assertEquals(taskMiddleSameTime, testList.get(MIDDLE_SAME_TIME_POS));
+    }
+
+    @Test
+    public void checkDeleteTaskFromPrioritizedSet() throws TaskCreateException {
+        Task task = testTaskTemplateGen();
+        taskManager.createTask(task);
+        taskManager.deleteTasks();
+        assertEquals(0, taskManager.getPrioritizedTasks().size());
+    }
+
+    @Test
+    public void checkDeleteEpicFromPrioritizedSet() {
+
+    }
+
+    @Test
+    public void checkDeleteDubTaskFromPrioritizedSet() {
+
+    }
+
+    @Test
+    public  void checkDeleteTasksFromPrioritizedSet() {
+
+    }
+
+    @Test
+    public  void checkDeleteEpicsFromPrioritizedSet() {
+
+    }
+
+    @Test
+    public  void checkDeleteSubTasksFromPrioritizedSet() {
+
     }
 }

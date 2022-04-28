@@ -118,7 +118,7 @@ public class Task implements Comparable<Task> {
         if (this.startTime != null && o.startTime == null) return -1;
         if (this.startTime.isAfter(o.startTime)) return 1;
         if (this.startTime.isBefore(o.startTime)) return -1;
-        return 0;
+        return 1;
     }
 
     protected boolean isStartTimeEquals(Task task) {
