@@ -4,8 +4,6 @@ import main.model.TaskTypes;
 import main.model.exceptions.TaskTimeException;
 import main.service.EpicStatusService;
 import main.service.IdGenerator;
-import main.service.TimeParametersManager;
-import main.util.Util;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -79,7 +77,7 @@ public class Epic extends Task {
     public String toString() {
         StringBuilder resultBuilder = new StringBuilder(TaskTypes.EPIC + "," + id + "," + name + "," + description
                 + "," + status + "," + timeParametersManager.convertStartTimeToString(startTime) + ","
-                + timeParametersManager.convertDurationInToString(duration));
+                + timeParametersManager.convertDurationToString(duration));
 
         if (!subTasks.isEmpty()) {
             resultBuilder.append(",");
@@ -105,7 +103,12 @@ public class Epic extends Task {
             if (this.getSubTasks().get(i).getId() != epic.getSubTasks().get(i).getId()) return false;
         }
 
-        return true;
+        return id == epic.id &&
+                Objects.equals(name, epic.name) &&
+                Objects.equals(description, epic.description) &&
+                status == epic.status &&
+                isStartTimeEquals(epic) &&
+                isDurationEquals(epic);
     }
 
     @Override

@@ -7,14 +7,13 @@ import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     protected final HashMap<Long, Task> tasks;
     protected final HashMap<Long, Epic> epics;
     protected final HashMap<Long, SubTask> subTasks;
+    protected final Set<Task> prioritizedTasks;
     protected final EpicStatusService epicStatusService;
     protected final HistoryManager historyManager;
 
@@ -22,6 +21,7 @@ public class InMemoryTaskManager implements TaskManager {
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subTasks = new HashMap<>();
+        prioritizedTasks = new TreeSet<>();
         epicStatusService = new EpicStatusService();
         this.historyManager = historyManager;
     }
@@ -50,6 +50,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (Long id : tasks.keySet()) {
             historyManager.remove(id);
         }
+        deleteTasksFromPrioritizedSet(tasks.values()); // !
         tasks.clear();
     }
 
@@ -58,6 +59,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (long id : epics.keySet()) {
             historyManager.remove(id);
         }
+        deleteEpicsFromPrioritizedSet(epics.values());  // !
         epics.clear();
     }
 
@@ -66,6 +68,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (long id : subTasks.keySet()) {
             historyManager.remove(id);
         }
+        deleteSubTasksFromPrioritizedSet(subTasks.values());  // !
         subTasks.clear();
     }
 
@@ -100,6 +103,7 @@ public class InMemoryTaskManager implements TaskManager {
         );
 
         tasks.put(task.getId(), task);
+        prioritizedTasks.add(task); // !
     }
 
     @Override
@@ -112,6 +116,7 @@ public class InMemoryTaskManager implements TaskManager {
         );
 
         epics.put(epic.getId(), epic);
+        prioritizedTasks.add(epic); // !
     }
 
     @Override
@@ -124,6 +129,7 @@ public class InMemoryTaskManager implements TaskManager {
         );
 
         subTasks.put(subTask.getId(), subTask);
+        prioritizedTasks.add(subTask); // !
     }
 
     /**
@@ -140,6 +146,7 @@ public class InMemoryTaskManager implements TaskManager {
         );
 
         tasks.put(task.getId(), task);
+        prioritizedTasks.add(task);  // !
     }
 
     /**
@@ -160,6 +167,7 @@ public class InMemoryTaskManager implements TaskManager {
         for (SubTask subTask : epic.getSubTasks()) {
             updateSubTask(subTask);
         }
+        prioritizedTasks.add(epic); // !
     }
 
     /**
@@ -176,6 +184,7 @@ public class InMemoryTaskManager implements TaskManager {
         );
 
         subTasks.put(subTask.getId(), subTask);
+        prioritizedTasks.add(subTask);  // !
     }
 
     @Override
@@ -185,6 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
         );
 
         historyManager.remove(id);
+        deleteTaskFromPrioritizedSet(id);  // !
         tasks.remove(id);
     }
 
@@ -196,6 +206,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         List<SubTask> innerSubTasks = epics.get(id).getSubTasks();
         historyManager.remove(id);
+        deleteEpicFromPrioritizedSet(id); // также удалит из приоритетного множества подзадачи эпика  // !
         epics.remove(id);
 
         for (SubTask subTask : innerSubTasks) {
@@ -213,6 +224,7 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = subTasks.get(id).getEpic();
         epic.deleteSubTaskById(id);
         historyManager.remove(id);
+        deleteSubTaskFromPrioritizedSet(id); // !
         subTasks.remove(id);
         epic.setStatus(epicStatusService.calculateStatus(epic));
     }
@@ -221,5 +233,55 @@ public class InMemoryTaskManager implements TaskManager {
     public List<SubTask> getSubTasks(Epic epic) {
         if (epic == null) throw  new NullPointerException("Epic = null! при попытке getSubTasks()");
         return epic.getSubTasks();
+    }
+
+    public Set<Task> getPrioritizedTasks() {
+        return prioritizedTasks;
+    }
+
+    protected void deleteTaskFromPrioritizedSet(long id) {
+        if (tasks.containsKey(id)) {
+            prioritizedTasks.remove(tasks.get(id));
+        }
+    }
+
+    protected void deleteEpicFromPrioritizedSet(long id) {
+        if (epics.containsKey(id)) {
+            List<SubTask> subTasks = epics.get(id).getSubTasks();
+
+            prioritizedTasks.remove(epics.get(id));
+
+            for (SubTask subTask : subTasks) {
+                prioritizedTasks.remove(subTask);
+            }
+        }
+    }
+
+    protected void deleteSubTaskFromPrioritizedSet(long id) {
+        if (subTasks.containsKey(id)) {
+            prioritizedTasks.remove(subTasks.get(id));
+        }
+    }
+
+    protected void deleteTasksFromPrioritizedSet(Collection<Task> tasks) {
+        for (Task task : tasks) {
+            prioritizedTasks.remove(task);
+        }
+    }
+
+    protected void deleteEpicsFromPrioritizedSet(Collection<Epic> epics) {
+        for (Epic epic : epics) {
+
+            for (SubTask subTask : epic.getSubTasks()) {
+                prioritizedTasks.remove(subTask);
+            }
+            prioritizedTasks.remove(epic);
+        }
+    }
+
+    protected void deleteSubTasksFromPrioritizedSet(Collection<SubTask> subTasks) {
+        for (SubTask subTask : subTasks) {
+            prioritizedTasks.remove(subTask);
+        }
     }
 }

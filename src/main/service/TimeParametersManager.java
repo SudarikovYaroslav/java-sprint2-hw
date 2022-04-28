@@ -27,7 +27,7 @@ public class TimeParametersManager {
         return startTime.format(formatter);
     }
 
-    public String convertDurationInToString(Duration duration) {
+    public String convertDurationToString(Duration duration) {
         if (duration == null) return "null";
         return "D" + duration.toMillis();
     }

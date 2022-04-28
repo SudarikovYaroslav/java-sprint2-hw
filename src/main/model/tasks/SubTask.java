@@ -4,7 +4,6 @@ import main.model.Status;
 import main.model.TaskTypes;
 import main.model.exceptions.TaskTimeException;
 import main.service.IdGenerator;
-import main.util.Util;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -29,7 +28,7 @@ public class SubTask extends Task {
     public String toString() {
         return TaskTypes.SUB_TASK + "," + id + "," + name + "," + description + "," + status
                 + "," + timeParametersManager.convertStartTimeToString(startTime) + ","
-                + timeParametersManager.convertDurationInToString(duration) + ","
+                + timeParametersManager.convertDurationToString(duration) + ","
                 + epic.getId();
     }
 
@@ -47,7 +46,15 @@ public class SubTask extends Task {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         SubTask subTask = (SubTask) o;
-        return Objects.equals(epic, subTask.epic);
+        return id == subTask.id &&
+                Objects.equals(name, subTask.name) &&
+                Objects.equals(description, subTask.description) &&
+                status == subTask.status &&
+                startTime == subTask.startTime &&
+                duration == subTask.duration &&
+                epic.id == subTask.epic.id &&
+                isStartTimeEquals(subTask) &&
+                isDurationEquals(subTask);
     }
 
     @Override

@@ -12,7 +12,11 @@ import main.service.IdGenerator;
 import main.service.InMemoryHistoryManager;
 import main.service.TaskManager;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -667,5 +671,26 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         );
 
         assertEquals("Epic = null! при попытке getSubTasks()", ex.getMessage());
+    }
+
+    @Test
+    public void checkGetPrioritizedTasks() throws TaskCreateException {
+        Task task1 = testTaskTemplateGen();
+        Task task2 = testTaskTemplateGen();
+        Task task3 = testTaskTemplateGen();
+        task1.setStartTime(LocalDateTime.of(28,4,22,18,30));
+        task2.setStartTime(LocalDateTime.of(28,4,21,18,30));
+        task3.setStartTime(LocalDateTime.of(28,4,22,10,0));
+
+        /*taskManager.createTask(task1);
+        taskManager.createTask(task2);
+        taskManager.createTask(task3);
+
+        List<Task> testList = new ArrayList<>();
+
+
+        assertEquals(task2, testList.get(0));
+        assertEquals(task3, testList.get(1));
+        assertEquals(task1, testList.get(3));*/
     }
 }

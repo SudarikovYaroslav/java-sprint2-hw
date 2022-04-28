@@ -5,7 +5,6 @@ import main.model.TaskTypes;
 import main.model.exceptions.TaskTimeException;
 import main.service.IdGenerator;
 import main.service.TimeParametersManager;
-import main.util.Util;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -14,7 +13,7 @@ import java.util.Objects;
 /**
  * Basic "task" type
  */
-public class Task {
+public class Task implements Comparable<Task> {
     protected String name;
     protected String description;
     protected long id;
@@ -90,7 +89,7 @@ public class Task {
     public String toString() {
         return TaskTypes.TASK + "," + id + "," + name + "," + description + "," + status
                 + "," + timeParametersManager.convertStartTimeToString(startTime) + ","
-                + timeParametersManager.convertDurationInToString(duration);
+                + timeParametersManager.convertDurationToString(duration);
     }
 
 
@@ -102,12 +101,39 @@ public class Task {
         return id == task.id &&
                 Objects.equals(name, task.name) &&
                 Objects.equals(description, task.description) &&
-                status == task.status;
+                status == task.status &&
+                isStartTimeEquals(task) &&
+                isDurationEquals(task);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, id, status);
+        return Objects.hash(name, description, id, status, startTime, duration);
     }
 
+
+    @Override
+    public int compareTo(Task o) {
+        if (this.startTime == null) return 1;
+        if (this.startTime != null && o.startTime == null) return -1;
+        if (this.startTime.isAfter(o.startTime)) return 1;
+        if (this.startTime.isBefore(o.startTime)) return -1;
+        return 0;
+    }
+
+    protected boolean isStartTimeEquals(Task task) {
+        if (startTime == null && task.startTime != null) return false;
+        if (startTime != null && task.startTime == null) return false;
+        if (startTime == null && task.startTime == null) return true;
+        if (startTime.equals(task.startTime)) return true;
+        return false;
+    }
+
+    protected boolean isDurationEquals(Task task) {
+        if (duration == null && task.duration != null) return false;
+        if (duration != null && task.duration == null) return false;
+        if (duration == null && task.duration == null) return true;
+        if (duration.equals(task.duration)) return true;
+        return false;
+    }
 }

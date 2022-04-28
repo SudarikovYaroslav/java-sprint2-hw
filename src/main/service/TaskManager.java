@@ -8,6 +8,7 @@ import main.model.tasks.SubTask;
 import main.model.tasks.Task;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
 
@@ -57,4 +58,6 @@ public interface TaskManager {
     void deleteSubTaskById(long id) throws TaskDeleteException;
 
     List<SubTask> getSubTasks(Epic epic);
+
+    Set<Task> getPrioritizedTasks();
 }
