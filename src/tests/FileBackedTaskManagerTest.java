@@ -26,10 +26,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
      * При пустой истории и отсутствии задач в файл записываются 2 строки: мета-строка и строка разделитель
      */
     private static final int EMPTY_BACKED_LINES = 2;
-    private static final int EPIC_POSITION = 1;
 
     private final Path fileBackedPath = Util.getBackedPath();
-    private FileBackedTaskManager backedTaskManager;
 
     @BeforeEach
     protected void preparation() {
