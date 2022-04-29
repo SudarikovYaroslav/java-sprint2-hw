@@ -1,2 +1,4 @@
-type,id,name,description,status,startTime,duration,id...,#87
+type,id,name,description,status,startTime,duration,id...,#236
+EPIC,234,TestEpic,TestEpic description,NEW,null,null,235.
+SUB_TASK,235,TestSubTask,TestSubTask description,NEW,null,null,234
  

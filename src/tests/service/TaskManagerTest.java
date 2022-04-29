@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public abstract class TaskManagerTest<T extends TaskManager> {
 
     protected InMemoryHistoryManager historyManager;
-    protected TaskManager taskManager;
+    protected T taskManager;
     protected IdGenerator idGenerator;
 
     private void linkEpicWithSubTask(Epic epic, SubTask subTask) throws TaskCreateException, TimeIntersectionException {
@@ -35,30 +35,30 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertEquals(Status.NEW, epic.getStatus());
     }
 
-    private Task testTaskTemplateGen() {
+    protected Task testTaskTemplateGen() {
         return new Task("TestTask", "TestDescription", idGenerator);
     }
 
-    private Epic testEpicTemplateGen() {
+    protected Epic testEpicTemplateGen() {
         return new Epic("TestEpic", "TestEpic description", idGenerator);
     }
 
-    private SubTask testSubTaskTemplateGen() {
+    protected SubTask testSubTaskTemplateGen() {
         return new SubTask("TestSubTask", "TestSubTask description", idGenerator);
     }
 
-    private Task testInProgressTaskTemplateGen() {
+    protected Task testInProgressTaskTemplateGen() {
         Task task = new Task("TestUpdatedTask", "Task in progress status", idGenerator);
         task.setStatus(Status.IN_PROGRESS);
         return task;
     }
-    private Epic testInProgressEpicTemplateGen() {
+    protected Epic testInProgressEpicTemplateGen() {
         Epic epic = new Epic("TestUpdatedEpic", "Epic in progress status", idGenerator);
         epic.setStatus(Status.IN_PROGRESS);
         return epic;
     }
 
-    private SubTask testInProgressSubTaskTemplateGen() {
+    protected SubTask testInProgressSubTaskTemplateGen() {
         SubTask subTask = new SubTask("TestUpdatedSubTask", "SubTask in progress status", idGenerator);
         subTask.setStatus(Status.IN_PROGRESS);
         return subTask;
