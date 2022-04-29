@@ -18,7 +18,6 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
 public abstract class TaskManagerTest<T extends TaskManager> {
 
     protected InMemoryHistoryManager historyManager;
@@ -38,7 +37,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     protected Epic testEpicTemplateGen() {
-        return new Epic("TestEpic", "TestEpic description", idGenerator);
+        return new Epic("TestEpic", "TestEpic description",
+                idGenerator);
     }
 
     protected SubTask testSubTaskTemplateGen() {
@@ -50,6 +50,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         task.setStatus(Status.IN_PROGRESS);
         return task;
     }
+
     protected Epic testInProgressEpicTemplateGen() {
         Epic epic = new Epic("TestUpdatedEpic", "Epic in progress status", idGenerator);
         epic.setStatus(Status.IN_PROGRESS);

@@ -111,7 +111,8 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void checkHistoryEmptyWhenDeleteEpicContainedSubTasks() throws TaskDeleteException, TaskCreateException, TimeIntersectionException {
+    public void checkHistoryEmptyWhenDeleteEpicContainedSubTasks() throws TaskDeleteException, TaskCreateException,
+            TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask1 = testSubTaskTemplateGen();
         SubTask subTask2 = testSubTaskTemplateGen();
@@ -140,7 +141,8 @@ public class InMemoryHistoryManagerTest {
     }
 
     private Epic testEpicTemplateGen() {
-        return new Epic("TestEpic", "TestEpic description", idGenerator);
+        return new Epic("TestEpic", "TestEpic description",
+                idGenerator);
     }
 
     private SubTask testSubTaskTemplateGen() {

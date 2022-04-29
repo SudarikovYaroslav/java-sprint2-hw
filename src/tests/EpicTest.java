@@ -1,15 +1,14 @@
 import main.model.Status;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
-import org.junit.jupiter.api.Test;
-import main.service.EpicStatusService;
 import main.service.IdGenerator;
+import org.junit.jupiter.api.Test;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EpicTest {
 
     private final IdGenerator idGenerator = IdGenerator.getInstance();
-    private final EpicStatusService epicStatusService = new EpicStatusService();
     private SubTask subTask1;
     private SubTask subTask2;
     private Epic epic;

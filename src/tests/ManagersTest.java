@@ -2,39 +2,25 @@ import main.model.exceptions.*;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import main.service.FileBackedTaskManager;
 import main.service.IdGenerator;
 import main.service.InMemoryHistoryManager;
 import main.util.Managers;
 import main.util.Util;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/*
- Методы этого класса должны были находиться в классе FileInBackedTaskManagerTest!,
- но из за Error java can not find symbol class: test.TaskManagerTest, возникающей по непонятной причине при малейших
- изменениях в классе FileInBackedTaskManagerTest, ДАЖЕ ЕСЛИ ПРОСТО УБРАТЬ ЛИШНЮЮ ПУСТУЮ СТРОКУ,
- пришлось вынести эти тесты в отдельный класс. Причину возникновения ошибки установить не удалось. При её возникновении
- переставала компилироваться вся программа, по этой же причине в дженерик классах менеджеров не указан тип-параметр так
- как это тоже приводит к этой ошибке. Причём она не всегда исправляется даже если сделать откат через гит с помощью
- git reset --hard на коммит, где только что всё исправно работало.
- */
 public class ManagersTest {
 
-    /**
-     * При пустой истории и отсутствии задач в файл записываются 2 строки: мета-строка и строка разделитель
-     */
-    private static final int EMPTY_BACKED_LINES = 2;
     private static final int EPIC_POSITION = 1;
 
-    private Path fileBackedPath = Util.getBackedPath();
+    private final Path fileBackedPath = Util.getBackedPath();
     private InMemoryHistoryManager historyManager;
     private FileBackedTaskManager taskManager;
     private IdGenerator idGenerator;
@@ -160,7 +146,8 @@ public class ManagersTest {
     }
 
     private Epic testEpicTemplateGen() {
-        return new Epic("TestEpic", "TestEpic description", idGenerator);
+        return new Epic("TestEpic", "TestEpic description",
+                idGenerator);
     }
 
     private SubTask testSubTaskTemplateGen() {
