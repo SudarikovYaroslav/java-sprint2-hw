@@ -113,7 +113,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createEpic(Epic epic) throws TaskCreateException{
+    public void createEpic(Epic epic) throws TaskCreateException, TimeIntersectionException {
         if (epic == null) throw new TaskCreateException("При создании Epic == null");
         if (epic.getId() <= 0) throw new TaskCreateException(
                 "При создании Epic id должен быть больше 0. Actual: " + epic.getId());
@@ -121,22 +121,17 @@ public class InMemoryTaskManager implements TaskManager {
                 "Epic с id: " + epic.getId() + " уже существует"
         );
 
-        try {
-            IntersectionAlerts check = checkTimeIntersections(epic);
-            if(check.isIntersection()) {
-                throw new TimeIntersectionException(check.getAlerts().toString());
-            }
-        } catch (TimeIntersectionException e) {
-            e.printStackTrace();
+        IntersectionAlerts check = checkTimeIntersections(epic);
+        if(check.isIntersection()) {
+            throw new TimeIntersectionException(check.getAlerts().toString());
         }
-
 
         epics.put(epic.getId(), epic);
         prioritizedTasks.add(epic);
     }
 
     @Override
-    public void createSubTask(SubTask subTask) throws TaskCreateException{
+    public void createSubTask(SubTask subTask) throws TaskCreateException, TimeIntersectionException {
         if (subTask == null) throw new TaskCreateException("При создании SubTask == null");
         if (subTask.getId() <= 0) throw new TaskCreateException(
                 "При создании SubTask id должен быть больше 0. Actual: " + subTask.getId());
@@ -144,13 +139,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "SubTask с id: " + subTask.getId() + " уже существует"
         );
 
-        try {
-            IntersectionAlerts check = checkTimeIntersections(subTask);
-            if(check.isIntersection()) {
-                throw new TimeIntersectionException(check.getAlerts().toString());
-            }
-        } catch (TimeIntersectionException e) {
-            e.printStackTrace();
+        IntersectionAlerts check = checkTimeIntersections(subTask);
+        if(check.isIntersection()) {
+            throw new TimeIntersectionException(check.getAlerts().toString());
         }
 
         subTasks.put(subTask.getId(), subTask);
@@ -161,7 +152,7 @@ public class InMemoryTaskManager implements TaskManager {
      * Method gets new version of task with right id as parameter
      */
     @Override
-    public void updateTask(Task task) throws TaskUpdateException {
+    public void updateTask(Task task) throws TaskUpdateException, TimeIntersectionException {
         if (task == null) throw new TaskUpdateException("Обновляемая Task = null");
         if (task.getId() <= 0) throw new TaskUpdateException(
                 "id обновляемой Task должен быть больше 0! Actual: " + task.getId()
@@ -170,13 +161,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "Task с id: " + task.getId() + " не существует. Обновление невозможно!"
         );
 
-        try {
-            IntersectionAlerts check = checkTimeIntersections(task);
-            if(check.isIntersection()) {
-                throw new TimeIntersectionException(check.getAlerts().toString());
-            }
-        } catch (TimeIntersectionException e) {
-            e.printStackTrace();
+        IntersectionAlerts check = checkTimeIntersections(task);
+        if(check.isIntersection()) {
+            throw new TimeIntersectionException(check.getAlerts().toString());
         }
 
         tasks.put(task.getId(), task);
@@ -187,7 +174,7 @@ public class InMemoryTaskManager implements TaskManager {
      * Method gets new version of epic with right id as parameter
      */
     @Override
-    public void updateEpic(Epic epic) throws TaskUpdateException {
+    public void updateEpic(Epic epic) throws TaskUpdateException, TimeIntersectionException {
         if (epic == null) throw new TaskUpdateException("Обновляемый Epic = null");
         if (epic.getId() <= 0) throw new TaskUpdateException(
                 "id обновляемого Epic должен быть больше 0! Actual: " + epic.getId()
@@ -196,13 +183,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "Epic с id: " + epic.getId() + " не существует. Обновление невозможно!"
         );
 
-        try {
-            IntersectionAlerts check = checkTimeIntersections(epic);
-            if(check.isIntersection()) {
-                throw new TimeIntersectionException(check.getAlerts().toString());
-            }
-        } catch (TimeIntersectionException e) {
-            e.printStackTrace();
+        IntersectionAlerts check = checkTimeIntersections(epic);
+        if(check.isIntersection()) {
+            throw new TimeIntersectionException(check.getAlerts().toString());
         }
 
         epics.put(epic.getId(), epic);
@@ -217,7 +200,7 @@ public class InMemoryTaskManager implements TaskManager {
      * Method gets new version of SubTask with right id as parameter
      */
     @Override
-    public void updateSubTask(SubTask subTask) throws TaskUpdateException {
+    public void updateSubTask(SubTask subTask) throws TaskUpdateException, TimeIntersectionException {
         if (subTask == null) throw new TaskUpdateException("Обновляемая SubTask = null");
         if (subTask.getId() <= 0) throw new TaskUpdateException(
                 "id обновляемой SubTask должен быть больше 0! Actual: " + subTask.getId()
@@ -226,13 +209,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "SubTask с id: " + subTask.getId() + " не существует. Обновление невозможно!"
         );
 
-        try {
-            IntersectionAlerts check = checkTimeIntersections(subTask);
-            if(check.isIntersection()) {
-                throw new TimeIntersectionException(check.getAlerts().toString());
-            }
-        } catch (TimeIntersectionException e) {
-            e.printStackTrace();
+        IntersectionAlerts check = checkTimeIntersections(subTask);
+        if(check.isIntersection()) {
+            throw new TimeIntersectionException(check.getAlerts().toString());
         }
 
         subTasks.put(subTask.getId(), subTask);

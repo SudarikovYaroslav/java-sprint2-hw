@@ -111,7 +111,7 @@ public class SaveLoadTests {
     }
 
     @Test
-    public void convertStringToSubTaskTest() throws TaskLoadException, TaskCreateException {
+    public void convertStringToSubTaskTest() throws TaskLoadException, TaskCreateException, TimeIntersectionException {
         SubTask subTask = testSubTaskTemplateGen();
         Epic epic = testEpicTemplateGen();
         epic.addSubTask(subTask);
@@ -135,7 +135,7 @@ public class SaveLoadTests {
 
     @Test
     public void fillEpicWithSubTaskTest()
-            throws TaskCreateException, TaskSaveException, IOException, TaskLoadException {
+            throws TaskCreateException, TaskSaveException, IOException, TaskLoadException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         epic.addSubTask(subTask);
@@ -153,12 +153,11 @@ public class SaveLoadTests {
     }
 
     @Test
-    public void fillEpicWithSubTasksBeforeSubTasksLoad() throws TaskCreateException {
+    public void fillEpicWithSubTasksBeforeSubTasksLoad() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         epic.addSubTask(subTask);
         subTask.setEpic(epic);
-        String inLine = epic.toString();
 
         taskManager.createEpic(epic);
         TaskLoadException ex = assertThrows(

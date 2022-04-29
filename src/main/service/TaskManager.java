@@ -33,24 +33,24 @@ public interface TaskManager {
 
     void createTask(Task task) throws TaskCreateException, TimeIntersectionException;
 
-    void createEpic(Epic epic) throws TaskCreateException;
+    void createEpic(Epic epic) throws TaskCreateException, TimeIntersectionException;
 
-    void createSubTask(SubTask subTask) throws TaskCreateException;
+    void createSubTask(SubTask subTask) throws TaskCreateException, TimeIntersectionException;
 
     /**
      * Method gets new version of task with right id as parameter
      */
-    void updateTask(Task task) throws TaskUpdateException;
+    void updateTask(Task task) throws TaskUpdateException, TimeIntersectionException;
 
     /**
      * Method gets new version of epic with right id as parameter
      */
-    void updateEpic(Epic epic) throws TaskUpdateException;
+    void updateEpic(Epic epic) throws TaskUpdateException, TimeIntersectionException;
 
     /**
      * Method gets new version of SubTask with right id as parameter
      */
-    void updateSubTask(SubTask subTask) throws TaskUpdateException;
+    void updateSubTask(SubTask subTask) throws TaskUpdateException, TimeIntersectionException;
 
     void deleteTaskById(long id) throws TaskDeleteException;
 

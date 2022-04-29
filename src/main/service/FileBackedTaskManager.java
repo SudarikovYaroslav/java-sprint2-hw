@@ -123,7 +123,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void createEpic(Epic epic) throws TaskCreateException {
+    public void createEpic(Epic epic) throws TaskCreateException, TimeIntersectionException {
         super.createEpic(epic);
         try {
             save();
@@ -133,7 +133,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void createSubTask(SubTask subTask) throws TaskCreateException {
+    public void createSubTask(SubTask subTask) throws TaskCreateException, TimeIntersectionException {
         super.createSubTask(subTask);
         try {
             save();
@@ -143,7 +143,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void updateTask(Task task) throws TaskUpdateException {
+    public void updateTask(Task task) throws TaskUpdateException, TimeIntersectionException {
         super.updateTask(task);
         try {
             save();
@@ -153,7 +153,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void updateEpic(Epic epic) throws TaskUpdateException {
+    public void updateEpic(Epic epic) throws TaskUpdateException, TimeIntersectionException {
         super.updateEpic(epic);
         try {
             save();
@@ -163,7 +163,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void updateSubTask(SubTask subTask) throws TaskUpdateException {
+    public void updateSubTask(SubTask subTask) throws TaskUpdateException, TimeIntersectionException {
         super.updateSubTask(subTask);
         try {
             save();

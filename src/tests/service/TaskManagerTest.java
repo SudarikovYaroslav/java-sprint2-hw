@@ -14,7 +14,6 @@ import main.service.TaskManager;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +26,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     protected TaskManager taskManager;
     protected IdGenerator idGenerator;
 
-    private void linkEpicWithSubTask(Epic epic, SubTask subTask) throws TaskCreateException {
+    private void linkEpicWithSubTask(Epic epic, SubTask subTask) throws TaskCreateException, TimeIntersectionException {
         subTask.setEpic(epic);
         taskManager.createSubTask(subTask);
         epic.addSubTask(subTask);
@@ -97,7 +96,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkStandardEpicsListAddedRight() throws TaskCreateException {
+    public void checkStandardEpicsListAddedRight() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         assertEquals(1, taskManager.getEpicsList().size());
@@ -122,7 +121,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkStandardSubTasksListAddedRight() throws TaskCreateException {
+    public void checkStandardSubTasksListAddedRight() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         linkEpicWithSubTask(epic, subTask);
@@ -157,7 +156,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteEpicFunctionDeleteEpicFromEpicsList() throws TaskCreateException {
+    public void checkDeleteEpicFunctionDeleteEpicFromEpicsList() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         taskManager.deleteEpics();
@@ -171,7 +170,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteSubTaskFunctionDeleteSubTaskFromEpicsList() throws TaskCreateException {
+    public void checkDeleteSubTaskFunctionDeleteSubTaskFromEpicsList() throws TaskCreateException,
+            TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         linkEpicWithSubTask(epic, subTask);
@@ -209,7 +209,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetEpicByIdStandard() throws TaskCreateException {
+    public void checkGetEpicByIdStandard() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         long id = epic.getId();
@@ -222,7 +222,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetEpicByIdWithIncorrectId() throws TaskCreateException {
+    public void checkGetEpicByIdWithIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         long testId = 2L;
@@ -232,7 +232,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetSubTaskByIdStandard() throws TaskCreateException {
+    public void checkGetSubTaskByIdStandard() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         linkEpicWithSubTask(epic, subTask);
@@ -246,7 +246,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetSubTaskByIdWithIncorrectId() throws TaskCreateException {
+    public void checkGetSubTaskByIdWithIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         linkEpicWithSubTask(epic,subTask);
@@ -292,7 +292,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkCreateEpicStandard() throws TaskCreateException {
+    public void checkCreateEpicStandard() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         assertEquals(1, taskManager.getEpicsList().size());
@@ -328,7 +328,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkCreateSubTaskStandard() throws TaskCreateException {
+    public void checkCreateSubTaskStandard() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         linkEpicWithSubTask(epic, subTask);
@@ -347,7 +347,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkCreateSubTaskWithIncorrectId() throws TaskCreateException {
+    public void checkCreateSubTaskWithIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         subTask.setEpic(epic);
@@ -437,7 +437,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateEpicStandard() throws TaskCreateException, TaskUpdateException {
+    public void checkUpdateEpicStandard() throws TaskCreateException, TaskUpdateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         long id = epic.getId();
@@ -449,7 +449,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateEpicNull() throws TaskCreateException {
+    public void checkUpdateEpicNull() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
 
@@ -463,7 +463,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateEpicWithIncorrectId() throws TaskCreateException {
+    public void checkUpdateEpicWithIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
 
@@ -500,7 +500,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateSubTaskStandard() throws TaskCreateException, TaskUpdateException {
+    public void checkUpdateSubTaskStandard() throws TaskCreateException, TaskUpdateException,
+            TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask  = testSubTaskTemplateGen();
         linkEpicWithSubTask(epic, subTask);
@@ -515,7 +516,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateSubTaskNull() throws TaskCreateException {
+    public void checkUpdateSubTaskNull() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         SubTask subTask = testSubTaskTemplateGen();
@@ -532,7 +533,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateSubTaskWithIncorrectId() throws TaskCreateException {
+    public void checkUpdateSubTaskWithIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         SubTask subTask = testSubTaskTemplateGen();
@@ -596,7 +597,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteEpicById() throws TaskCreateException, TaskDeleteException {
+    public void checkDeleteEpicById() throws TaskCreateException, TaskDeleteException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         long id = epic.getId();
@@ -605,7 +606,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteEpicByIncorrectId() throws TaskCreateException {
+    public void checkDeleteEpicByIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         long id = 123;
@@ -619,7 +620,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteSubTaskById() throws TaskCreateException, TaskDeleteException {
+    public void checkDeleteSubTaskById() throws TaskCreateException, TaskDeleteException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         linkEpicWithSubTask(epic, subTask);
@@ -631,7 +632,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteSubTaskByIncorrectId() throws TaskCreateException {
+    public void checkDeleteSubTaskByIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();
         linkEpicWithSubTask(epic, subTask);
@@ -648,7 +649,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetSubTasks() throws TaskCreateException {
+    public void checkGetSubTasks() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         SubTask subTask = testSubTaskTemplateGen();
@@ -716,7 +717,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteEpicFromPrioritizedSet() throws TaskCreateException, TaskDeleteException {
+    public void checkDeleteEpicFromPrioritizedSet() throws TaskCreateException, TaskDeleteException,
+            TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         long id = epic.getId();
 
@@ -728,7 +730,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteSubTaskFromPrioritizedSet() throws TaskCreateException, TaskDeleteException {
+    public void checkDeleteSubTaskFromPrioritizedSet() throws TaskCreateException, TaskDeleteException,
+            TimeIntersectionException {
         SubTask subTask = testSubTaskTemplateGen();
         Epic epic = testEpicTemplateGen();
         subTask.setEpic(epic);
@@ -758,7 +761,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public  void checkDeleteEpicsFromPrioritizedSet() throws TaskCreateException {
+    public  void checkDeleteEpicsFromPrioritizedSet() throws TaskCreateException, TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createEpic(epic);
         assertNotEquals(0, taskManager.getPrioritizedTasks().size());
@@ -768,7 +771,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public  void checkDeleteSubTasksFromPrioritizedSet() throws TaskCreateException {
+    public  void checkDeleteSubTasksFromPrioritizedSet() throws TaskCreateException, TimeIntersectionException {
         SubTask subTask1 = testSubTaskTemplateGen();
         SubTask subTask2 = testSubTaskTemplateGen();
         Epic epic = testEpicTemplateGen();
@@ -803,7 +806,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkTimeIntersectionsTest2() throws TaskCreateException {
+    public void checkTimeIntersectionsTest2() throws TaskCreateException, TimeIntersectionException {
         //отдельная проверка пары Epic - SubTask
         Epic existsEpic = testEpicTemplateGen();
         taskManager.createEpic(existsEpic);
