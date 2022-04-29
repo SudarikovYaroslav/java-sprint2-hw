@@ -14,6 +14,7 @@ import main.service.TaskManager;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkStandardTasksListAddedRight() throws TaskCreateException {
+    public void checkStandardTasksListAddedRight() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         assertEquals(1, taskManager.getTasksList().size());
@@ -142,7 +143,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteTaskFunctionDeleteTaskFromTasksList() throws TaskCreateException {
+    public void checkDeleteTaskFunctionDeleteTaskFromTasksList() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         taskManager.deleteTasks();
@@ -185,7 +186,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetTaskByIdStandard() throws TaskCreateException {
+    public void checkGetTaskByIdStandard() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long controlId = task.getId();
@@ -198,7 +199,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetTaskByIdWithIncorrectId() throws TaskCreateException {
+    public void checkGetTaskByIdWithIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long testId = 2L;
@@ -255,7 +256,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkCreateTaskStandard() throws TaskCreateException {
+    public void checkCreateTaskStandard() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         assertEquals(1, taskManager.getTasksList().size());
@@ -373,7 +374,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateTaskStandard() throws TaskCreateException, TaskUpdateException {
+    public void checkUpdateTaskStandard() throws TaskCreateException, TaskUpdateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long id = task.getId();
@@ -385,7 +386,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateTaskNull() throws TaskCreateException {
+    public void checkUpdateTaskNull() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
 
@@ -399,7 +400,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkUpdateTaskWithIncorrectId() throws TaskCreateException {
+    public void checkUpdateTaskWithIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
 
@@ -572,7 +573,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteTaskById() throws TaskCreateException, TaskDeleteException {
+    public void checkDeleteTaskById() throws TaskCreateException, TaskDeleteException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long id = task.getId();
@@ -581,7 +582,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteTaskByIncorrectId() throws TaskCreateException {
+    public void checkDeleteTaskByIncorrectId() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long id = 123;
@@ -673,14 +674,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkGetPrioritizedTasks() throws TaskCreateException {
+    public void checkGetPrioritizedTasks() throws TaskCreateException, TimeIntersectionException {
         Task taskLatest = testTaskTemplateGen();
         Task taskEarliest = testTaskTemplateGen();
         Task taskMiddle = testTaskTemplateGen();
 
-        taskLatest.setStartTime(LocalDateTime.of(28,4,22,18,30));
-        taskEarliest.setStartTime(LocalDateTime.of(28,4,21,18,30));
-        taskMiddle.setStartTime(LocalDateTime.of(28,4,22,10,0));
+        taskEarliest.setStartTime(LocalDateTime.of(2022,4,21,18,30));
+        taskMiddle.setStartTime(LocalDateTime.of(2022,4,22,10,0));
+        taskLatest.setStartTime(LocalDateTime.of(2022,4,22,18,30));
 
         taskManager.createTask(taskLatest);
         taskManager.createTask(taskEarliest);
@@ -702,7 +703,8 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void checkDeleteTaskFromPrioritizedSet() throws TaskCreateException, TaskDeleteException {
+    public void checkDeleteTaskFromPrioritizedSet() throws TaskCreateException, TaskDeleteException,
+            TimeIntersectionException {
         Task task = testTaskTemplateGen();
         long id = task.getId();
 
@@ -738,11 +740,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertNotEquals(0, taskManager.getPrioritizedTasks().size());
 
         taskManager.deleteSubTaskById(id);
-        assertEquals(0, taskManager.getPrioritizedTasks().size());
+        // остаться должен только Epic
+        assertEquals(1, taskManager.getPrioritizedTasks().size());
     }
 
     @Test
-    public  void checkDeleteTasksFromPrioritizedSet() throws TaskCreateException {
+    public  void checkDeleteTasksFromPrioritizedSet() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         Task task1 = testTaskTemplateGen();
         task1.setStartTime(LocalDateTime.of(28,4,22,18,30));
@@ -769,10 +772,12 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         SubTask subTask1 = testSubTaskTemplateGen();
         SubTask subTask2 = testSubTaskTemplateGen();
         Epic epic = testEpicTemplateGen();
+
         subTask1.setEpic(epic);
         subTask2.setEpic(epic);
         epic.addSubTask(subTask1);
         epic.addSubTask(subTask2);
+
         subTask2.setStartTime(LocalDateTime.now());
 
         taskManager.createEpic(epic);
@@ -781,16 +786,50 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         assertNotEquals(0, taskManager.getPrioritizedTasks().size());
 
         taskManager.deleteSubTasks();
-        assertEquals(0, taskManager.getPrioritizedTasks().size());
+        // остаться должен только 1 Epic
+        assertEquals(1, taskManager.getPrioritizedTasks().size());
     }
 
     @Test
-    public void checkTimeIntersectionsTest() throws TaskCreateException {
-        Task checkedTask = testTaskTemplateGen();
-        Task existsTestTask = testTaskTemplateGen();
+    public void checkTimeIntersectionsTest1() throws TaskCreateException, TimeIntersectionException {
+        Task checkedTaskNullNull = testTaskTemplateGen();
+        Task existsTaskNullNull = testTaskTemplateGen();
 
         //все поля тасков null
-        taskManager.createTask(existsTestTask);
-        
+        taskManager.createTask(existsTaskNullNull);
+        taskManager.createTask(checkedTaskNullNull);
+        // проверяем, что вторая задача действительно создалась
+        assertEquals(2, taskManager.getPrioritizedTasks().size());
     }
+
+    @Test
+    public void checkTimeIntersectionsTest2() throws TaskCreateException {
+        //отдельная проверка пары Epic - SubTask
+        Epic existsEpic = testEpicTemplateGen();
+        taskManager.createEpic(existsEpic);
+        SubTask checkedSubTask = testSubTaskTemplateGen();
+        checkedSubTask.setStartTime(LocalDateTime.now());
+        checkedSubTask.setEpic(existsEpic);
+        existsEpic.addSubTask(checkedSubTask);
+        taskManager.createSubTask(checkedSubTask);
+        assertEquals(2, taskManager.getPrioritizedTasks().size());
+    }
+
+    @Test
+    public void checkTimeIntersectionsTest3() throws TaskCreateException, TimeIntersectionException {
+        LocalDateTime time = LocalDateTime.of(2022,4,29,11,0);
+        Task existsTask = testTaskTemplateGen();
+        Task checkedTask = testTaskTemplateGen();
+
+        existsTask.setStartTime(time);
+        taskManager.createTask(existsTask);
+
+        checkedTask.setStartTime(time);
+
+        TimeIntersectionException ex = assertThrows(
+                TimeIntersectionException.class,
+                () -> taskManager.createTask(checkedTask)
+        );
+    }
+
 }

@@ -2,6 +2,7 @@ package service;
 
 import main.model.exceptions.TaskCreateException;
 import main.model.exceptions.TaskDeleteException;
+import main.model.exceptions.TimeIntersectionException;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
@@ -25,7 +26,7 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void addTaskIntoHistoryTest() throws TaskCreateException {
+    public void addTaskIntoHistoryTest() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long id = task.getId();
@@ -44,7 +45,7 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void maxHistorySizeTest() throws TaskCreateException {
+    public void maxHistorySizeTest() throws TaskCreateException, TimeIntersectionException {
         final int MAX_HISTORY_SIZE = 10;
 
         for (int i = 0; i < (MAX_HISTORY_SIZE + 1); i++) {
@@ -58,7 +59,7 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void addOneTaskTwiceInHistoryTest() throws TaskCreateException {
+    public void addOneTaskTwiceInHistoryTest() throws TaskCreateException, TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long id = task.getId();
@@ -68,7 +69,7 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void getLastViewedTasksTest() throws TaskCreateException {
+    public void getLastViewedTasksTest() throws TaskCreateException, TimeIntersectionException {
         assertEquals(0, historyManager.getLastViewedTasks().size());
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
@@ -83,7 +84,7 @@ public class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void removeRemoveTest() throws TaskCreateException, TaskDeleteException {
+    public void removeRemoveTest() throws TaskCreateException, TaskDeleteException, TimeIntersectionException {
         Task task1 = testTaskTemplateGen();
         Task task2 = testTaskTemplateGen();
         Task task3 = testTaskTemplateGen();

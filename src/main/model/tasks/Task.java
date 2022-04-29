@@ -108,15 +108,15 @@ public class Task implements Comparable<Task> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, description, id, status, startTime, duration);
+        return Objects.hash(name, description, id, status);
     }
 
     @Override
     public int compareTo(Task o) {
-        if (startTime == null && o.startTime == null) return 0;
+        if (id == o.id) return 0;
+        if (startTime == null && o.startTime == null) return 1;
         if (startTime != null && o.startTime == null) return -1;
         if (startTime == null && o.startTime != null) return 1;
-        if (startTime != null && o.startTime != null && startTime.equals(o.startTime)) return 0;
         if (startTime.isBefore(o.startTime)) return -1;
         return 1;
     }

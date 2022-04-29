@@ -95,7 +95,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void createTask(Task task) throws TaskCreateException {
+    public void createTask(Task task) throws TaskCreateException, TimeIntersectionException {
         if (task == null) throw new TaskCreateException("При создании task == null");
         if (task.getId() <= 0) throw new TaskCreateException(
                 "При создании Task id должен быть больше 0. Actual: " + task.getId());
@@ -103,13 +103,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "Task с id: " + task.getId() + " уже существует"
         );
 
-        try {
-            IntersectionAlerts check = checkTimeIntersections(task);
-            if(check.isIntersection()) {
-                throw new TimeIntersectionException(check.getAlerts().toString());
-            }
-        } catch (TimeIntersectionException e) {
-            e.printStackTrace();
+        IntersectionAlerts check = checkTimeIntersections(task);
+        if(check.isIntersection()) {
+            throw new TimeIntersectionException(check.getAlerts().toString());
         }
 
         tasks.put(task.getId(), task);
@@ -360,18 +356,25 @@ public class InMemoryTaskManager implements TaskManager {
         return searchIfTaskHaveStartTimeAndDuration(task);
     }
 
-    protected IntersectionAlerts searchIfTaskHaveStartTimeOnly(Task task) {
+    protected IntersectionAlerts searchIfTaskHaveStartTimeOnly(Task checkedTask) {
         boolean intersection;
+        boolean specialCase = false; // startTime эпика и его подзадачи могут быть равны
+
         for (Task existsTask : getPrioritizedTasks()) {
             if (existsTask.getStartTime() == null) continue;
 
             if (existsTask.getStartTime() != null && existsTask.getDuration() == null) {
-                if (task.getStartTime().equals(existsTask.getStartTime()))
+                if (checkedTask.getStartTime().equals(existsTask.getStartTime())) {
+                    specialCase = controlIfEpicAndSubTaskPair(checkedTask, existsTask);
+                    if (specialCase) continue;
                     return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+                }
             }
 
             if (existsTask.getStartTime() != null && existsTask.getDuration() != null ) {
-                intersection = checkIfTaskPeriodIncludesTimePoint(existsTask, task.getStartTime());
+                intersection = checkIfTaskPeriodIncludesTimePoint(existsTask, checkedTask.getStartTime());
+                specialCase = controlIfEpicAndSubTaskPair(checkedTask, existsTask);
+                if (specialCase) continue;
                 if (intersection)
                     return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
             }
@@ -379,10 +382,11 @@ public class InMemoryTaskManager implements TaskManager {
         return new IntersectionAlerts(false, Optional.empty());
     }
 
-    protected IntersectionAlerts searchIfTaskHaveStartTimeAndDuration(Task task) {
+    protected IntersectionAlerts searchIfTaskHaveStartTimeAndDuration(Task checkedTask) {
         boolean intersection;
         boolean startIntersection;
         boolean endIntersection;
+        boolean specialCase = false; // startTime эпика и его подзадачи могут быть равны
         try {
             for (Task existsTask : getPrioritizedTasks()) {
                 if (existsTask.getStartTime() == null) continue;
@@ -390,15 +394,17 @@ public class InMemoryTaskManager implements TaskManager {
                 // если у существующей задачи установлено только startTime без duration,
                 // проверяем пересечение нашей задачи со startTime уже существующей
                 if (existsTask.getStartTime() != null && existsTask.getDuration() == null) {
-                    intersection = checkIfTaskPeriodIncludesTimePoint(task, existsTask.getStartTime());
+                    intersection = checkIfTaskPeriodIncludesTimePoint(checkedTask, existsTask.getStartTime());
                     if (intersection)
-                        return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+                        specialCase = controlIfEpicAndSubTaskPair(checkedTask, existsTask);
+                        if (specialCase) continue;
+                    return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
                 }
 
                 // проверяем пересечение времени исполнения нашей задачи и существующей
                 if (existsTask.getStartTime() != null && existsTask.getDuration() != null) {
-                    startIntersection = checkIfTaskPeriodIncludesTimePoint(existsTask, task.getStartTime());
-                    endIntersection = checkIfTaskPeriodIncludesTimePoint(existsTask, task.getEndTime());
+                    startIntersection = checkIfTaskPeriodIncludesTimePoint(existsTask, checkedTask.getStartTime());
+                    endIntersection = checkIfTaskPeriodIncludesTimePoint(existsTask, checkedTask.getEndTime());
                     if (startIntersection || endIntersection)
                         return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
                 }
@@ -417,7 +423,9 @@ public class InMemoryTaskManager implements TaskManager {
             LocalDateTime start = task.getStartTime();
             LocalDateTime end = task.getEndTime();
 
-            if (timePoint.isAfter(start) && timePoint.isBefore(end)) return true;
+            if (timePoint.isAfter(start) && timePoint.isBefore(end)
+            || timePoint.equals(start)
+            || timePoint.equals(end)) return true;
 
         } catch (TaskTimeException e) {
             e.printStackTrace();
@@ -438,5 +446,27 @@ public class InMemoryTaskManager implements TaskManager {
             e.printStackTrace();
         }
         return alert;
+    }
+
+    /**
+     * В случае, если проверяемые задачи - это Epic с его SubTask, из-за особенностей расчёта стартового времени
+     * класса Epic - у них может быть одинаковое startTime. В этом случае возвращается true, в противном false
+     */
+    protected boolean controlIfEpicAndSubTaskPair(Task testedTask, Task existsTask) {
+        //т.к. один из тасков должен быть эпик, а второй подзадача - проверяем оба возможных варианта
+        try {
+            Epic epic = (Epic) testedTask;
+            SubTask subTask = (SubTask) existsTask;
+            if (epic.getSubTasks().contains(subTask) && subTask.getEpic().getId() == epic.getId()) return true;
+        } catch (ClassCastException e1) {
+            try {
+                SubTask subTask = (SubTask) testedTask;
+                Epic epic = (Epic) existsTask;
+                if (epic.getSubTasks().contains(subTask) && subTask.getEpic().getId() == epic.getId()) return true;
+            } catch (ClassCastException e2) {
+                return false;
+            }
+        }
+        return false;
     }
 }

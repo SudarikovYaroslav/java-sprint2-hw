@@ -31,7 +31,7 @@ public interface TaskManager {
 
     SubTask getSubTaskById(long id);
 
-    void createTask(Task task) throws TaskCreateException;
+    void createTask(Task task) throws TaskCreateException, TimeIntersectionException;
 
     void createEpic(Epic epic) throws TaskCreateException;
 

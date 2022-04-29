@@ -79,7 +79,7 @@ public class Managers {
                             taskManager.createSubTask(subTask);
                             break;
                     }
-                } catch (TaskCreateException e) {
+                } catch (TaskCreateException | TimeIntersectionException e) {
                     e.printStackTrace();
                 }
             }

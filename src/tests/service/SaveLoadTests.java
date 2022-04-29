@@ -56,7 +56,8 @@ public class SaveLoadTests {
     }
 
     @Test
-    public void saveWithEmptyEpicTest() throws TaskCreateException, TaskSaveException, IOException {
+    public void saveWithEmptyEpicTest() throws TaskCreateException, TaskSaveException, IOException,
+            TimeIntersectionException {
         Epic epic = testEpicTemplateGen();
         taskManager.createTask(epic);
         taskManager.save();
@@ -66,7 +67,8 @@ public class SaveLoadTests {
     }
 
     @Test
-    public void saveTestWithOneTaskAndNotEmptyHistory() throws TaskCreateException, TaskSaveException, IOException {
+    public void saveTestWithOneTaskAndNotEmptyHistory() throws TaskCreateException, TaskSaveException, IOException,
+            TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long id = task.getId();
@@ -167,7 +169,8 @@ public class SaveLoadTests {
     }
 
     @Test
-    public void loadHistoryTest() throws TaskCreateException, TaskSaveException, IOException, TaskLoadException {
+    public void loadHistoryTest() throws TaskCreateException, TaskSaveException, IOException, TaskLoadException,
+            TimeIntersectionException {
         Task task = testTaskTemplateGen();
         taskManager.createTask(task);
         long id = task.getId();
@@ -188,7 +191,8 @@ public class SaveLoadTests {
     }
 
     @Test
-    public void loadHistoryTestWhenLoadingTaskDoesnTExists() throws TaskCreateException, TaskDeleteException {
+    public void loadHistoryTestWhenLoadingTaskDoesnTExists() throws TaskCreateException, TaskDeleteException,
+            TimeIntersectionException {
         Task task = testTaskTemplateGen();
         long id = task.getId();
         taskManager.createTask(task);
@@ -204,7 +208,8 @@ public class SaveLoadTests {
     }
 
     @Test
-    public void loadFromFileTest() throws TaskCreateException, TaskSaveException, TaskLoadException {
+    public void loadFromFileTest() throws TaskCreateException, TaskSaveException, TaskLoadException,
+            TimeIntersectionException {
         Task task = testTaskTemplateGen();
         Epic epic = testEpicTemplateGen();
         SubTask subTask = testSubTaskTemplateGen();

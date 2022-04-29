@@ -113,7 +113,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     @Override
-    public void createTask(Task task) throws TaskCreateException {
+    public void createTask(Task task) throws TaskCreateException, TimeIntersectionException {
         super.createTask(task);
         try {
             save();
