@@ -1,5 +1,3 @@
-package service;
-
 import main.model.Status;
 import main.model.exceptions.TaskCreateException;
 import main.model.exceptions.TaskDeleteException;

@@ -1,5 +1,3 @@
-package service;
-
 import org.junit.jupiter.api.BeforeEach;
 import main.service.IdGenerator;
 import main.service.InMemoryHistoryManager;
