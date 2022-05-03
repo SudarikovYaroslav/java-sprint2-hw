@@ -1,3 +1,5 @@
+package TaskManagerTests;
+
 import main.model.exceptions.TaskCreateException;
 import main.model.exceptions.TaskLoadException;
 import main.model.exceptions.TaskSaveException;
@@ -5,10 +7,11 @@ import main.model.exceptions.TimeIntersectionException;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
-import org.junit.jupiter.api.BeforeEach;
 import main.service.FileBackedTaskManager;
 import main.service.InMemoryHistoryManager;
 import main.util.Util;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -16,10 +19,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static main.service.TaskForTestsGenerator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
+public class FileBackedTaskManagerFieldsInitRightTest extends TaskManagerFieldsInitRightTest<FileBackedTaskManager> {
 
     /**
      * При пустой истории и отсутствии задач в файл записываются 2 строки: мета-строка и строка разделитель
@@ -32,6 +36,11 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
     protected void preparation() {
         historyManager = new InMemoryHistoryManager();
         taskManager = new FileBackedTaskManager(historyManager, fileBackedPath);
+        Assertions.assertTrue(historyManager.getLastViewedTasks().isEmpty());
+        Assertions.assertTrue(taskManager.getPrioritizedTasks().isEmpty());
+        Assertions.assertTrue(taskManager.getTasksList().isEmpty());
+        Assertions.assertTrue(taskManager.getEpicsList().isEmpty());
+        Assertions.assertTrue(taskManager.getSubTasksList().isEmpty());
     }
 
     @Test

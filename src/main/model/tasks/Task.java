@@ -3,7 +3,6 @@ package main.model.tasks;
 import main.model.Status;
 import main.model.TaskTypes;
 import main.model.exceptions.TaskTimeException;
-import main.service.IdGenerator;
 import main.service.TimeParameterConverter;
 
 import java.time.Duration;

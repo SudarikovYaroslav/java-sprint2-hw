@@ -1,3 +1,5 @@
+package TaskManagerTests;
+
 import main.model.exceptions.TaskCreateException;
 import main.model.exceptions.TaskDeleteException;
 import main.model.exceptions.TimeIntersectionException;
