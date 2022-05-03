@@ -22,7 +22,6 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     protected InMemoryHistoryManager historyManager;
     protected T taskManager;
-    protected IdGenerator idGenerator;
 
     private void linkEpicWithSubTask(Epic epic, SubTask subTask) throws TaskCreateException, TimeIntersectionException {
         subTask.setEpic(epic);
@@ -33,32 +32,34 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     protected Task testTaskTemplateGen() {
-        return new Task("TestTask", "TestDescription", idGenerator);
+        return new Task("TestTask", "TestDescription",
+                IdGenerator.generate());
     }
 
     protected Epic testEpicTemplateGen() {
         return new Epic("TestEpic", "TestEpic description",
-                idGenerator);
+                IdGenerator.generate());
     }
 
     protected SubTask testSubTaskTemplateGen() {
-        return new SubTask("TestSubTask", "TestSubTask description", idGenerator);
+        return new SubTask("TestSubTask", "TestSubTask description", IdGenerator.generate());
     }
 
     protected Task testInProgressTaskTemplateGen() {
-        Task task = new Task("TestUpdatedTask", "Task in progress status", idGenerator);
+        Task task = new Task("TestUpdatedTask", "Task in progress status", IdGenerator.generate());
         task.setStatus(Status.IN_PROGRESS);
         return task;
     }
 
     protected Epic testInProgressEpicTemplateGen() {
-        Epic epic = new Epic("TestUpdatedEpic", "Epic in progress status", idGenerator);
+        Epic epic = new Epic("TestUpdatedEpic", "Epic in progress status", IdGenerator.generate());
         epic.setStatus(Status.IN_PROGRESS);
         return epic;
     }
 
     protected SubTask testInProgressSubTaskTemplateGen() {
-        SubTask subTask = new SubTask("TestUpdatedSubTask", "SubTask in progress status", idGenerator);
+        SubTask subTask = new SubTask("TestUpdatedSubTask", "SubTask in progress status",
+                IdGenerator.generate());
         subTask.setStatus(Status.IN_PROGRESS);
         return subTask;
     }
@@ -107,10 +108,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Epic epic = testEpicTemplateGen();
         epic.setId(-1);
 
-        TaskCreateException ex = assertThrows(
-                TaskCreateException.class,
-                () -> taskManager.createTask(epic)
-        );
+        assertThrows(TaskCreateException.class, () -> taskManager.createTask(epic));
 
         assertEquals(0, taskManager.getEpicsList().size());
     }

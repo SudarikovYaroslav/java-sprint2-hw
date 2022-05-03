@@ -8,15 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EpicTest {
 
-    private final IdGenerator idGenerator = IdGenerator.getInstance();
     private SubTask subTask1;
     private SubTask subTask2;
     private Epic epic;
 
     private void preparation() {
-        subTask1 = new SubTask("TestSubTask1", "TestSubTask1 description", idGenerator);
-        subTask2 = new SubTask("TestSubTask2", "TestSubTask2 description", idGenerator);
-        epic = new Epic("Test epic", "Test description", idGenerator);
+        subTask1 = new SubTask("TestSubTask1", "TestSubTask1 description", IdGenerator.generate());
+        subTask2 = new SubTask("TestSubTask2", "TestSubTask2 description", IdGenerator.generate());
+        epic = new Epic("Test epic", "Test description", IdGenerator.generate());
         subTask1.setEpic(epic);
         subTask2.setEpic(epic);
     }
@@ -24,7 +23,7 @@ class EpicTest {
 
     @Test
     public void checkEmptyEpicStatusWhenItJustInit() {
-        Epic epic = new Epic("Test epic", "Test description", idGenerator);
+        Epic epic = new Epic("Test epic", "Test description", IdGenerator.generate());
         assertEquals(Status.NEW, epic.getStatus());
     }
 

@@ -13,12 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class InMemoryHistoryManagerTest {
 
     private TaskManager taskManager;
-    private IdGenerator idGenerator;
     private HistoryManager historyManager;
 
     @BeforeEach
     private void preparation() {
-        idGenerator = IdGenerator.getInstance();
         historyManager = new InMemoryHistoryManager();
         taskManager = new InMemoryTaskManager(historyManager);
     }
@@ -44,16 +42,16 @@ public class InMemoryHistoryManagerTest {
 
     @Test
     public void maxHistorySizeTest() throws TaskCreateException, TimeIntersectionException {
-        final int MAX_HISTORY_SIZE = 10;
+        final int maxHistorySize = 10;
 
-        for (int i = 0; i < (MAX_HISTORY_SIZE + 1); i++) {
+        for (int i = 0; i < (maxHistorySize + 1); i++) {
             Task task = testTaskTemplateGen();
             taskManager.createTask(task);
             long id = task.getId();
             taskManager.getTaskById(id);
         }
 
-        assertEquals(MAX_HISTORY_SIZE, historyManager.getLastViewedTasks().size());
+        assertEquals(maxHistorySize, historyManager.getLastViewedTasks().size());
     }
 
     @Test
@@ -137,15 +135,16 @@ public class InMemoryHistoryManagerTest {
     }
 
     private Task testTaskTemplateGen() {
-        return new Task("TestTask", "TestDescription", idGenerator);
+        return new Task("TestTask", "TestDescription",
+                IdGenerator.generate());
     }
 
     private Epic testEpicTemplateGen() {
         return new Epic("TestEpic", "TestEpic description",
-                idGenerator);
+                IdGenerator.generate());
     }
 
     private SubTask testSubTaskTemplateGen() {
-        return new SubTask("TestSubTask", "TestSubTask description", idGenerator);
+        return new SubTask("TestSubTask", "TestSubTask description", IdGenerator.generate());
     }
 }

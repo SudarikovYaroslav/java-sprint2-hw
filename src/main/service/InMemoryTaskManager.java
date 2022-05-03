@@ -1,6 +1,6 @@
 package main.service;
 
-import main.model.IntersectionAlerts;
+import main.model.IntersectionSearchResult;
 import main.model.exceptions.*;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
@@ -103,9 +103,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "Task с id: " + task.getId() + " уже существует"
         );
 
-        IntersectionAlerts check = checkTimeIntersections(task);
+        IntersectionSearchResult check = checkTimeIntersections(task);
         if(check.isIntersection()) {
-            throw new TimeIntersectionException(check.getAlerts().toString());
+            throw new TimeIntersectionException(check.generateMessage());
         }
 
         tasks.put(task.getId(), task);
@@ -121,9 +121,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "Epic с id: " + epic.getId() + " уже существует"
         );
 
-        IntersectionAlerts check = checkTimeIntersections(epic);
+        IntersectionSearchResult check = checkTimeIntersections(epic);
         if(check.isIntersection()) {
-            throw new TimeIntersectionException(check.getAlerts().toString());
+            throw new TimeIntersectionException(check.generateMessage());
         }
 
         epics.put(epic.getId(), epic);
@@ -139,9 +139,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "SubTask с id: " + subTask.getId() + " уже существует"
         );
 
-        IntersectionAlerts check = checkTimeIntersections(subTask);
+        IntersectionSearchResult check = checkTimeIntersections(subTask);
         if(check.isIntersection()) {
-            throw new TimeIntersectionException(check.getAlerts().toString());
+            throw new TimeIntersectionException(check.generateMessage());
         }
 
         subTasks.put(subTask.getId(), subTask);
@@ -161,9 +161,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "Task с id: " + task.getId() + " не существует. Обновление невозможно!"
         );
 
-        IntersectionAlerts check = checkTimeIntersections(task);
+        IntersectionSearchResult check = checkTimeIntersections(task);
         if(check.isIntersection()) {
-            throw new TimeIntersectionException(check.getAlerts().toString());
+            throw new TimeIntersectionException(check.generateMessage());
         }
 
         tasks.put(task.getId(), task);
@@ -183,9 +183,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "Epic с id: " + epic.getId() + " не существует. Обновление невозможно!"
         );
 
-        IntersectionAlerts check = checkTimeIntersections(epic);
+        IntersectionSearchResult check = checkTimeIntersections(epic);
         if(check.isIntersection()) {
-            throw new TimeIntersectionException(check.getAlerts().toString());
+            throw new TimeIntersectionException(check.generateMessage());
         }
 
         epics.put(epic.getId(), epic);
@@ -209,9 +209,9 @@ public class InMemoryTaskManager implements TaskManager {
                 "SubTask с id: " + subTask.getId() + " не существует. Обновление невозможно!"
         );
 
-        IntersectionAlerts check = checkTimeIntersections(subTask);
+        IntersectionSearchResult check = checkTimeIntersections(subTask);
         if(check.isIntersection()) {
-            throw new TimeIntersectionException(check.getAlerts().toString());
+            throw new TimeIntersectionException(check.generateMessage());
         }
 
         subTasks.put(subTask.getId(), subTask);
@@ -322,9 +322,9 @@ public class InMemoryTaskManager implements TaskManager {
      * если задача имеет пересечение по времени с существующей задачей c id, началом startTime и завершением endTime.
      * Или boolean false и null, если пересечений не выявлено
      */
-    protected IntersectionAlerts checkTimeIntersections(Task task) {
+    protected IntersectionSearchResult checkTimeIntersections(Task task) {
         if (task == null) throw new NullPointerException();
-        if (task.getStartTime() == null) return new IntersectionAlerts(false, Optional.empty());
+        if (task.getStartTime() == null) return new IntersectionSearchResult(false, task);
 
         // у task установлено только startTime
         if (task.getStartTime() != null && task.getDuration() == null) {
@@ -335,7 +335,7 @@ public class InMemoryTaskManager implements TaskManager {
         return searchIfTaskHaveStartTimeAndDuration(task);
     }
 
-    protected IntersectionAlerts searchIfTaskHaveStartTimeOnly(Task checkedTask) {
+    protected IntersectionSearchResult searchIfTaskHaveStartTimeOnly(Task checkedTask) {
         boolean intersection;
         boolean specialCase = false; // startTime эпика и его подзадачи могут быть равны
 
@@ -346,7 +346,7 @@ public class InMemoryTaskManager implements TaskManager {
                 if (checkedTask.getStartTime().equals(existsTask.getStartTime())) {
                     specialCase = controlIfEpicAndSubTaskPair(checkedTask, existsTask);
                     if (specialCase) continue;
-                    return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+                    return new IntersectionSearchResult(true, existsTask);
                 }
             }
 
@@ -355,13 +355,13 @@ public class InMemoryTaskManager implements TaskManager {
                 specialCase = controlIfEpicAndSubTaskPair(checkedTask, existsTask);
                 if (specialCase) continue;
                 if (intersection)
-                    return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+                    return new IntersectionSearchResult(true, existsTask);
             }
         }
-        return new IntersectionAlerts(false, Optional.empty());
+        return new IntersectionSearchResult(false, checkedTask);
     }
 
-    protected IntersectionAlerts searchIfTaskHaveStartTimeAndDuration(Task checkedTask) {
+    protected IntersectionSearchResult searchIfTaskHaveStartTimeAndDuration(Task checkedTask) {
         boolean intersection;
         boolean startIntersection;
         boolean endIntersection;
@@ -377,7 +377,7 @@ public class InMemoryTaskManager implements TaskManager {
                     if (intersection)
                         specialCase = controlIfEpicAndSubTaskPair(checkedTask, existsTask);
                         if (specialCase) continue;
-                    return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+                    return new IntersectionSearchResult(true,existsTask);
                 }
 
                 // проверяем пересечение времени исполнения нашей задачи и существующей
@@ -385,13 +385,13 @@ public class InMemoryTaskManager implements TaskManager {
                     startIntersection = checkIfTaskPeriodIncludesTimePoint(existsTask, checkedTask.getStartTime());
                     endIntersection = checkIfTaskPeriodIncludesTimePoint(existsTask, checkedTask.getEndTime());
                     if (startIntersection || endIntersection)
-                        return new IntersectionAlerts(true, Optional.of(createAlertMessage(existsTask)));
+                        return new IntersectionSearchResult(true, existsTask);
                 }
             }
         } catch (TaskTimeException e) {
             e.printStackTrace();
         }
-        return new IntersectionAlerts(false, Optional.empty());
+        return new IntersectionSearchResult(false, checkedTask);
     }
 
     /**

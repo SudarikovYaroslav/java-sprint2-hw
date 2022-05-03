@@ -4,6 +4,7 @@ import main.model.TaskTypes;
 import main.model.exceptions.TaskTimeException;
 import main.service.EpicStatusService;
 import main.service.IdGenerator;
+import main.service.TimeParameterConverter;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -12,37 +13,37 @@ import java.util.*;
 public class Epic extends Task {
     private final List<SubTask> subTasks = new ArrayList<>();
     //Множество id используется для корректной загрузки Epic-ов
-    private final Set<Long> subTasksId = new HashSet<>();
+    private final Set<Long> subTasksIds = new HashSet<>();
     private final EpicStatusService epicStatusService = new EpicStatusService();
 
-    public Epic(String name, String description, List<SubTask> subTasks, IdGenerator idGenerator) {
-        super(name, description, idGenerator);
+    public Epic(String name, String description, List<SubTask> subTasks, long id) {
+        super(name, description, id);
         addSubTasks(subTasks);
     }
 
-    public Epic(String name, String description, IdGenerator idGenerator) {
-        super(name, description, idGenerator);
+    public Epic(String name, String description, long id) {
+        super(name, description, id);
     }
 
     public List<SubTask> getSubTasks() {
         return subTasks;
     }
 
-    public Set<Long> getSubTasksId() {
-        return subTasksId;
+    public Set<Long> getSubTasksIds() {
+        return subTasksIds;
     }
 
     public void addSubTask(SubTask subTask) {
         subTask.setEpic(this);
         subTasks.add(subTask);
-        subTasksId.add(subTask.getId());
+        subTasksIds.add(subTask.getId());
         calculateStatus();
         duration = countSubTasksDuration();
     }
 
     public void deleteSubTaskById(long id) {
         subTasks.removeIf(subTask -> subTask.getId() == id);
-        subTasksId.remove(id);
+        subTasksIds.remove(id);
         calculateStatus();
         duration = countSubTasksDuration();
     }
@@ -52,7 +53,7 @@ public class Epic extends Task {
         this.subTasks.addAll(subTasks);
 
         for (SubTask item : subTasks) {
-            subTasksId.add(item.getId());
+            subTasksIds.add(item.getId());
         }
 
         calculateStatus();
@@ -60,7 +61,7 @@ public class Epic extends Task {
     }
 
     public void addSubTasksId(Long[] ids) {
-        subTasksId.addAll(Arrays.asList(ids));
+        subTasksIds.addAll(Arrays.asList(ids));
     }
 
     private void linkWithSubTasks(List<SubTask> subTasks) {
@@ -76,8 +77,8 @@ public class Epic extends Task {
     @Override
     public String toString() {
         StringBuilder resultBuilder = new StringBuilder(TaskTypes.EPIC + "," + id + "," + name + "," + description
-                + "," + status + "," + timeParametersManager.convertStartTimeToString(startTime) + ","
-                + timeParametersManager.convertDurationToString(duration));
+                + "," + status + "," + TimeParameterConverter.convertStartTimeToString(startTime) + ","
+                + TimeParameterConverter.convertDurationToString(duration));
 
         if (!subTasks.isEmpty()) {
             resultBuilder.append(",");
@@ -206,7 +207,7 @@ public class Epic extends Task {
     @Override
     public LocalDateTime getEndTime() throws TaskTimeException {
         if (subTasks.isEmpty() && duration != null && startTime != null) return startTime.plus(duration);
-        if (subTasks.isEmpty() && (duration == null || startTime == null)) throw new TaskTimeException(
+        if (subTasks.isEmpty()) throw new TaskTimeException(
                 "В Epic id: " + getId() + "; startTime = " + getStartTime() + " duration = " + getDuration()
                         + " рассчитать EndTime невозможно!"
         );

@@ -3,7 +3,7 @@ package main.model.tasks;
 import main.model.Status;
 import main.model.TaskTypes;
 import main.model.exceptions.TaskTimeException;
-import main.service.IdGenerator;
+import main.service.TimeParameterConverter;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -12,8 +12,8 @@ public class SubTask extends Task {
     private Epic epic;
 
 
-    public SubTask(String name, String description, IdGenerator idGenerator) {
-        super(name, description, idGenerator);
+    public SubTask(String name, String description, long id) {
+        super(name, description, id);
     }
 
     public Epic getEpic() {
@@ -27,8 +27,8 @@ public class SubTask extends Task {
     @Override
     public String toString() {
         return TaskTypes.SUB_TASK + "," + id + "," + name + "," + description + "," + status
-                + "," + timeParametersManager.convertStartTimeToString(startTime) + ","
-                + timeParametersManager.convertDurationToString(duration) + ","
+                + "," + TimeParameterConverter.convertStartTimeToString(startTime) + ","
+                + TimeParameterConverter.convertDurationToString(duration) + ","
                 + epic.getId();
     }
 

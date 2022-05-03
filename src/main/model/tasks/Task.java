@@ -4,7 +4,7 @@ import main.model.Status;
 import main.model.TaskTypes;
 import main.model.exceptions.TaskTimeException;
 import main.service.IdGenerator;
-import main.service.TimeParametersManager;
+import main.service.TimeParameterConverter;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -20,12 +20,11 @@ public class Task implements Comparable<Task> {
     protected Status status;
     protected Duration duration;
     protected LocalDateTime startTime;
-    protected final TimeParametersManager timeParametersManager = new TimeParametersManager();
 
-    public Task(String name, String description, IdGenerator idGenerator) {
+    public Task(String name, String description, long id) {
         this.name = name;
         this.description = description;
-        this.id = idGenerator.generate();
+        this.id = id;
         status = Status.NEW;
     }
     public void setDuration(Duration duration) {
@@ -88,8 +87,8 @@ public class Task implements Comparable<Task> {
     @Override
     public String toString() {
         return TaskTypes.TASK + "," + id + "," + name + "," + description + "," + status
-                + "," + timeParametersManager.convertStartTimeToString(startTime) + ","
-                + timeParametersManager.convertDurationToString(duration);
+                + "," + TimeParameterConverter.convertStartTimeToString(startTime) + ","
+                + TimeParameterConverter.convertDurationToString(duration);
     }
 
 

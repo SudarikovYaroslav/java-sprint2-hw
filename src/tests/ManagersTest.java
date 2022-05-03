@@ -23,16 +23,17 @@ public class ManagersTest {
     private final Path fileBackedPath = Util.getBackedPath();
     private InMemoryHistoryManager historyManager;
     private FileBackedTaskManager taskManager;
-    private IdGenerator idGenerator;
 
     @BeforeEach
     private void preparation() {
         historyManager = new InMemoryHistoryManager();
-        idGenerator = IdGenerator.getInstance();
-        taskManager = new FileBackedTaskManager(historyManager, fileBackedPath, idGenerator);
+        taskManager = new FileBackedTaskManager(historyManager, fileBackedPath);
+        assertTrue(historyManager.getLastViewedTasks().isEmpty());
+        assertTrue(taskManager.getPrioritizedTasks().isEmpty());
+        assertTrue(taskManager.getTasksList().isEmpty());
+        assertTrue(taskManager.getEpicsList().isEmpty());
+        assertTrue(taskManager.getSubTasksList().isEmpty());
     }
-
-
 
     @Test
     public void fillEpicWithSubTaskTest()
@@ -81,7 +82,7 @@ public class ManagersTest {
 
         // перезагружаем менеджеры
         historyManager = new InMemoryHistoryManager();
-        taskManager = new FileBackedTaskManager(historyManager, fileBackedPath, idGenerator);
+        taskManager = new FileBackedTaskManager(historyManager, fileBackedPath);
         //имитация загрузки задачи
         taskManager.createTask(task);
 
@@ -142,15 +143,16 @@ public class ManagersTest {
     }
 
     private Task testTaskTemplateGen() {
-        return new Task("TestTask", "TestDescription", idGenerator);
+        return new Task("TestTask", "TestDescription",
+                IdGenerator.generate());
     }
 
     private Epic testEpicTemplateGen() {
         return new Epic("TestEpic", "TestEpic description",
-                idGenerator);
+                IdGenerator.generate());
     }
 
     private SubTask testSubTaskTemplateGen() {
-        return new SubTask("TestSubTask", "TestSubTask description", idGenerator);
+        return new SubTask("TestSubTask", "TestSubTask description", IdGenerator.generate());
     }
 }

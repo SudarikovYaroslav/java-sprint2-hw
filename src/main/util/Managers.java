@@ -26,19 +26,13 @@ public class Managers {
         return historyManger;
     }
 
-    /*
-    Сергей, перенёс loadFromFile(Path tasksFilePath) из FileBackedTaskManager, но пришлось сделать приватные статик
-    переменные и необходимые для загрузки методы публичными. Хотя, кажется их лучше бы оставить приватными и тоже тогда
-    сюда перенести?
-    */
     public static FileBackedTaskManager loadFromFile(Path tasksFilePath) throws TaskLoadException {
 
         if (tasksFilePath == null) throw new TaskLoadException("Не указан файл для загрузки");
         if (!Files.exists(tasksFilePath)) throw new TaskLoadException("Указанный файл для загрузки не существует");
 
         HistoryManager historyManager = Managers.getDefaultHistory();
-        FileBackedTaskManager taskManager = new FileBackedTaskManager(historyManager, tasksFilePath,
-                IdGenerator.getInstance());
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(historyManager, tasksFilePath);
 
         try {
             String mixedLine = new String(Files.readAllBytes(tasksFilePath));
@@ -56,7 +50,7 @@ public class Managers {
             String[] metaData = metaLine.split(FileBackedTaskManager.META_LINE_DELIMITER);
             long currentIdValue = Util.getIdFromString(metaData[FileBackedTaskManager.CURRENT_ID_INDEX],
                     "неверный формат id при загрузке текущего значения id");
-            IdGenerator.getInstance().setStartIdValue(currentIdValue);
+            IdGenerator.setStartIdValue(currentIdValue);
 
             for (int i = 1; i < tasksLines.length; i++) {
                 String taskInLine = tasksLines[i];
