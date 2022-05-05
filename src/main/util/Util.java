@@ -9,20 +9,16 @@ import java.nio.file.Paths;
 
 public class Util {
 
-    public static Status getStatusFromString(String data) {
-        Status status = Status.IN_PROGRESS; // default value
+    private Util(){}
 
+    public static Status getStatusFromString(String data) {
         switch (data) {
             case "NEW":
-                status = Status.NEW;
-                break;
-            case "IN_PROGRESS":
-                break;
+                return Status.NEW;
             case "DONE":
-                status = Status.DONE;
+                return Status.DONE;
+            default: return Status.IN_PROGRESS;
         }
-
-        return status;
     }
 
     public static long getIdFromString(String data, String expMessage) {
@@ -30,7 +26,7 @@ public class Util {
         try {
             id = Long.parseLong(data);
         } catch (NumberFormatException e) {
-            Util.print(e.getMessage() + " " + expMessage);
+            print(e.getMessage() + " " + expMessage);
         }
         return id;
     }

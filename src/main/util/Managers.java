@@ -15,6 +15,8 @@ import java.nio.file.Path;
 
 public class Managers {
 
+    private Managers(){};
+
     private static final InMemoryHistoryManager historyManger = new InMemoryHistoryManager();
     private static final InMemoryTaskManager taskManager = new InMemoryTaskManager(historyManger);
 
