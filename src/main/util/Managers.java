@@ -24,6 +24,10 @@ public class Managers {
         return taskManager;
     }
 
+    public static FileBackedTaskManager getFileBackedTaskManager() {
+        return new FileBackedTaskManager(historyManger, Util.getBackedPath());
+    }
+
     public static HistoryManager getDefaultHistory() {
         return historyManger;
     }
