@@ -276,6 +276,11 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    @Override
+    public List<Task> history() {
+        return historyManager.getLastViewedTasks();
+    }
+
     protected void deleteEpicFromPrioritizedSet(long id) {
         if (epics.containsKey(id)) {
             List<SubTask> subTasks = epics.get(id).getSubTasks();

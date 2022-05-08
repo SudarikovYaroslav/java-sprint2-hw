@@ -63,6 +63,12 @@ public class HttpTaskServer {
                         exchange.sendResponseHeaders(RESPONSE_OK, 0);
                     }
 
+                    if (uriPath.endsWith("/history")) {
+                        response = gson.toJson(taskManager.history());
+                        processed = true;
+                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                    }
+
                     if (uriPath.endsWith("/task")) {
                         response = gson.toJson(taskManager.getTasksList());
                         processed = true;
