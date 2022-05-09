@@ -32,7 +32,7 @@ public class KVTaskClient {
 
     public void put(String key, String json) throws IOException, InterruptedException {
         // должен сохранять состояние менеджера задач через запрос POST /save/<ключ>?API_KEY=
-        URI uri = URI.create(dataServerUrl + "/save/" + API_KEY + "?API_KEY=" + API_KEY);
+        URI uri = URI.create(dataServerUrl + "/save/" + key + "?API_KEY=" + API_KEY);
         HttpRequest saveRequest = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(uri)
@@ -48,7 +48,7 @@ public class KVTaskClient {
 
     public String load(String key) throws IOException, InterruptedException {
         // должен возвращать состояние менеджера задач через запрос GET /load/<ключ>?API_KEY=
-        URI uri = URI.create(dataServerUrl + "/load/ " + API_KEY + "?API_KEY=" + API_KEY);
+        URI uri = URI.create(dataServerUrl + "/load/" + key + "?API_KEY=" + API_KEY);
         HttpRequest loadRequest = HttpRequest.newBuilder()
                 .GET()
                 .uri(uri)
