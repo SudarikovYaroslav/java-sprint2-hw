@@ -29,7 +29,7 @@ import java.nio.file.Path;
 */
 public class FileBackedManagerPrioritizedSetTest extends TaskManagerPrioritizedSetTest<FileBackedTaskManager> {
 
-    private final Path fileBackedPath = Util.getBackedPath();
+    private final String fileBackedPath = Util.getBackedPath();
 
     @BeforeEach
     public void preparation() {

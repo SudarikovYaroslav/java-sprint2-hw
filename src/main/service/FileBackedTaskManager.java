@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,11 +38,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     public static final int START_TIME_COLUMN_INDEX = 5;
     public static final int DURATION_COLUMN_INDEX = 6;
 
-    private final Path fileBacked;
+    private final String fileBackedPath;
 
-    public FileBackedTaskManager(HistoryManager historyManager, Path fileBacked) {
+    public FileBackedTaskManager(HistoryManager historyManager, String fileBackedPath) {
         super(historyManager);
-        this.fileBacked = fileBacked;
+        this.fileBackedPath = fileBackedPath;
     }
 
     @Override
@@ -198,6 +199,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     }
 
     public void save() throws TaskSaveException {
+        Path fileBacked = Paths.get(fileBackedPath);
+
         if (!Files.exists(fileBacked)) throw new TaskSaveException("Указанный файл для записи не существует");
 
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileBacked.toFile()))) {

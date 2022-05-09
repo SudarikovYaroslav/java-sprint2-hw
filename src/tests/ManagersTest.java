@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,7 +21,8 @@ public class ManagersTest {
 
     private static final int EPIC_POSITION = 1;
 
-    private final Path fileBackedPath = Util.getBackedPath();
+    private final String fileBackedPath = Util.getBackedPath();
+    private final Path fileBacked = Paths.get(fileBackedPath);
     private InMemoryHistoryManager historyManager;
     private FileBackedTaskManager taskManager;
 
@@ -138,7 +140,7 @@ public class ManagersTest {
     }
 
     private String[] readSavedFileInLinesArr() throws IOException {
-        String savedFileInLine = new String(Files.readAllBytes(fileBackedPath));
+        String savedFileInLine = new String(Files.readAllBytes(fileBacked));
         return savedFileInLine.split(FileBackedTaskManager.LINE_DELIMITER);
     }
 

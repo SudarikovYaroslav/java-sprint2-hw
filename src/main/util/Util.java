@@ -31,7 +31,7 @@ public class Util {
         return id;
     }
 
-    public static Path getBackedPath() {
+    public static String getBackedPath() {
         Path uniPath = Paths.get("").toAbsolutePath();
         Path fileBacked = Paths.get(uniPath + "\\FileBacked.txt");
 
@@ -40,7 +40,7 @@ public class Util {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return fileBacked;
+        return fileBacked.toString();
     }
 
     private static void print(String message) {

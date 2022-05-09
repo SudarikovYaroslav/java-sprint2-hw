@@ -10,7 +10,7 @@ import java.nio.file.Path;
 
 public class FileBackedTaskManagerUpdateTest extends TaskManagerUpdateTest<FileBackedTaskManager> {
 
-    private final Path fileBackedPath = Util.getBackedPath();
+    private final String fileBackedPath = Util.getBackedPath();
 
     @BeforeEach
     public void preparation() {

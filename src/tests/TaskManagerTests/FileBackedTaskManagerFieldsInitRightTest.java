@@ -30,7 +30,7 @@ public class FileBackedTaskManagerFieldsInitRightTest extends TaskManagerFieldsI
      */
     private static final int EXPECTED_LINES_FROM_FILE_COUNT = 2;
 
-    private final Path fileBackedPath = Util.getBackedPath();
+    private final String fileBackedPath = Util.getBackedPath();
 
     @BeforeEach
     protected void preparation() {
@@ -78,7 +78,7 @@ public class FileBackedTaskManagerFieldsInitRightTest extends TaskManagerFieldsI
 
     @Test
     public void saveWithInvalidPathTest() {
-        Path dangerousPath = Paths.get("Some doesn't exists path");
+        String dangerousPath = "Some doesn't exists path";
         FileBackedTaskManager dangerousTaskManager = new FileBackedTaskManager(historyManager, dangerousPath);
         TaskSaveException ex = assertThrows(
                 TaskSaveException.class,
@@ -127,7 +127,8 @@ public class FileBackedTaskManagerFieldsInitRightTest extends TaskManagerFieldsI
     }
 
     private String[] readSavedFileInLinesArr() throws IOException {
-        String savedFileInLine = new String(Files.readAllBytes(fileBackedPath));
+        Path fileBaked = Paths.get(fileBackedPath);
+        String savedFileInLine = new String(Files.readAllBytes(fileBaked));
         return savedFileInLine.split(FileBackedTaskManager.LINE_DELIMITER);
     }
 }

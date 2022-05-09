@@ -9,7 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import java.nio.file.Path;
 
 public class FileBackedTaskManagerDeleteTest extends TaskManagerDeleteTest<FileBackedTaskManager> {
-    private final Path fileBackedPath = Util.getBackedPath();
+    private final String fileBackedPath = Util.getBackedPath();
 
     @BeforeEach
     public void preparation() {

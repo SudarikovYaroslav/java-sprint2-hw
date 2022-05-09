@@ -12,6 +12,7 @@ import main.service.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Managers {
 
@@ -32,16 +33,16 @@ public class Managers {
         return historyManger;
     }
 
-    public static FileBackedTaskManager loadFromFile(Path tasksFilePath) throws TaskLoadException {
-
+    public static FileBackedTaskManager loadFromFile(String tasksFilePath) throws TaskLoadException {
         if (tasksFilePath == null) throw new TaskLoadException("Не указан файл для загрузки");
-        if (!Files.exists(tasksFilePath)) throw new TaskLoadException("Указанный файл для загрузки не существует");
+        Path tasksFile = Paths.get(tasksFilePath);
+        if (!Files.exists(tasksFile)) throw new TaskLoadException("Указанный файл для загрузки не существует");
 
         HistoryManager historyManager = Managers.getDefaultHistory();
         FileBackedTaskManager taskManager = new FileBackedTaskManager(historyManager, tasksFilePath);
 
         try {
-            String mixedLine = new String(Files.readAllBytes(tasksFilePath));
+            String mixedLine = new String(Files.readAllBytes(tasksFile));
             String[] tasksAndHistoryLines = mixedLine.split(FileBackedTaskManager.EMPTY_LINE_DELIMITER);
             String allTasksInLine = tasksAndHistoryLines[FileBackedTaskManager.ALL_TASKS_IN_LINE_INDEX];
 
