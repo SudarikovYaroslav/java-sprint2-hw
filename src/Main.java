@@ -1,10 +1,17 @@
-import com.google.gson.Gson;
-import main.model.exceptions.TaskCreateException;
-import main.model.exceptions.TaskLoadException;
-import main.model.exceptions.TaskSaveException;
+import main.model.HttpTaskServer;
+import main.model.KVServer;
+
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws TaskSaveException, TaskCreateException, TaskLoadException {
-        Gson gson = new Gson();
+    public static void main(String[] args) throws IOException {
+        new KVServer().start();
+
+        /*try {
+            HttpTaskServer server = new HttpTaskServer();
+            server.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
     }
 }

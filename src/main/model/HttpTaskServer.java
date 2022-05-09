@@ -269,6 +269,7 @@ public class HttpTaskServer {
             }
         }
 
+        // обрабатывает uriPath вида /tasks/task/?id=1"
         private int getIdFromUriPath(String uriPath) {
             String idField = uriPath.split("\\?")[1];  // поле вида id=value
             return Integer.parseInt(idField.substring(idField.lastIndexOf("=") + 1));
