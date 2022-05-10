@@ -8,31 +8,41 @@ import java.net.http.HttpResponse;
 
 public class KVTaskClient {
     private String API_KEY;
-    private final String dataServerUrl;
+    private final String kvServerUrl;
     private final HttpClient httpClient;
 
-    public KVTaskClient(String dataServerUrl) throws IOException, InterruptedException {
-        this.dataServerUrl = dataServerUrl;
+    public KVTaskClient(String kvServerUrl) {
+        this.kvServerUrl = kvServerUrl;
         httpClient = HttpClient.newHttpClient();
 
-        URI uri = URI.create(dataServerUrl + "/register");
+        URI uri = URI.create(kvServerUrl + "/register");
         HttpRequest registerRequest = HttpRequest.newBuilder()
                 .uri(uri)
                 .GET()
                 .build();
 
-        HttpResponse<String> registerResponse = httpClient.send(registerRequest, HttpResponse.BodyHandlers.ofString());
-        if (registerResponse.statusCode() != 200) {
-            System.out.println("Не удалось зарегистрировать KVTaskClient! Response code: "
-                    + registerResponse.statusCode());
-            return;
+        try {
+            HttpResponse<String> registerResponse = httpClient.send(registerRequest,
+                    HttpResponse.BodyHandlers.ofString());
+
+            if (registerResponse.statusCode() != 200) {
+                System.out.println("Не удалось зарегистрировать KVTaskClient! Response code: "
+                        + registerResponse.statusCode());
+                return;
+            }
+            API_KEY = registerResponse.body();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
-        API_KEY = registerResponse.body();
+    }
+
+    public String getAPI_KEY() {
+        return API_KEY;
     }
 
     public void put(String key, String json) throws IOException, InterruptedException {
         // должен сохранять состояние менеджера задач через запрос POST /save/<ключ>?API_KEY=
-        URI uri = URI.create(dataServerUrl + "/save/" + key + "?API_KEY=" + API_KEY);
+        URI uri = URI.create(kvServerUrl + "/save/" + key + "?API_KEY=" + API_KEY);
         HttpRequest saveRequest = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(uri)
@@ -48,7 +58,7 @@ public class KVTaskClient {
 
     public String load(String key) throws IOException, InterruptedException {
         // должен возвращать состояние менеджера задач через запрос GET /load/<ключ>?API_KEY=
-        URI uri = URI.create(dataServerUrl + "/load/" + key + "?API_KEY=" + API_KEY);
+        URI uri = URI.create(kvServerUrl + "/load/" + key + "?API_KEY=" + API_KEY);
         HttpRequest loadRequest = HttpRequest.newBuilder()
                 .GET()
                 .uri(uri)

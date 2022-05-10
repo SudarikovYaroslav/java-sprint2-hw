@@ -17,8 +17,8 @@ import java.util.Map;
 public class KVServer {
     public static final int PORT = 8078;
     private final String API_KEY;
-    private HttpServer server;
-    private Map<String, String> data = new HashMap<>();
+    private final HttpServer server;
+    private final Map<String, String> data = new HashMap<>();
 
     public KVServer() throws IOException {
         API_KEY = generateApiKey();

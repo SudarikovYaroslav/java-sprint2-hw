@@ -11,7 +11,7 @@ import main.model.exceptions.TimeIntersectionException;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.model.tasks.Task;
-import main.service.FileBackedTaskManager;
+import main.service.TaskManager;
 import main.util.Managers;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class HttpTaskServer {
     private static final int PORT = 8080;
     private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
-    private final FileBackedTaskManager taskManager = Managers.getFileBackedTaskManager();
+    private final TaskManager taskManager = Managers.getDefault();
     private final HttpServer server;
 
     public HttpTaskServer() throws IOException {

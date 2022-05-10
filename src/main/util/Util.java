@@ -43,6 +43,10 @@ public class Util {
         return fileBacked.toString();
     }
 
+    public static String getKVServerUrl() {
+        return "http://localhost:8078";
+    }
+
     private static void print(String message) {
         System.out.println(message);
     }

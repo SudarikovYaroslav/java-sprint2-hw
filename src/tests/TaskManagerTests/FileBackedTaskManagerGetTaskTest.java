@@ -6,8 +6,6 @@ import main.util.Util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.nio.file.Path;
-
 public class FileBackedTaskManagerGetTaskTest extends TaskManagerGetTaskTest<FileBackedTaskManager> {
     private final String fileBackedPath = Util.getBackedPath();
 

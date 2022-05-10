@@ -1,5 +1,7 @@
 package main.util;
 
+import com.google.gson.Gson;
+import main.model.KVTaskClient;
 import main.model.TaskTypes;
 import main.model.exceptions.TaskCreateException;
 import main.model.exceptions.TaskLoadException;
@@ -20,6 +22,7 @@ public class Managers {
 
     private static final InMemoryHistoryManager historyManger = new InMemoryHistoryManager();
     private static final InMemoryTaskManager taskManager = new InMemoryTaskManager(historyManger);
+    private static final HttpTaskManager httpTaskManager = new HttpTaskManager(historyManger, Util.getKVServerUrl());
 
     public static TaskManager getDefault() {
         return taskManager;
@@ -104,6 +107,14 @@ public class Managers {
         }
 
         return taskManager;
+    }
+
+    public static HttpTaskManager loadHTTPTaskManagerFromKVServer(String apiKey) throws IOException,
+            InterruptedException {
+        Gson gson = new Gson();
+        KVTaskClient kvTaskClient = new KVTaskClient(Util.getKVServerUrl());
+        String jsonHTTPTaskManager = kvTaskClient.load(apiKey);
+        return gson.fromJson(jsonHTTPTaskManager, HttpTaskManager.class);
     }
 
     private static boolean isHistoryPresent(String[] tasksAndHistoryLines) {
