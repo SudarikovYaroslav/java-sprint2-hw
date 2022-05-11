@@ -1,33 +1,47 @@
-import main.model.HttpTaskServer;
-import main.model.KVServer;
-import main.model.KVTaskClient;
-import main.service.HttpTaskManager;
-import main.service.TaskManager;
-import main.util.Managers;
-import main.util.Util;
-
-import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import main.model.serializators.SubTaskSerializer;
+import main.model.tasks.Epic;
+import main.model.tasks.SubTask;
+import main.service.TaskForTestsGenerator;
 
 public class Main {
-    public static void main(String[] args) throws IOException, InterruptedException {
-        new KVServer().start();
-        KVTaskClient client = new KVTaskClient(Util.getKVServerUrl());
+    public static void main(String[] args) {
 
-        String task1 = "{\"name\":\"TestTask1\",\"description\":\"task1 description\",\"id\":1}";
-        String task2 = "{\"name\":\"TestTask2\",\"description\":\"task2 description\",\"id\":2}";
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(SubTask.class, new SubTaskSerializer())
+                .serializeNulls()
+                .create();
+        Epic testEpic = TaskForTestsGenerator.testEpicTemplateGen();
+        SubTask testSubTask1 = TaskForTestsGenerator.testSubTaskTemplateGen();
+        SubTask testSubTask2 = TaskForTestsGenerator.testSubTaskTemplateGen();
+        testEpic.addSubTask(testSubTask1);
+        testEpic.addSubTask(testSubTask2);
+        testSubTask1.setEpic(testEpic);
 
-        client.put("1", task1);
-        System.out.println(client.load("1"));
-        client.put("2", task2);
-        System.out.println(client.load("2"));
+        String epicJson = gson.toJson(testEpic);
+        String subTaskJson = gson.toJson(testSubTask1);
 
-        TaskManager taskManager = Managers.getDefault();
+        System.out.println("Source Epic: " + testEpic.toString());
+        System.out.println("Source SubTask: " + testSubTask1.toString());
 
-        /*try {
-            HttpTaskServer server = new HttpTaskServer();
-            server.start();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }*/
+        System.out.println("=======================");
+
+        System.out.println("Epic: " + epicJson);
+        System.out.println("SubTask: " + subTaskJson);
+
+        System.out.println("=======================");
+
+        SubTask loadedSubTask = gson.fromJson(subTaskJson, SubTask.class);
+        Epic loadedEpic = gson.fromJson(epicJson, Epic.class);
+
+        System.out.println("Loaded epic: " + loadedEpic);
+        System.out.println("Loaded subTask: " + loadedSubTask.toString());
+
+        System.out.println("Equals Epic test: " + testEpic.equals(loadedEpic));
+        System.out.println("Equals SubTask test: " + testSubTask1.equals(loadedSubTask));
+
     }
+
+
 }

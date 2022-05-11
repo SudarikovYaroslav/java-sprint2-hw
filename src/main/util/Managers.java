@@ -109,7 +109,7 @@ public class Managers {
         return taskManager;
     }
 
-    public static HttpTaskManager loadHTTPTaskManagerFromKVServer(String apiKey) throws IOException,
+    public static HttpTaskManager loadHttpTaskManagerFromKVServer(String apiKey) throws IOException,
             InterruptedException {
         Gson gson = new Gson();
         KVTaskClient kvTaskClient = new KVTaskClient(Util.getKVServerUrl());

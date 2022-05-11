@@ -35,17 +35,19 @@ public class HttpTaskServer {
 
     public void start() {
         server.start();
+        System.out.println("Запуск сервера HttpTaskServer на порту: " + PORT);
     }
 
     public void stop() {
         server.stop(0);
+        System.out.println("Сервер HttpTaskServer остановлен");
     }
 
     public class HttpTaskHandler implements HttpHandler {
-        private static final int RESPONSE_OK = 200;
-        private static final int RESPONSE_NOT_FOUND = 404;
-        private static final int RESPONSE_BAD_REQUEST = 400;
-        private static final int RESPONSE_METHOD_NOT_ALLOWED = 405;
+        private static final int STATUS_OK = 200;
+        private static final int STATUS_NOT_FOUND = 404;
+        private static final int STATUS_BAD_REQUEST = 400;
+        private static final int STATUS_METHOD_NOT_ALLOWED = 405;
 
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -60,31 +62,31 @@ public class HttpTaskServer {
                     if (uriPath.endsWith("/tasks/")) {
                         response = gson.toJson(taskManager.getPrioritizedTasks());
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.endsWith("/history")) {
                         response = gson.toJson(taskManager.history());
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.endsWith("/task")) {
                         response = gson.toJson(taskManager.getTasksList());
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.endsWith("/epic")) {
                         response = gson.toJson(taskManager.getEpicsList());
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.endsWith("/subTask")) {
                         response = gson.toJson(taskManager.getSubTasksList());
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.contains("/task") && uriPath.contains("?")) {
@@ -93,9 +95,9 @@ public class HttpTaskServer {
 
                         if (requestedTask != null) {
                             response = gson.toJson(requestedTask);
-                            exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                            exchange.sendResponseHeaders(STATUS_OK, 0);
                         } else {
-                            exchange.sendResponseHeaders(RESPONSE_NOT_FOUND, 0);
+                            exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                         }
                         processed = true;
                     }
@@ -106,9 +108,9 @@ public class HttpTaskServer {
 
                         if (requestedEpic != null) {
                             response = gson.toJson(requestedEpic);
-                            exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                            exchange.sendResponseHeaders(STATUS_OK, 0);
                         } else {
-                            exchange.sendResponseHeaders(RESPONSE_NOT_FOUND, 0);
+                            exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                         }
                         processed = true;
                     }
@@ -119,14 +121,14 @@ public class HttpTaskServer {
 
                         if (requestedSubTask != null) {
                             response = gson.toJson(requestedSubTask);
-                            exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                            exchange.sendResponseHeaders(STATUS_OK, 0);
                         } else {
-                            exchange.sendResponseHeaders(RESPONSE_NOT_FOUND, 0);
+                            exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                         }
                         processed = true;
                     }
 
-                    if (!processed) exchange.sendResponseHeaders(RESPONSE_BAD_REQUEST, 0);
+                    if (!processed) exchange.sendResponseHeaders(STATUS_BAD_REQUEST, 0);
                     break;
 
                 case "POST" :
@@ -149,10 +151,10 @@ public class HttpTaskServer {
 
                             if (!update) taskManager.createTask(task);
                         } catch (TaskUpdateException | TimeIntersectionException | TaskCreateException e) {
-                            exchange.sendResponseHeaders(RESPONSE_NOT_FOUND, 0);
+                            exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                         }
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.endsWith("/epic")) {
@@ -172,10 +174,10 @@ public class HttpTaskServer {
 
                             if (!update) taskManager.createEpic(epic);
                         } catch (TaskUpdateException | TimeIntersectionException | TaskCreateException e) {
-                            exchange.sendResponseHeaders(RESPONSE_NOT_FOUND, 0);
+                            exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                         }
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.endsWith("/subTask")) {
@@ -195,31 +197,31 @@ public class HttpTaskServer {
 
                             if (!update) taskManager.createSubTask(subTask);
                         } catch (TaskUpdateException | TimeIntersectionException | TaskCreateException e) {
-                            exchange.sendResponseHeaders(RESPONSE_NOT_FOUND, 0);
+                            exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                         }
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
-                    if (!processed) exchange.sendResponseHeaders(RESPONSE_BAD_REQUEST, 0);
+                    if (!processed) exchange.sendResponseHeaders(STATUS_BAD_REQUEST, 0);
                     break;
 
                 case "DELETE" :
                     if (uriPath.endsWith("/task")) {
                         taskManager.deleteTasks();
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.endsWith("/epic")) {
                         taskManager.deleteEpics();
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.endsWith("/subTask")) {
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.contains("/task") && uriPath.contains("?")) {
@@ -227,10 +229,10 @@ public class HttpTaskServer {
                         try {
                             taskManager.deleteTaskById(id);
                         } catch (TaskDeleteException e) {
-                            exchange.sendResponseHeaders(RESPONSE_NOT_FOUND, 0);
+                            exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                         }
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.contains("/epic") && uriPath.contains("?")) {
@@ -238,10 +240,10 @@ public class HttpTaskServer {
                         try {
                             taskManager.deleteEpicById(id);
                         } catch (TaskDeleteException e) {
-                            exchange.sendResponseHeaders(RESPONSE_NOT_FOUND, 0);
+                            exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                         }
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
                     if (uriPath.contains("/subTask") && uriPath.contains("?")) {
@@ -249,17 +251,17 @@ public class HttpTaskServer {
                         try {
                             taskManager.deleteSubTaskById(id);
                         } catch (TaskDeleteException e) {
-                            exchange.sendResponseHeaders(RESPONSE_NOT_FOUND, 0);
+                            exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                         }
                         processed = true;
-                        exchange.sendResponseHeaders(RESPONSE_OK, 0);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
-                    if (!processed) exchange.sendResponseHeaders(RESPONSE_BAD_REQUEST, 0);
+                    if (!processed) exchange.sendResponseHeaders(STATUS_BAD_REQUEST, 0);
                     break;
 
                 default :
-                    exchange.sendResponseHeaders(RESPONSE_METHOD_NOT_ALLOWED, 0);
+                    exchange.sendResponseHeaders(STATUS_METHOD_NOT_ALLOWED, 0);
             }
 
             try(OutputStream os = exchange.getResponseBody()) {
