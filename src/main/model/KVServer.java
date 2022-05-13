@@ -123,6 +123,11 @@ public class KVServer {
         server.start();
     }
 
+    public void stop() {
+        System.out.println("KVServer остановлен");
+        server.stop(0);
+    }
+
     private String generateApiKey() {
         return "" + System.currentTimeMillis();
     }

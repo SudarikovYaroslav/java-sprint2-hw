@@ -7,6 +7,7 @@ import main.model.tasks.SubTask;
 import main.model.tasks.Task;
 import main.service.TaskForTestsGenerator;
 import main.util.SubTaskSerializer;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  * в соответствии с переданным запросом. Далее HttpTaskManager выполняет нужный метод, и при помощи KVTaskClient
  * выполняет сохранение или загрузку своего состояния на сервере KVServer
  */
+// Не очень понимаю, с чем связано, но если запустить все тесты HttpTaskServerTest разом, несколько упадут. Но при
+// отдельном запуске они проходят
 public class HttpTaskServerTest {
     private static final int PORT = 8080;
     private HttpTaskServer httpTaskServer;
@@ -45,9 +48,10 @@ public class HttpTaskServerTest {
         kvServer.start();
     }
 
+    @AfterEach
     public void termination() {
         httpTaskServer.stop();
-        kvServer.start();
+        kvServer.stop();
     }
 
     @Test
@@ -76,7 +80,7 @@ public class HttpTaskServerTest {
 
     @Test
     public void createSubTaskTest() throws IOException, InterruptedException {
-        URI url = URI.create("http://localhost:8080/tasks/subTask");
+        URI url = URI.create("http://localhost:8080/tasks/subtask");
         Epic testEpic = TaskForTestsGenerator.testEpicTemplateGen();
         SubTask testSubTask = TaskForTestsGenerator.testSubTaskTemplateGen();
         testEpic.addSubTask(testSubTask);
@@ -108,7 +112,7 @@ public class HttpTaskServerTest {
 
     @Test
     public void getSubTasksListTest() throws IOException, InterruptedException {
-        URI url = URI.create("http://localhost:8080/tasks/subTask");
+        URI url = URI.create("http://localhost:8080/tasks/subtask");
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         assertEquals(STATUS_OK, response.statusCode());
