@@ -83,7 +83,7 @@ public class HttpTaskServer {
                         exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
-                    if (uriPath.endsWith("/subTask")) {
+                    if (uriPath.endsWith("/subtask")) {
                         response = gson.toJson(taskManager.getSubTasksList());
                         processed = true;
                         exchange.sendResponseHeaders(STATUS_OK, 0);
@@ -115,7 +115,7 @@ public class HttpTaskServer {
                         processed = true;
                     }
 
-                    if (uriPath.contains("/subTask") && uriPath.contains("?")) {
+                    if (uriPath.contains("/subtask") && uriPath.contains("?")) {
                         int id = getIdFromUriPath(uriPath);
                         SubTask requestedSubTask = taskManager.getSubTaskById(id);
 
@@ -180,7 +180,7 @@ public class HttpTaskServer {
                         exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
-                    if (uriPath.endsWith("/subTask")) {
+                    if (uriPath.endsWith("/subtask")) {
                         InputStream inputStream = exchange.getRequestBody();
                         String body = new String(inputStream.readAllBytes(), DEFAULT_CHARSET);
                         SubTask subTask = gson.fromJson(body, SubTask.class);
@@ -219,7 +219,7 @@ public class HttpTaskServer {
                         exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
-                    if (uriPath.endsWith("/subTask")) {
+                    if (uriPath.endsWith("/subtask")) {
                         processed = true;
                         exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
@@ -246,7 +246,7 @@ public class HttpTaskServer {
                         exchange.sendResponseHeaders(STATUS_OK, 0);
                     }
 
-                    if (uriPath.contains("/subTask") && uriPath.contains("?")) {
+                    if (uriPath.contains("/subtask") && uriPath.contains("?")) {
                         int id = getIdFromUriPath(uriPath);
                         try {
                             taskManager.deleteSubTaskById(id);

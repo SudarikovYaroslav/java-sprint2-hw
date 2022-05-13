@@ -1,14 +1,18 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import main.model.serializators.SubTaskSerializer;
+import main.model.HttpTaskServer;
+import main.model.KVServer;
+import main.util.SubTaskSerializer;
 import main.model.tasks.Epic;
 import main.model.tasks.SubTask;
 import main.service.TaskForTestsGenerator;
 
-public class Main {
-    public static void main(String[] args) {
+import java.io.IOException;
 
-        Gson gson = new GsonBuilder()
+public class Main {
+    public static void main(String[] args) throws IOException {
+
+        /*Gson gson = new GsonBuilder()
                 .registerTypeAdapter(SubTask.class, new SubTaskSerializer())
                 .serializeNulls()
                 .create();
@@ -39,9 +43,10 @@ public class Main {
         System.out.println("Loaded subTask: " + loadedSubTask.toString());
 
         System.out.println("Equals Epic test: " + testEpic.equals(loadedEpic));
-        System.out.println("Equals SubTask test: " + testSubTask1.equals(loadedSubTask));
+        System.out.println("Equals SubTask test: " + testSubTask1.equals(loadedSubTask));*/
+
+        HttpTaskServer server = new HttpTaskServer();
+        server.start();
 
     }
-
-
 }

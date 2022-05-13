@@ -1,4 +1,4 @@
-package main.model.serializators;
+package main.util;
 
 import com.google.gson.*;
 import main.model.Status;
