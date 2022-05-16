@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
  * в соответствии с переданным запросом. Далее HttpTaskManager выполняет нужный метод, и при помощи KVTaskClient
  * выполняет сохранение или загрузку своего состояния на сервере KVServer
  */
-// Не очень понимаю, с чем связано, но если запустить все тесты model.http.HttpTaskServerTest разом, несколько упадут. Но при
-// отдельном запуске они проходят
+
 public class HttpTaskServerTest {
-    private static final int PORT = 8080;
+    private static final int STATUS_OK = 200;
+
     private HttpTaskServer httpTaskServer;
     private KVServer kvServer;
     private final Gson gson = new GsonBuilder()
@@ -39,15 +39,13 @@ public class HttpTaskServerTest {
             .serializeNulls()
             .create();
     private final HttpClient client = HttpClient.newHttpClient();
-    private static final int STATUS_OK = 200;
-
 
     @BeforeEach
     public void preparation() throws IOException {
-        httpTaskServer = new HttpTaskServer();
         kvServer = new KVServer();
-        httpTaskServer.start();
         kvServer.start();
+        httpTaskServer = new HttpTaskServer();
+        httpTaskServer.start();
     }
 
     @AfterEach

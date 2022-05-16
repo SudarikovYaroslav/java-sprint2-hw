@@ -1,15 +1,15 @@
 package util;
 
 import com.google.gson.Gson;
-import model.http.KVTaskClient;
 import model.TaskTypes;
 import model.exceptions.TaskCreateException;
 import model.exceptions.TaskLoadException;
 import model.exceptions.TimeIntersectionException;
+import model.http.KVTaskClient;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
-import service.*;
+import service.IdGenerator;
 import service.managers.*;
 
 import java.io.IOException;
@@ -26,7 +26,7 @@ public class Managers {
     private static final HttpTaskManager httpTaskManager = new HttpTaskManager(historyManger, Util.getKVServerUrl());
 
     public static TaskManager getDefault() {
-        return taskManager;
+        return httpTaskManager;
     }
 
     public static FileBackedTaskManager getFileBackedTaskManager() {
