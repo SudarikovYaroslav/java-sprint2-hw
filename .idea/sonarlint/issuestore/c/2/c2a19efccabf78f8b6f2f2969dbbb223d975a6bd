@@ -1,0 +1,10 @@
+
+g	java:S116
+"RRename this field "API_KEY" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÕØ×’
+t
+java:S2142""^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(òž¶È
+N	java:S106"9Replace this use of System.out or System.err by a logger.(”¡ê¨
+c	java:S100'"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(“÷¿Š
+S	java:S1065"9Replace this use of System.out or System.err by a logger.(Êî–„ùÿÿÿÿ
+S	java:S1067"9Replace this use of System.out or System.err by a logger.(£—˜´üÿÿÿÿ
+N	java:S106E"9Replace this use of System.out or System.err by a logger.(ßÞä¢

@@ -1,12 +1,12 @@
 package service.managers;
 
 import com.google.gson.Gson;
-import http.KVTaskClient;
+import model.http.KVTaskClient;
 
 import java.io.IOException;
 
 public class HttpTaskManager extends FileBackedTaskManager {
-    private String api_key;
+    private final String api_key;
 
     private final KVTaskClient kvTaskClient;
     private final Gson gson;
@@ -14,7 +14,7 @@ public class HttpTaskManager extends FileBackedTaskManager {
     public HttpTaskManager(HistoryManager historyManager, String kvServerUrl) {
         super(historyManager, kvServerUrl);
         kvTaskClient = new KVTaskClient(kvServerUrl);
-        api_key = kvTaskClient.getAPI_KEY();
+        api_key = kvTaskClient.getApiKey();
         gson = new Gson();
     }
 
@@ -25,7 +25,7 @@ public class HttpTaskManager extends FileBackedTaskManager {
         а продолжают браться из файлов" ?
 
      Так ведь у меня HttpTaskManager и сохраняется и грузится с KVServer:
-     HttpTaskHandler получает http запросы, мапит их сюда, менеджер их обрабатывает и сохраняет состояние вызовом
+     HttpTaskHandler получает model.http запросы, мапит их сюда, менеджер их обрабатывает и сохраняет состояние вызовом
      save() (в FileBackedTaskManager я сохраняю состояние во всех методах, которые его меняют). Но в
      FileBackedTaskManager save() пишет всё в файл, а тут  HttpTaskManager в конструкторе получает url к kvServer
      (String kvServerUrl), а метод save() я переопределил, чтобы он через KVTaskClient записывал текущее состояние
@@ -48,7 +48,7 @@ public class HttpTaskManager extends FileBackedTaskManager {
     @Override
     public void save() {
         try {
-            kvTaskClient.put(kvTaskClient.getAPI_KEY(), gson.toJson(this));
+            kvTaskClient.put(kvTaskClient.getApiKey(), gson.toJson(this));
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }

@@ -1,7 +1,7 @@
 package util;
 
 import com.google.gson.Gson;
-import http.KVTaskClient;
+import model.http.KVTaskClient;
 import model.TaskTypes;
 import model.exceptions.TaskCreateException;
 import model.exceptions.TaskLoadException;

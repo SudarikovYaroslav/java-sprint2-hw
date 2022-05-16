@@ -1,0 +1,7 @@
+
+K
+java:S1191"5Use classes from the Java API instead of Sun classes.( üà
+S	java:S106"9Replace this use of System.out or System.err by a logger.(·şŒ˜ûÿÿÿÿ
+N	java:S106"9Replace this use of System.out or System.err by a logger.(÷ŸáÑ
+I
+java:S1068"3Remove this unused "DEFAULT_CHARSET" private field.(Ö¦ş®
