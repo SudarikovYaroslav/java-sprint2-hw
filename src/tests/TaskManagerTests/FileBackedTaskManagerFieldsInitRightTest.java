@@ -1,15 +1,15 @@
 package TaskManagerTests;
 
-import main.model.exceptions.TaskCreateException;
-import main.model.exceptions.TaskLoadException;
-import main.model.exceptions.TaskSaveException;
-import main.model.exceptions.TimeIntersectionException;
-import main.model.tasks.Epic;
-import main.model.tasks.SubTask;
-import main.model.tasks.Task;
-import main.service.FileBackedTaskManager;
-import main.service.InMemoryHistoryManager;
-import main.util.Util;
+import model.exceptions.TaskCreateException;
+import model.exceptions.TaskLoadException;
+import model.exceptions.TaskSaveException;
+import model.exceptions.TimeIntersectionException;
+import model.tasks.Epic;
+import model.tasks.SubTask;
+import model.tasks.Task;
+import service.managers.FileBackedTaskManager;
+import service.managers.InMemoryHistoryManager;
+import util.Util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,11 +19,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static main.service.TaskForTestsGenerator.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static TaskManagerTests.TaskForTestsGenerator.*;
 
-public class FileBackedTaskManagerFieldsInitRightTest extends TaskManagerFieldsInitRightTest<FileBackedTaskManager> {
+public class FileBackedTaskManagerFieldsInitRightTest extends TaskManagerTests
+        .TaskManagerFieldsInitRightTest<FileBackedTaskManager> {
 
     /**
      * При пустой истории и отсутствии задач в файл записываются 2 строки: мета-строка и строка разделитель

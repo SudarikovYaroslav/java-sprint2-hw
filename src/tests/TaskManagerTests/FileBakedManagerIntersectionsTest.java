@@ -1,12 +1,13 @@
 package TaskManagerTests;
 
-import main.service.FileBackedTaskManager;
-import main.service.InMemoryHistoryManager;
-import main.util.Util;
+import service.managers.FileBackedTaskManager;
+import service.managers.InMemoryHistoryManager;
+import util.Util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
-public class FileBakedManagerIntersectionsTest extends TaskManagerIntersectionsTest<FileBackedTaskManager> {
+public class FileBakedManagerIntersectionsTest extends TaskManagerTests
+        .TaskManagerIntersectionsTest<FileBackedTaskManager> {
 
     private final String fileBackedPath = Util.getBackedPath();
 

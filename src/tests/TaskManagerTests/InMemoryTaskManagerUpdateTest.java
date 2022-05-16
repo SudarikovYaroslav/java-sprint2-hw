@@ -1,11 +1,12 @@
 package TaskManagerTests;
 
-import main.service.InMemoryHistoryManager;
-import main.service.InMemoryTaskManager;
+import service.managers.InMemoryHistoryManager;
+import service.managers.InMemoryTaskManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
-public class InMemoryTaskManagerUpdateTest extends TaskManagerUpdateTest<InMemoryTaskManager> {
+public class InMemoryTaskManagerUpdateTest extends TaskManagerTests
+        .TaskManagerUpdateTest<InMemoryTaskManager> {
     @BeforeEach
     protected void preparation() {
         historyManager = new InMemoryHistoryManager();

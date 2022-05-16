@@ -1,12 +1,16 @@
 package TaskManagerTests;
 
-import main.model.exceptions.TaskCreateException;
-import main.model.exceptions.TaskDeleteException;
-import main.model.exceptions.TimeIntersectionException;
-import main.model.tasks.Epic;
-import main.model.tasks.SubTask;
-import main.model.tasks.Task;
-import main.service.*;
+import model.exceptions.TaskCreateException;
+import model.exceptions.TaskDeleteException;
+import model.exceptions.TimeIntersectionException;
+import model.tasks.Epic;
+import model.tasks.SubTask;
+import model.tasks.Task;
+import service.*;
+import service.managers.HistoryManager;
+import service.managers.InMemoryHistoryManager;
+import service.managers.InMemoryTaskManager;
+import service.managers.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

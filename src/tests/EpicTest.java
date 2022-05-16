@@ -1,7 +1,7 @@
-import main.model.Status;
-import main.model.tasks.Epic;
-import main.model.tasks.SubTask;
-import main.service.IdGenerator;
+import model.Status;
+import model.tasks.Epic;
+import model.tasks.SubTask;
+import service.IdGenerator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -1,12 +1,12 @@
-import main.model.exceptions.*;
-import main.model.tasks.Epic;
-import main.model.tasks.SubTask;
-import main.model.tasks.Task;
-import main.service.FileBackedTaskManager;
-import main.service.IdGenerator;
-import main.service.InMemoryHistoryManager;
-import main.util.Managers;
-import main.util.Util;
+import model.exceptions.*;
+import model.tasks.Epic;
+import model.tasks.SubTask;
+import model.tasks.Task;
+import service.managers.FileBackedTaskManager;
+import service.IdGenerator;
+import service.managers.InMemoryHistoryManager;
+import util.Managers;
+import util.Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
