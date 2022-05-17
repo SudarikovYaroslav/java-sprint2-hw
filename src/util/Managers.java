@@ -5,6 +5,7 @@ import model.TaskTypes;
 import model.exceptions.TaskCreateException;
 import model.exceptions.TaskLoadException;
 import model.exceptions.TimeIntersectionException;
+import model.http.HttpTaskManagerCondition;
 import model.http.KVTaskClient;
 import model.tasks.Epic;
 import model.tasks.SubTask;
@@ -22,15 +23,17 @@ public class Managers {
     private Managers(){};
 
     private static final InMemoryHistoryManager historyManger = new InMemoryHistoryManager();
-    private static final InMemoryTaskManager taskManager = new InMemoryTaskManager(historyManger);
+    private static final InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager(historyManger);
     private static final HttpTaskManager httpTaskManager = new HttpTaskManager(historyManger, Util.getKVServerUrl());
+    private static final FileBackedTaskManager fileBackTaskManager = new FileBackedTaskManager(historyManger,
+            Util.getBackedPath());
 
     public static TaskManager getDefault() {
         return httpTaskManager;
     }
 
     public static FileBackedTaskManager getFileBackedTaskManager() {
-        return new FileBackedTaskManager(historyManger, Util.getBackedPath());
+        return fileBackTaskManager;
     }
 
     public static HistoryManager getDefaultHistory() {
@@ -114,8 +117,15 @@ public class Managers {
             InterruptedException {
         Gson gson = new Gson();
         KVTaskClient kvTaskClient = new KVTaskClient(Util.getKVServerUrl());
-        String jsonHTTPTaskManager = kvTaskClient.load(apiKey);
-        return gson.fromJson(jsonHTTPTaskManager, HttpTaskManager.class);
+        // загружаем состояние HttpTaskManager
+        String jsonHTTPTaskManagerCondition = kvTaskClient.load(apiKey);
+        HttpTaskManagerCondition managerCondition = gson.fromJson(jsonHTTPTaskManagerCondition,
+                HttpTaskManagerCondition.class);
+
+        // устанавливаем сохранённое состояние вефолтному HttpTaskManager
+        HttpTaskManager result = (HttpTaskManager) Managers.getDefault();
+        result.setManagerCondition(managerCondition);
+        return result;
     }
 
     private static boolean isHistoryPresent(String[] tasksAndHistoryLines) {
