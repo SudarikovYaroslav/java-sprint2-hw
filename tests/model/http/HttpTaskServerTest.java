@@ -282,8 +282,7 @@ public class HttpTaskServerTest {
 
         assertEquals(STATUS_OK, getTaskResponse.statusCode());
         String loadedTask = getTaskResponse.body();
-        String jsonTaskFromResponseArray = loadedTask.substring(1, loadedTask.length() - 1);
-        Task deserializeUpdatedTask = gson.fromJson(jsonTaskFromResponseArray, Task.class);
+        Task deserializeUpdatedTask = gson.fromJson(loadedTask, Task.class);
 
         assertEquals(updatedTask, deserializeUpdatedTask);
     }
@@ -320,11 +319,8 @@ public class HttpTaskServerTest {
 
         assertEquals(STATUS_OK, getUpdatedEpicResponse.statusCode());
 
-        String getUpdatedEpicResponseBody = getUpdatedEpicResponse.body();
-        String jsonEpicFromResponseArray = getUpdatedEpicResponseBody.substring(1,
-                getUpdatedEpicResponseBody.length() - 1);
-
-        Epic deserializeEpic = gson.fromJson(jsonEpicFromResponseArray, Epic.class);
+        String loadedEpic = getUpdatedEpicResponse.body();
+        Epic deserializeEpic = gson.fromJson(loadedEpic, Epic.class);
 
         assertEquals(updatedEpic, deserializeEpic);
     }
@@ -366,9 +362,7 @@ public class HttpTaskServerTest {
         assertEquals(STATUS_OK, getSubTaskResponse.statusCode());
 
         String subTaskResponseBody = getSubTaskResponse.body();
-        String jsonSubTaskFromResponseBody = subTaskResponseBody.substring(1, subTaskResponseBody.length() - 1);
-
-        SubTask deserializeSubTask = gson.fromJson(jsonSubTaskFromResponseBody, SubTask.class);
+        SubTask deserializeSubTask = gson.fromJson(subTaskResponseBody, SubTask.class);
 
         assertEquals(updatedSubTask, deserializeSubTask);
     }
