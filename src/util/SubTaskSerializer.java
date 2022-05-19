@@ -27,6 +27,7 @@ public class SubTaskSerializer implements JsonSerializer<SubTask>, JsonDeseriali
 
         SubTask result = new SubTask(name, description, id);
         result.setEpic(epic);
+        epic.addSubTask(result);
 
         switch (status) {
             case "NEW" :

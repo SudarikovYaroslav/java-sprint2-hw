@@ -10,6 +10,21 @@ import service.generators.HttpManagerApiKeyGenerator;
 
 import java.io.IOException;
 
+
+/*
+* СЕРГЕЙ, ПРИВЕТ!
+* Скоро от этого проекта невротиком стану))) одну ошибку починишь, взамен две получишь))
+*
+* Теперь серверы используют только HttpTaskManager, все таски берутся и кладутся в KVServer, никаких файлов на ПК.
+* Добавил отдельный тест на этот процесс, он даже, кажется правильно, работает)))
+* По ходу починил ошибки сохранения тасок на KVServer и все что касалось сделать с задачами по id оказалось, не работало
+* как надо - починил).
+* Сохранение/загрузка состояния HttpTaskManager выполняется целиком на/из KVServer (с помощью контейнера
+* HttpTaskManagerCondition). Метод по загрузке ты мне ёще с FileBackTaskManager рекомендовал делать в Util.Managers т.к
+* он новый менеджер возвращает.
+* В общем надеюсь всё норм на этот раз, а то эта задачка всю душу уже вытрясла)))
+*/
+
 public class HttpTaskManager extends FileBackedTaskManager {
     private final String apiKey;
     private final KVTaskClient kvTaskClient;

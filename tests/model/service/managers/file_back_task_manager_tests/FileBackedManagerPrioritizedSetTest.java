@@ -7,8 +7,8 @@ import util.Util;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
-// Сергей, попробовал с клонировать с гитхаба проект, добавил библиотеки - у меня норм все тесты компилируются :\
-// Может от версии идеи зависит? Но я всё равно добавил на всякий TaskManagerTests. где наследование есть в тестах
+// Сергей, попробовал клонировать с гитхаба проект, добавил библиотеки - у меня норм все тесты компилируются:\
+// Может от версии идеи зависит? Но я всё равно добавил на всякий TaskManagerTests, где наследование есть в тестах
 public class FileBackedManagerPrioritizedSetTest extends TaskManagerPrioritizedSetTest<FileBackedTaskManager> {
 
     private final String fileBackedPath = Util.getBackedPath();

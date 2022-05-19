@@ -1,6 +1,7 @@
 package util;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import model.TaskTypes;
 import model.exceptions.TaskCreateException;
 import model.exceptions.TaskLoadException;
@@ -114,14 +115,16 @@ public class Managers {
 
     public static HttpTaskManager loadHttpTaskManagerFromKVServer(String apiKey) throws IOException,
             InterruptedException {
-        Gson gson = new Gson();
+        GsonBuilder gsonBuilder = new GsonBuilder().registerTypeAdapter(SubTask.class, new SubTaskSerializer());
+        Gson gson = gsonBuilder.create();
+
         KVTaskClient kvTaskClient = new KVTaskClient(Util.getKVServerUrl());
         // загружаем состояние HttpTaskManager
         String jsonHTTPTaskManagerCondition = kvTaskClient.load(apiKey);
         HttpTaskManagerCondition managerCondition = gson.fromJson(jsonHTTPTaskManagerCondition,
                 HttpTaskManagerCondition.class);
 
-        // устанавливаем сохранённое состояние вефолтному HttpTaskManager
+        // устанавливаем сохранённое состояние дефолтному HttpTaskManager
         HttpTaskManager result = (HttpTaskManager) Managers.getDefault();
         result.setManagerCondition(managerCondition);
         return result;

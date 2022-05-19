@@ -253,7 +253,8 @@ public class InMemoryTaskManager implements TaskManager {
                 "SubTask с id: " + id + " не существует. Удаление не возможно!"
         );
 
-        Epic epic = subTasks.get(id).getEpic();
+        SubTask deletableSubTask = subTasks.get(id);
+        Epic epic = epics.get(deletableSubTask.getEpic().getId());
         epic.deleteSubTaskById(id);
         historyManager.remove(id);
         deleteSubTaskFromPrioritizedSet(id);
