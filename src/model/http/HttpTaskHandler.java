@@ -44,7 +44,7 @@ public class HttpTaskHandler implements HttpHandler {
 
         switch (requestMethod) {
             case "GET" :
-                if (uriPath.contains("/task") && query != null) {
+                if (uriPath.endsWith("/task") && query != null) {
                     int id = getIdFromQuery(query);
                     Task requestedTask = taskManager.getTaskById(id);
 
@@ -57,7 +57,7 @@ public class HttpTaskHandler implements HttpHandler {
                     processed = true;
                 }
 
-                if (uriPath.contains("/epic") && query != null) {
+                if (uriPath.endsWith("/epic") && query != null) {
                     int id = getIdFromQuery(query);
                     Epic requestedEpic = taskManager.getEpicById(id);
 
@@ -70,7 +70,7 @@ public class HttpTaskHandler implements HttpHandler {
                     processed = true;
                 }
 
-                if (uriPath.contains("/subtask") && query != null) {
+                if (uriPath.endsWith("/subtask") && query != null) {
                     int id = getIdFromQuery(query);
                     SubTask requestedSubTask = taskManager.getSubTaskById(id);
 
@@ -192,7 +192,7 @@ public class HttpTaskHandler implements HttpHandler {
                 break;
 
             case "DELETE" :
-                if (uriPath.contains("/task") && query != null) {
+                if (uriPath.endsWith("/task") && query != null) {
                     int id = getIdFromQuery(query);
                     try {
                         taskManager.deleteTaskById(id);
@@ -203,7 +203,7 @@ public class HttpTaskHandler implements HttpHandler {
                     exchange.sendResponseHeaders(STATUS_OK, 0);
                 }
 
-                if (uriPath.contains("/epic") && query != null) {
+                if (uriPath.endsWith("/epic") && query != null) {
                     int id = getIdFromQuery(query);
                     try {
                         taskManager.deleteEpicById(id);
@@ -214,7 +214,7 @@ public class HttpTaskHandler implements HttpHandler {
                     exchange.sendResponseHeaders(STATUS_OK, 0);
                 }
 
-                if (uriPath.contains("/subtask") && query != null) {
+                if (uriPath.endsWith("/subtask") && query != null) {
                     int id = getIdFromQuery(query);
                     try {
                         taskManager.deleteSubTaskById(id);

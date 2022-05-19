@@ -419,15 +419,20 @@ public class HttpTaskServerTest {
         long id = subTask.getId();
 
         URI subTaskUrl = URI.create("http://localhost:8080/tasks/subtask");
+        URI epicUrl = URI.create("http://localhost:8080/tasks/epic");
         URI subTaskByIdUrl = URI.create("http://localhost:8080/tasks/subtask?id=" + id);
 
-        String json = gson.toJson(subTask);
+        String epicJson = gson.toJson(epic);
+        HttpRequest.BodyPublisher epicBody = HttpRequest.BodyPublishers.ofString(epicJson);
+        HttpRequest createEpicRequest = HttpRequest.newBuilder(epicUrl).POST(epicBody).build();
+        HttpResponse<String> epicCreateResponse = client.send(createEpicRequest, HttpResponse.BodyHandlers.ofString());
+        assertEquals(STATUS_OK, epicCreateResponse.statusCode());
 
-        HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-        HttpRequest createSubTaskRequest = HttpRequest.newBuilder(subTaskUrl).POST(body).build();
+        String subTaskJson = gson.toJson(subTask);
+        HttpRequest.BodyPublisher subTaskBody = HttpRequest.BodyPublishers.ofString(subTaskJson);
+        HttpRequest createSubTaskRequest = HttpRequest.newBuilder(subTaskUrl).POST(subTaskBody).build();
         HttpResponse<String> createSubTaskResponse = client.send(createSubTaskRequest,
                 HttpResponse.BodyHandlers.ofString());
-
         assertEquals(STATUS_OK, createSubTaskResponse.statusCode());
 
         HttpRequest deleteSubTaskByIdRequest = HttpRequest.newBuilder(subTaskByIdUrl).DELETE().build();

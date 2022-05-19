@@ -23,17 +23,12 @@ public class Managers {
     private Managers(){};
 
     private static final InMemoryHistoryManager historyManger = new InMemoryHistoryManager();
-    private static final InMemoryTaskManager inMemoryTaskManager = new InMemoryTaskManager(historyManger);
     private static final HttpTaskManager httpTaskManager = new HttpTaskManager(historyManger, Util.getKVServerUrl());
     private static final FileBackedTaskManager fileBackTaskManager = new FileBackedTaskManager(historyManger,
             Util.getBackedPath());
 
     public static TaskManager getDefault() {
-        return httpTaskManager;
-    }
-
-    public static FileBackedTaskManager getFileBackedTaskManager() {
-        return fileBackTaskManager;
+        return new HttpTaskManager(historyManger, Util.getKVServerUrl());
     }
 
     public static HttpTaskManager getHttpTaskManager() {
