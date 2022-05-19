@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class HttpTaskHandler implements HttpHandler {
 
@@ -38,10 +39,50 @@ public class HttpTaskHandler implements HttpHandler {
         Gson gson = new Gson();
         String requestMethod = exchange.getRequestMethod();
         String uriPath = exchange.getRequestURI().getPath();
+        String query = exchange.getRequestURI().getQuery();
         boolean processed = false;
 
         switch (requestMethod) {
             case "GET" :
+                if (uriPath.contains("/task") && query != null) {
+                    int id = getIdFromQuery(query);
+                    Task requestedTask = taskManager.getTaskById(id);
+
+                    if (requestedTask != null) {
+                        response = gson.toJson(requestedTask);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
+                    } else {
+                        exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
+                    }
+                    processed = true;
+                }
+
+                if (uriPath.contains("/epic") && query != null) {
+                    int id = getIdFromQuery(query);
+                    Epic requestedEpic = taskManager.getEpicById(id);
+
+                    if (requestedEpic != null) {
+                        response = gson.toJson(requestedEpic);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
+                    } else {
+                        exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
+                    }
+                    processed = true;
+                }
+
+                if (uriPath.contains("/subtask") && query != null) {
+                    int id = getIdFromQuery(query);
+                    SubTask requestedSubTask = taskManager.getSubTaskById(id);
+
+                    if (requestedSubTask != null) {
+                        response = gson.toJson(requestedSubTask);
+                        exchange.sendResponseHeaders(STATUS_OK, 0);
+                    } else {
+                        exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
+                    }
+                    processed = true;
+                }
+
                 if (uriPath.endsWith("/tasks/")) {
                     response = gson.toJson(taskManager.getPrioritizedTasks());
                     processed = true;
@@ -54,61 +95,22 @@ public class HttpTaskHandler implements HttpHandler {
                     exchange.sendResponseHeaders(STATUS_OK, 0);
                 }
 
-                if (uriPath.endsWith("/task")) {
+                if (uriPath.endsWith("/task") && query == null) {
                     response = gson.toJson(taskManager.getTasksList());
                     processed = true;
                     exchange.sendResponseHeaders(STATUS_OK, 0);
                 }
 
-                if (uriPath.endsWith("/epic")) {
+                if (uriPath.endsWith("/epic") && query == null) {
                     response = gson.toJson(taskManager.getEpicsList());
                     processed = true;
                     exchange.sendResponseHeaders(STATUS_OK, 0);
                 }
 
-                if (uriPath.endsWith("/subtask")) {
+                if (uriPath.endsWith("/subtask") && query == null) {
                     response = gson.toJson(taskManager.getSubTasksList());
                     processed = true;
                     exchange.sendResponseHeaders(STATUS_OK, 0);
-                }
-
-                if (uriPath.contains("/task") && uriPath.contains("?")) {
-                    int id = getIdFromUriPath(uriPath);
-                    Task requestedTask = taskManager.getTaskById(id);
-
-                    if (requestedTask != null) {
-                        response = gson.toJson(requestedTask);
-                        exchange.sendResponseHeaders(STATUS_OK, 0);
-                    } else {
-                        exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
-                    }
-                    processed = true;
-                }
-
-                if (uriPath.contains("/epic") && uriPath.contains("?")) {
-                    int id = getIdFromUriPath(uriPath);
-                    Epic requestedEpic = taskManager.getEpicById(id);
-
-                    if (requestedEpic != null) {
-                        response = gson.toJson(requestedEpic);
-                        exchange.sendResponseHeaders(STATUS_OK, 0);
-                    } else {
-                        exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
-                    }
-                    processed = true;
-                }
-
-                if (uriPath.contains("/subtask") && uriPath.contains("?")) {
-                    int id = getIdFromUriPath(uriPath);
-                    SubTask requestedSubTask = taskManager.getSubTaskById(id);
-
-                    if (requestedSubTask != null) {
-                        response = gson.toJson(requestedSubTask);
-                        exchange.sendResponseHeaders(STATUS_OK, 0);
-                    } else {
-                        exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
-                    }
-                    processed = true;
                 }
 
                 if (!processed) exchange.sendResponseHeaders(STATUS_BAD_REQUEST, 0);
@@ -190,25 +192,8 @@ public class HttpTaskHandler implements HttpHandler {
                 break;
 
             case "DELETE" :
-                if (uriPath.endsWith("/task")) {
-                    taskManager.deleteTasks();
-                    processed = true;
-                    exchange.sendResponseHeaders(STATUS_OK, 0);
-                }
-
-                if (uriPath.endsWith("/epic")) {
-                    taskManager.deleteEpics();
-                    processed = true;
-                    exchange.sendResponseHeaders(STATUS_OK, 0);
-                }
-
-                if (uriPath.endsWith("/subtask")) {
-                    processed = true;
-                    exchange.sendResponseHeaders(STATUS_OK, 0);
-                }
-
-                if (uriPath.contains("/task") && uriPath.contains("?")) {
-                    int id = getIdFromUriPath(uriPath);
+                if (uriPath.contains("/task") && query != null) {
+                    int id = getIdFromQuery(query);
                     try {
                         taskManager.deleteTaskById(id);
                     } catch (TaskDeleteException e) {
@@ -218,8 +203,8 @@ public class HttpTaskHandler implements HttpHandler {
                     exchange.sendResponseHeaders(STATUS_OK, 0);
                 }
 
-                if (uriPath.contains("/epic") && uriPath.contains("?")) {
-                    int id = getIdFromUriPath(uriPath);
+                if (uriPath.contains("/epic") && query != null) {
+                    int id = getIdFromQuery(query);
                     try {
                         taskManager.deleteEpicById(id);
                     } catch (TaskDeleteException e) {
@@ -229,13 +214,30 @@ public class HttpTaskHandler implements HttpHandler {
                     exchange.sendResponseHeaders(STATUS_OK, 0);
                 }
 
-                if (uriPath.contains("/subtask") && uriPath.contains("?")) {
-                    int id = getIdFromUriPath(uriPath);
+                if (uriPath.contains("/subtask") && query != null) {
+                    int id = getIdFromQuery(query);
                     try {
                         taskManager.deleteSubTaskById(id);
                     } catch (TaskDeleteException e) {
                         exchange.sendResponseHeaders(STATUS_NOT_FOUND, 0);
                     }
+                    processed = true;
+                    exchange.sendResponseHeaders(STATUS_OK, 0);
+                }
+
+                if (uriPath.endsWith("/task") && query == null) {
+                    taskManager.deleteTasks();
+                    processed = true;
+                    exchange.sendResponseHeaders(STATUS_OK, 0);
+                }
+
+                if (uriPath.endsWith("/epic") && query == null) {
+                    taskManager.deleteEpics();
+                    processed = true;
+                    exchange.sendResponseHeaders(STATUS_OK, 0);
+                }
+
+                if (uriPath.endsWith("/subtask") && query == null) {
                     processed = true;
                     exchange.sendResponseHeaders(STATUS_OK, 0);
                 }
@@ -255,8 +257,9 @@ public class HttpTaskHandler implements HttpHandler {
     }
 
     // обрабатывает uriPath вида /tasks/task/?id=1"
-    private int getIdFromUriPath(String uriPath) {
-        String idField = uriPath.split("\\?")[1];  // поле вида id=value
-        return Integer.parseInt(idField.substring(idField.lastIndexOf("=") + 1));
+    private int getIdFromQuery(String query) {
+        int idPos = 1;
+        String[] arr = query.split("=");  // поле вида id=value
+        return Integer.parseInt(arr[idPos]);
     }
 }

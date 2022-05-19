@@ -4,7 +4,7 @@ import model.Status;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
-import service.IdGenerator;
+import service.generators.IdGenerator;
 
 /**
  * Утилитарный класс, генерирующий задачи для тестов

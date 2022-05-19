@@ -1,9 +1,7 @@
 package model.tasks;
 
 import model.Status;
-import model.tasks.Epic;
-import model.tasks.SubTask;
-import service.IdGenerator;
+import service.generators.IdGenerator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

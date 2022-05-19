@@ -10,7 +10,7 @@ import model.http.KVTaskClient;
 import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
-import service.IdGenerator;
+import service.generators.IdGenerator;
 import service.managers.*;
 
 import java.io.IOException;
@@ -34,6 +34,10 @@ public class Managers {
 
     public static FileBackedTaskManager getFileBackedTaskManager() {
         return fileBackTaskManager;
+    }
+
+    public static HttpTaskManager getHttpTaskManager() {
+        return httpTaskManager;
     }
 
     public static HistoryManager getDefaultHistory() {

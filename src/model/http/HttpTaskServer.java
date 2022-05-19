@@ -2,8 +2,10 @@ package model.http;
 
 import com.sun.net.httpserver.HttpServer;
 import service.managers.HttpTaskManager;
+import service.managers.InMemoryHistoryManager;
 import service.managers.TaskManager;
 import util.Managers;
+import util.Util;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,12 +24,12 @@ public class HttpTaskServer {
 
     public void start() {
         server.start();
-        System.out.println("Запуск сервера HttpTaskServer на порту: " + PORT);
+        System.out.println("Запуск HttpTaskServer на порту: " + PORT);
     }
 
     public void stop() {
         server.stop(0);
-        System.out.println("Сервер HttpTaskServer остановлен");
+        System.out.println("HttpTaskServer остановлен");
     }
 
     /**
@@ -43,6 +45,11 @@ public class HttpTaskServer {
             e.printStackTrace();
         }
         return apiKey;
+    }
+
+    // todo method MUST BE DELETED! after tests
+    public TaskManager getTaskManager() {
+        return taskManager;
     }
 }
 

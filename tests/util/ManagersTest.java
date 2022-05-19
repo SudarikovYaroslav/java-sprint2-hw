@@ -5,10 +5,8 @@ import model.tasks.Epic;
 import model.tasks.SubTask;
 import model.tasks.Task;
 import service.managers.FileBackedTaskManager;
-import service.IdGenerator;
+import service.generators.IdGenerator;
 import service.managers.InMemoryHistoryManager;
-import util.Managers;
-import util.Util;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

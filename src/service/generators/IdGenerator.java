@@ -1,8 +1,7 @@
-package service;
+package service.generators;
 
 public class IdGenerator {
     private static long id = 1;
-    private static IdGenerator instance = null;
 
     public static void setStartIdValue(long value) {
         id = value;
