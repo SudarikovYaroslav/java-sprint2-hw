@@ -6,7 +6,7 @@ import model.TaskTypes;
 import model.exceptions.TaskCreateException;
 import model.exceptions.TaskLoadException;
 import model.exceptions.TimeIntersectionException;
-import model.http.HttpTaskManagerCondition;
+import model.http.GlobalTasksState;
 import model.http.KVTaskClient;
 import model.tasks.Epic;
 import model.tasks.SubTask;
@@ -121,8 +121,8 @@ public class Managers {
         KVTaskClient kvTaskClient = new KVTaskClient(Util.getKVServerUrl());
         // загружаем состояние HttpTaskManager
         String jsonHTTPTaskManagerCondition = kvTaskClient.load(apiKey);
-        HttpTaskManagerCondition managerCondition = gson.fromJson(jsonHTTPTaskManagerCondition,
-                HttpTaskManagerCondition.class);
+        GlobalTasksState managerCondition = gson.fromJson(jsonHTTPTaskManagerCondition,
+                GlobalTasksState.class);
 
         // устанавливаем сохранённое состояние дефолтному HttpTaskManager
         HttpTaskManager result = (HttpTaskManager) Managers.getDefault();

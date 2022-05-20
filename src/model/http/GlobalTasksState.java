@@ -14,13 +14,13 @@ import java.util.Objects;
  * HttpTaskManager нужное состояние при загрузке, c помощью метода
  * setManagerCondition(HttpTaskManagerCondition condition)
  */
-public class HttpTaskManagerCondition {
+public class GlobalTasksState {
     protected final List<Task> tasks;
     protected final List<Epic> epics;
     protected final List<SubTask> subTasks;
     private final List<Task> lastViewedTasks;
 
-    public HttpTaskManagerCondition(TaskManager taskManager) {
+    public GlobalTasksState(TaskManager taskManager) {
         tasks = taskManager.getTasksList();
         epics = taskManager.getEpicsList();
         subTasks = taskManager.getSubTasksList();
@@ -47,7 +47,7 @@ public class HttpTaskManagerCondition {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        HttpTaskManagerCondition that = (HttpTaskManagerCondition) o;
+        GlobalTasksState that = (GlobalTasksState) o;
         return Objects.equals(tasks, that.tasks)
                 && Objects.equals(epics, that.epics)
                 && Objects.equals(subTasks, that.subTasks)
