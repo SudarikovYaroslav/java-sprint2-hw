@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * HttpTaskManagerCondition - класс-контейнер. Он может сохранить состояние объекта HttpTaskManager, и может быть
- * сереализован в Json для сохранения состояния менеджера задач на KVServer. А также может быть использован чтобы задать
- * HttpTaskManager нужное состояние при загрузке, c помощью метода
+ * GlobalTasksState - класс-контейнер. Он может сохранить состояние объекта TaskManager, и может быть
+ * сереализован в Json для сохранения состояния менеджера задач. А также может быть использован при работе с
+ * HttpTaskManager чтобы задать нужное состояние при загрузке, c помощью метода
  * setManagerCondition(HttpTaskManagerCondition condition)
  */
 public class GlobalTasksState {
