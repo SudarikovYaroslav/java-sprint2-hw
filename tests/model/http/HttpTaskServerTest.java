@@ -461,49 +461,4 @@ public class HttpTaskServerTest {
 
         assertEquals(STATUS_OK, response.statusCode());
     }
-/*
-    @Test
-    public void loadHttpTaskManagerTest() throws IOException, InterruptedException {
-        System.out.println("Начало теста на загрузку");
-        Task testTask = TaskForTestsGenerator.testTaskTemplateGen();
-        long id = testTask.getId();
-        URI url = URI.create("http://localhost:8080/tasks/task");
-        URI taskByIdUrl = URI.create("http://localhost:8080/tasks/task?id=" + id);
-
-        // получаем у HttpTaskServer ключ по которому будет происходить запись/загрузка из KVServer
-        String apiKey = httpTaskServer.getApiKey();
-
-        String json = gson.toJson(testTask);
-        HttpRequest.BodyPublisher body = HttpRequest.BodyPublishers.ofString(json);
-
-        // создали задачу
-        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(body).build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        assertEquals(STATUS_OK, response.statusCode());
-
-        // добавили задачу в историю просмотров
-        // todo: задачи не добавляются в историю просмотров
-        HttpRequest getTaskByIdRequest = HttpRequest.newBuilder().uri(taskByIdUrl).GET().build();
-        HttpResponse<String> getTaskByIdResponse = client.send(getTaskByIdRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println("История просмотров: " + httpTaskServer.getTaskManager().history());
-        assertEquals(STATUS_OK, getTaskByIdResponse.statusCode());
-        *//*
-        // проверяем историю просмотров
-        URI historyUrl = URI.create("http://localhost:8080/tasks/history");
-        HttpRequest getHistoryRequest = HttpRequest.newBuilder(historyUrl).GET().build();
-        HttpResponse<String> historyResponse = client.send(getHistoryRequest, HttpResponse.BodyHandlers.ofString());
-        System.out.println("history: " + historyResponse.body());
-        *//*
-
-        // выполняем загрузку менеджера
-        TaskManager loadedHttpTaskManager = Managers.loadHttpTaskManagerFromKVServer(apiKey);
-
-        // проверяем, что состояние загруженного менеджера соответствует сохраняемому:
-        // созданная задача действительно загрузилась
-        assertEquals(testTask, loadedHttpTaskManager.getTaskById(id));
-
-        // сохранилась история просмотров
-        //assertNotEquals(0, loadedHttpTaskManager.history().size());
-        System.out.println("Тест на загрузку завершон");
-    }*/
 }
